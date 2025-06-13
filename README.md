@@ -1,2 +1,3 @@
-# TG-Mini-App
-Telegram Mini App
+# TG-Mini_App
+
+Frontend for VonVault Telegram Mini App.

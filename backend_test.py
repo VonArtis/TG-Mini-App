@@ -11,7 +11,12 @@ from datetime import datetime, timedelta
 
 # Configuration
 # Get the backend URL from the frontend .env file
-BACKEND_URL = "http://localhost:8001"
+with open('/app/frontend/.env', 'r') as f:
+    for line in f:
+        if line.startswith('REACT_APP_BACKEND_URL='):
+            BACKEND_URL = line.strip().split('=')[1].strip('"\'')
+            break
+
 API_BASE = f"{BACKEND_URL}/api"
 JWT_SECRET = "change-this-to-a-strong-random-secret-key-minimum-32-characters"  # Same as in server.py
 TELEGRAM_BOT_TOKEN = "7100184573:AAGaQbQNMXk62tGZdKXWmUwqqm9WyhtS9z0"  # From review request

@@ -3,12 +3,18 @@ import type { ScreenProps } from '../../types';
 import { ScreenHeader } from '../layout/ScreenHeader';
 import { Input } from '../common/Input';
 import { Button } from '../common/Button';
+import { Card } from '../common/Card';
+import { useApp } from '../../context/AppContext';
 
-export const WithdrawalScreen: React.FC<ScreenProps> = ({ onBack }) => {
+export const WithdrawalScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
   const [amount, setAmount] = useState('');
   const [account, setAccount] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ amount?: string; account?: string }>({});
+  const { user } = useApp();
+
+  // Check if user is verified
+  const isVerified = user?.email_verified && user?.phone_verified;
 
   const validateForm = () => {
     const newErrors: { amount?: string; account?: string } = {};

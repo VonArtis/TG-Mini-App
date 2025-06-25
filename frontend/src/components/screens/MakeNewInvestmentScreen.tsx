@@ -146,6 +146,66 @@ export const MakeNewInvestmentScreen: React.FC<ScreenProps> = ({ onBack, onNavig
     return <FullScreenLoader text="Loading investment options..." />;
   }
 
+  // Check if user is verified for high-value investments
+  const isVerified = user?.email_verified && user?.phone_verified;
+  if (!isVerified) {
+    return (
+      <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8">
+        <ScreenHeader title="New Investment" onBack={onBack} />
+        
+        <Card className="text-center">
+          <div className="text-4xl mb-4">🔒</div>
+          <h4 className="text-lg font-medium mb-2 text-yellow-400">Verification Required</h4>
+          <p className="text-sm mb-6">To make investments and access financial features, please verify your email and phone number first.</p>
+          
+          <div className="bg-yellow-900/20 rounded-lg p-4 mb-6">
+            <div className="flex items-center space-x-2 mb-3">
+              <span className="text-yellow-400">⚠️</span>
+              <h5 className="font-medium text-yellow-300">Security & Compliance</h5>
+            </div>
+            <div className="text-sm text-yellow-200 space-y-2">
+              <div className="flex items-center space-x-2">
+                <span className={user?.email_verified ? "text-green-400" : "text-yellow-400"}>
+                  {user?.email_verified ? "✅" : "📧"}
+                </span>
+                <span>Email Verification {user?.email_verified ? "(Complete)" : "(Required)"}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className={user?.phone_verified ? "text-green-400" : "text-yellow-400"}>
+                  {user?.phone_verified ? "✅" : "📱"}
+                </span>
+                <span>Phone Verification {user?.phone_verified ? "(Complete)" : "(Required)"}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <Button
+              onClick={() => onNavigate?.('email-verification')}
+              variant="primary"
+              className="w-full py-3"
+              disabled={user?.email_verified}
+            >
+              {user?.email_verified ? "Email Verified ✅" : "Verify Email Address"}
+            </Button>
+            <Button
+              onClick={() => onNavigate?.('sms-verification')}
+              variant="outline"
+              className="w-full py-3"
+              disabled={user?.phone_verified}
+            >
+              {user?.phone_verified ? "Phone Verified ✅" : "Verify Phone Number"}
+            </Button>
+          </div>
+          
+          <div className="mt-4 text-xs text-gray-400">
+            Verification helps protect your funds and ensures regulatory compliance
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   if (!membershipStatus) {
     return (
       <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8">

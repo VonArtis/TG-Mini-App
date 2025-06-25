@@ -3,10 +3,15 @@ import type { ConnectionScreenProps } from '../../types';
 import { ScreenHeader } from '../layout/ScreenHeader';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
+import { useApp } from '../../context/AppContext';
 
-export const ConnectBankScreen: React.FC<ConnectionScreenProps> = ({ onConnect, onBack }) => {
+export const ConnectBankScreen: React.FC<ConnectionScreenProps> = ({ onConnect, onBack, onNavigate }) => {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'start' | 'connecting' | 'success'>('start');
+  const { user } = useApp();
+
+  // Check if user is verified
+  const isVerified = user?.email_verified && user?.phone_verified;
 
   const handleConnect = async () => {
     if (!onConnect) {

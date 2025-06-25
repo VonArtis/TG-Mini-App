@@ -79,21 +79,44 @@ export const DashboardScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
               </p>
             </div>
             <div className="flex gap-2 ml-4">
-              <Button 
-                onClick={() => onNavigate?.('connect-bank')} 
-                size="sm" 
-                variant="secondary"
-                className="bg-blue-600 hover:bg-blue-700 border-blue-500"
-              >
-                Bank
-              </Button>
-              <Button 
-                onClick={() => onNavigate?.('connect-crypto')} 
-                size="sm"
-                className="bg-orange-500 hover:bg-orange-600"
-              >
-                Crypto
-              </Button>
+              {user?.email_verified && user?.phone_verified ? (
+                <Button 
+                  onClick={() => onNavigate?.('connect-bank')} 
+                  size="sm" 
+                  variant="secondary"
+                  className="bg-blue-600 hover:bg-blue-700 border-blue-500"
+                >
+                  Bank
+                </Button>
+              ) : (
+                <Button 
+                  onClick={() => onNavigate?.('email-verification')} 
+                  size="sm" 
+                  variant="outline"
+                  className="border-yellow-500 text-yellow-400 hover:bg-yellow-500/10"
+                >
+                  Verify to Connect Bank
+                </Button>
+              )}
+              
+              {user?.email_verified && user?.phone_verified ? (
+                <Button 
+                  onClick={() => onNavigate?.('connect-crypto')} 
+                  size="sm"
+                  className="bg-orange-500 hover:bg-orange-600"
+                >
+                  Crypto
+                </Button>
+              ) : (
+                <Button 
+                  onClick={() => onNavigate?.('email-verification')} 
+                  size="sm" 
+                  variant="outline"
+                  className="border-yellow-500 text-yellow-400 hover:bg-yellow-500/10"
+                >
+                  Verify to Connect Crypto
+                </Button>
+              )}
             </div>
           </div>
         </Card>

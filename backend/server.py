@@ -1953,6 +1953,7 @@ async def webauthn_register_complete_impl(request: WebAuthnRegistration, authori
             {
                 "$set": {
                     "biometric_2fa_enabled": True,
+                    "enhanced_2fa_enabled": True,  # Master flag for Enhanced 2FA
                     "updated_at": datetime.utcnow().isoformat()
                 }
             }

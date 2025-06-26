@@ -405,6 +405,56 @@ class ApiService {
     );
     return response.data;
   }
+
+  // === ADMIN API METHODS ===
+  
+  // Admin Dashboard Overview
+  async getAdminOverview(token: string) {
+    const response = await axios.get(`${API_BASE}/admin/overview`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  // Admin Users Management
+  async getAdminUsers(token: string, params?: any) {
+    const queryParams = params ? `?${new URLSearchParams(params).toString()}` : '';
+    const response = await axios.get(`${API_BASE}/admin/users${queryParams}`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async getAdminUserDetails(token: string, userId: string) {
+    const response = await axios.get(`${API_BASE}/admin/users/${userId}`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  // Admin Investments Analytics
+  async getAdminInvestments(token: string) {
+    const response = await axios.get(`${API_BASE}/admin/investments`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  // Admin Crypto Analytics
+  async getAdminCrypto(token: string) {
+    const response = await axios.get(`${API_BASE}/admin/crypto`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  // Admin System Status
+  async getAdminSystem(token: string) {
+    const response = await axios.get(`${API_BASE}/admin/system`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
 }
 
 export const apiService = new ApiService();

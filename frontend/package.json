@@ -4,13 +4,13 @@
   "description": "VonVault DeFi Telegram Mini App Frontend",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "npx update-browserslist-db@latest && TSC_COMPILE_ON_ERROR=true react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
-    "dev": "react-scripts start",
-    "preview": "serve -s build",
-    "serve": "npx serve -s build -l 3000"
+    "audit": "yarn audit --level moderate",
+    "audit-fix": "yarn audit --fix",
+    "security-check": "../scripts/security-audit.sh"
   },
   "dependencies": {
     "@types/node": "^18.19.0",

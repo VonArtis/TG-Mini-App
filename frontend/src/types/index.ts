@@ -58,6 +58,8 @@ export interface User {
   id: string;
   user_id?: string; // For backward compatibility
   name?: string;
+  first_name?: string;
+  last_name?: string;
   email?: string;
   phone?: string;
   token?: string;

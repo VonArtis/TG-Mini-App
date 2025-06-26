@@ -106,6 +106,32 @@ export const MakeNewInvestmentScreen: React.FC<ScreenProps> = ({ onBack, onNavig
       return;
     }
 
+    // === PHASE 2A: ENHANCED 2FA VALIDATION FOR HIGH-VALUE INVESTMENTS ===
+    const investmentAmount = parseFloat(amount);
+    const enhanced2faValidation = apiService.validateEnhanced2FAForInvestment(user!, investmentAmount);
+    
+    if (!enhanced2faValidation.canProceed) {
+      // Show Enhanced 2FA requirement dialog
+      const userConfirmed = window.confirm(
+        `🛡️ Enhanced Security Required\n\n` +
+        `${enhanced2faValidation.message}\n\n` +
+        `Would you like to set up Enhanced 2FA now?\n\n` +
+        `This includes:\n` +
+        `• Biometric authentication (fingerprint/Face ID)\n` +
+        `• Push notification approval\n\n` +
+        `Click OK to set up Enhanced 2FA, or Cancel to return.`
+      );
+      
+      if (userConfirmed) {
+        // Redirect to Enhanced 2FA setup
+        onNavigate?.('enhanced-2fa-setup');
+        return;
+      } else {
+        // User declined, return to amount selection
+        return;
+      }
+    }
+
     // === PHASE 2C: PRIMARY WALLET VALIDATION ===
     if (!selectedWallet) {
       alert('Please connect a crypto wallet to make investments.');

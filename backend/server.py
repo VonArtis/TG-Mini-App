@@ -1225,6 +1225,409 @@ def root():
 def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
+# ===== IMPLEMENTATION FUNCTIONS FOR API VERSIONING =====
+
+async def user_signup_impl(request: Request, user_data: UserSignup):
+    """Implementation for user signup - shared between versions"""
+    try:
+        # Validate email format
+        if not validate_email(user_data.email):
+            raise HTTPException(status_code=400, detail="Invalid email format")
+        
+        # Check if user already exists
+        existing_user = db.users.find_one({"email": user_data.email})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="User with this email already exists")
+        
+        # Hash password
+        hashed_password = hash_password(user_data.password)
+        
+        # Create user document
+        user_id = str(uuid.uuid4())
+        id_number = get_next_user_id()
+        
+        # Check if this is an admin email
+        admin_emails = ["admin@vonartis.com", "security@vonartis.com"]
+        is_admin = user_data.email in admin_emails
+        
+        user_doc = {
+            "id": user_id,
+            "user_id": user_id,
+            "id_number": id_number,
+            "email": user_data.email,
+            "password": hashed_password,
+            "name": user_data.name,
+            "first_name": user_data.name.split(' ')[0] if user_data.name else '',
+            "last_name": ' '.join(user_data.name.split(' ')[1:]) if len(user_data.name.split(' ')) > 1 else '',
+            "phone": f"{user_data.country_code}{user_data.phone}",
+            "country_code": user_data.country_code,
+            "email_verified": False,
+            "phone_verified": False,
+            "membership_level": "basic" if is_admin else "none",
+            "total_invested": 0.0,
+            "crypto_connected": False,
+            "bank_connected": False,
+            "created_at": datetime.utcnow().isoformat(),
+            "last_login": datetime.utcnow().isoformat(),
+            "auth_type": "email",
+            "is_admin": is_admin,
+            "onboarding_complete": False
+        }
+        
+        # Insert user into database
+        result = db.users.insert_one(user_doc)
+        
+        # Generate JWT token
+        token = generate_jwt(user_id)
+        
+        # Prepare response
+        user_response = UserResponse(
+            id=user_id,
+            user_id=user_id,
+            name=user_data.name,
+            first_name=user_doc["first_name"],
+            last_name=user_doc["last_name"],
+            email=user_data.email,
+            phone=user_doc["phone"],
+            email_verified=False,
+            phone_verified=False,
+            membership_level=user_doc["membership_level"],
+            created_at=user_doc["created_at"],
+            is_admin=is_admin
+        )
+        
+        return {
+            "message": "User created successfully",
+            "user": user_response,
+            "token": token,
+            "authenticated": True
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Signup error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create user account")
+
+async def user_login_impl(request: Request, login_data: UserLogin):
+    """Implementation for user login - shared between versions"""
+    try:
+        # Find user by email
+        user = db.users.find_one({"email": login_data.email})
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Verify password
+        if not verify_password(login_data.password, user["password"]):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Update last login
+        db.users.update_one(
+            {"_id": user["_id"]},
+            {"$set": {"last_login": datetime.utcnow().isoformat()}}
+        )
+        
+        # Generate JWT token
+        token = generate_jwt(user["user_id"])
+        
+        # Prepare response
+        user_response = UserResponse(
+            id=user["user_id"],
+            user_id=user["user_id"],
+            name=user.get("name", ""),
+            first_name=user.get("first_name", ""),
+            last_name=user.get("last_name", ""),
+            email=user["email"],
+            phone=user.get("phone", ""),
+            email_verified=user.get("email_verified", False),
+            phone_verified=user.get("phone_verified", False),
+            membership_level=user.get("membership_level", "none"),
+            created_at=user.get("created_at", ""),
+            is_admin=user.get("is_admin", False)
+        )
+        
+        return {
+            "message": "Login successful",
+            "user": user_response,
+            "token": token,
+            "authenticated": True
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Login error: {e}")
+        raise HTTPException(status_code=500, detail="Login failed")
+
+async def get_current_user_impl(authorization: str):
+    """Implementation for get current user - shared between versions"""
+    try:
+        user_id = require_auth(authorization)
+        
+        # Find user in database
+        user = db.users.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Prepare response
+        user_response = UserResponse(
+            id=user["user_id"],
+            user_id=user["user_id"],
+            name=user.get("name", ""),
+            first_name=user.get("first_name", ""),
+            last_name=user.get("last_name", ""),
+            email=user["email"],
+            phone=user.get("phone", ""),
+            email_verified=user.get("email_verified", False),
+            phone_verified=user.get("phone_verified", False),
+            membership_level=user.get("membership_level", "none"),
+            created_at=user.get("created_at", ""),
+            is_admin=user.get("is_admin", False)
+        )
+        
+        return {
+            "user": user_response,
+            "authenticated": True
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Get user error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get user information")
+
+def get_admin_overview_impl(authorization: str):
+    """Implementation for admin overview - shared between versions"""
+    require_admin_auth(authorization)
+    
+    try:
+        # Count total users
+        total_users = db.users.count_documents({})
+        
+        # Count verified users (email or phone verified)
+        verified_users = db.users.count_documents({
+            "$or": [
+                {"email_verified": True},
+                {"phone_verified": True}
+            ]
+        })
+        
+        # Count users with investments
+        users_with_investments = db.users.count_documents({"total_invested": {"$gt": 0}})
+        
+        # Recent signups (last 7 days)
+        seven_days_ago = datetime.utcnow() - timedelta(days=7)
+        recent_signups = db.users.count_documents({
+            "created_at": {"$gte": seven_days_ago.isoformat()}
+        })
+        
+        # Investment statistics
+        pipeline = [
+            {"$group": {
+                "_id": None,
+                "total_amount": {"$sum": "$amount"},
+                "total_count": {"$sum": 1}
+            }}
+        ]
+        investment_stats = list(db.investments.aggregate(pipeline))
+        total_investment_amount = investment_stats[0]["total_amount"] if investment_stats else 0
+        total_investment_count = investment_stats[0]["total_count"] if investment_stats else 0
+        
+        # Recent investments (last 7 days)
+        recent_investments = db.investments.count_documents({
+            "created_at": {"$gte": seven_days_ago.isoformat()}
+        })
+        
+        # Membership level distribution
+        membership_pipeline = [
+            {"$group": {"_id": "$membership_level", "count": {"$sum": 1}}}
+        ]
+        membership_stats = list(db.users.aggregate(membership_pipeline))
+        membership_distribution = {stat["_id"]: stat["count"] for stat in membership_stats}
+        
+        # Calculate verification rate
+        verification_rate = (verified_users / total_users * 100) if total_users > 0 else 0
+        
+        return {
+            "users": {
+                "total": total_users,
+                "verified": verified_users,
+                "with_investments": users_with_investments,
+                "recent_signups": recent_signups
+            },
+            "investments": {
+                "total_amount": total_investment_amount,
+                "total_count": total_investment_count,
+                "recent_count": recent_investments
+            },
+            "membership_distribution": membership_distribution,
+            "verification_rate": verification_rate
+        }
+        
+    except Exception as e:
+        print(f"Error getting admin overview: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get admin overview: {str(e)}")
+
+def get_admin_users_impl(authorization: str, page: int, limit: int, search: str, filter_verified: bool):
+    """Implementation for admin users list - shared between versions"""
+    require_admin_auth(authorization)
+    
+    try:
+        # Build query
+        query = {}
+        
+        if search:
+            query["$or"] = [
+                {"email": {"$regex": search, "$options": "i"}},
+                {"name": {"$regex": search, "$options": "i"}}
+            ]
+        
+        if filter_verified is not None:
+            if filter_verified:
+                query["$or"] = [
+                    {"email_verified": True},
+                    {"phone_verified": True}
+                ]
+            else:
+                query["email_verified"] = {"$ne": True}
+                query["phone_verified"] = {"$ne": True}
+        
+        # Calculate pagination
+        skip = (page - 1) * limit
+        
+        # Get users with pagination
+        users = list(db.users.find(query).skip(skip).limit(limit).sort("created_at", -1))
+        total_count = db.users.count_documents(query)
+        total_pages = (total_count + limit - 1) // limit
+        
+        # Format user data
+        formatted_users = []
+        for user in users:
+            user["_id"] = str(user["_id"])
+            user["id"] = user.get("user_id", user.get("id", ""))
+            
+            # Count connected wallets
+            user["connected_wallets_count"] = db.wallets.count_documents({"user_id": user.get("user_id", "")})
+            
+            formatted_users.append(user)
+        
+        return {
+            "users": formatted_users,
+            "pagination": {
+                "current_page": page,
+                "total_pages": total_pages,
+                "total_count": total_count,
+                "per_page": limit
+            }
+        }
+        
+    except Exception as e:
+        print(f"Error getting admin users: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get users list")
+
+async def setup_totp_2fa_impl(authorization: str):
+    """Implementation for TOTP 2FA setup - shared between versions"""
+    user_id = require_auth(authorization)
+    
+    try:
+        # Get user info for QR code
+        user = db.users.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Generate TOTP secret
+        secret = pyotp.random_base32()
+        
+        # Create TOTP object
+        totp_uri = pyotp.totp.TOTP(secret).provisioning_uri(
+            name=user.get('first_name', 'VonVault User'),
+            issuer_name="VonVault"
+        )
+        
+        # Generate QR code
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(totp_uri)
+        qr.make(fit=True)
+        
+        # Create QR code image
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, format='PNG')
+        qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
+        
+        # Store temporary secret (not enabled until verified)
+        db.users.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "totp_secret_pending": secret,
+                    "updated_at": datetime.utcnow().isoformat()
+                }
+            }
+        )
+        
+        return {
+            "success": True,
+            "secret": secret,
+            "qr_code": f"data:image/png;base64,{qr_code_base64}",
+            "manual_entry_key": secret
+        }
+        
+    except Exception as e:
+        print(f"TOTP setup error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to setup TOTP 2FA")
+
+async def verify_totp_2fa_impl(request: dict, authorization: str):
+    """Implementation for TOTP 2FA verification - shared between versions"""
+    user_id = require_auth(authorization)
+    code = request.get("code", "")
+    
+    try:
+        # Get user's pending TOTP secret
+        user = db.users.find_one({"user_id": user_id})
+        if not user or not user.get("totp_secret_pending"):
+            raise HTTPException(status_code=400, detail="No pending TOTP setup found")
+        
+        # Verify the code
+        totp = pyotp.TOTP(user["totp_secret_pending"])
+        if not totp.verify(code):
+            return {
+                "success": False,
+                "verified": False,
+                "message": "Invalid TOTP code"
+            }
+        
+        # Code is valid - enable TOTP 2FA
+        backup_codes = [pyotp.random_base32()[:8] for _ in range(10)]  # Generate 10 backup codes
+        
+        db.users.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "totp_2fa_enabled": True,
+                    "totp_secret": user["totp_secret_pending"],
+                    "backup_codes": backup_codes,
+                    "updated_at": datetime.utcnow().isoformat()
+                },
+                "$unset": {
+                    "totp_secret_pending": ""
+                }
+            }
+        )
+        
+        return {
+            "success": True,
+            "verified": True,
+            "message": "TOTP 2FA enabled successfully",
+            "backup_codes": backup_codes
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"TOTP verification error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to verify TOTP code")
+
 # ===== USER MANAGEMENT ENDPOINTS =====
 
 @app.post("/api/auth/signup")

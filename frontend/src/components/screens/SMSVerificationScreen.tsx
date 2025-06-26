@@ -422,7 +422,7 @@ export const SMSVerificationScreen: React.FC<ScreenProps> = ({ onBack, onNavigat
             <Button
               onClick={() => {
                 console.log('SMS verification skipped from initial screen');
-                onNavigate?.('two-factor-setup');
+                onNavigate?.('2fa-setup');
               }}
               variant="secondary"
               fullWidth

@@ -88,6 +88,24 @@ class ApiService {
     return response.data;
   }
 
+  // User Management - Signup/Login
+  async signup(userData: { name: string; email: string; password: string; phone: string; country_code: string }) {
+    const response = await axios.post(`${API_BASE}/auth/signup`, userData);
+    return response.data;
+  }
+
+  async login(credentials: { email: string; password: string }) {
+    const response = await axios.post(`${API_BASE}/auth/login`, credentials);
+    return response.data;
+  }
+
+  async getCurrentUser(token: string) {
+    const response = await axios.get(`${API_BASE}/auth/me`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
   // Membership
   async getMembershipStatus(token: string): Promise<MembershipStatus> {
     const response = await axios.get(`${API_BASE}/membership/status`, {

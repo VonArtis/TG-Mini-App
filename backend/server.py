@@ -492,6 +492,31 @@ class UserResponse(BaseModel):
     created_at: str
     is_admin: Optional[bool] = False
 
+# WebAuthn/Biometric 2FA Models - Phase 2 Enhancement
+class WebAuthnRegistration(BaseModel):
+    credential_id: str
+    public_key: str
+    sign_count: int = 0
+
+class WebAuthnChallenge(BaseModel):
+    challenge: str
+    user_id: str
+    timeout: int = 60000  # 60 seconds
+
+class WebAuthnVerification(BaseModel):
+    credential_id: str
+    authenticator_data: str
+    client_data_json: str
+    signature: str
+
+class BiometricSetupRequest(BaseModel):
+    device_name: Optional[str] = "Device"
+    
+class PushNotificationToken(BaseModel):
+    token: str
+    device_type: str  # ios, android, web
+    device_name: Optional[str] = "Device"
+
 # 2FA Models
 class SMSSendRequest(BaseModel):
     phone_number: str

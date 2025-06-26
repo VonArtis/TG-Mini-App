@@ -8,6 +8,8 @@ import { FullScreenLoader } from '../common/LoadingSpinner';
 import { useApp } from '../../context/AppContext';
 import { apiService } from '../../services/api';
 
+const USERS_PER_PAGE = 20;
+
 interface AdminUser {
   id: string;
   user_id: string;

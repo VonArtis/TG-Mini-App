@@ -37,9 +37,14 @@ load_dotenv()
 # Initialize FastAPI app with security configurations
 app = FastAPI(
     title="VonVault DeFi API",
-    docs_url="/docs" if os.getenv("ENVIRONMENT") == "development" else None,  # Hide docs in production
+    version="1.0.0",
+    docs_url="/docs" if os.getenv("ENVIRONMENT") == "development" else None,
     redoc_url="/redoc" if os.getenv("ENVIRONMENT") == "development" else None
 )
+
+# Create routers for different API versions
+api_v1_router = APIRouter(prefix="/api/v1", tags=["v1"])
+api_legacy_router = APIRouter(prefix="/api", tags=["legacy"])  # Keep legacy for backward compatibility
 
 # Rate limiting
 limiter = Limiter(key_func=get_remote_address)

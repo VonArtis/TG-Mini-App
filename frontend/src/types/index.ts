@@ -69,6 +69,10 @@ export interface User {
   connected_wallets?: ConnectedWallet[];
   primary_wallet_id?: string;
   
+  // === PHASE 2A: ENHANCED 2FA SUPPORT ===
+  biometric_2fa_enabled?: boolean;
+  push_2fa_enabled?: boolean;
+  
   // === LEGACY FIELDS (MAINTAINED FOR BACKWARD COMPATIBILITY) ===
   wallet_address?: string; // DEPRECATED
   wallet_type?: string; // DEPRECATED

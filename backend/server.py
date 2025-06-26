@@ -2925,11 +2925,19 @@ def telegram_webhook(update: TelegramUpdate):
         
         # Handle different commands
         if text == "/start":
+            # Main persistent menu with all options inline
             keyboard = {
                 "inline_keyboard": [
                     [{"text": "🚀 Launch VonVault", "web_app": {"url": "https://www.vonartis.app"}}],
-                    [{"text": "📊 View Portfolio", "callback_data": "portfolio"}],
-                    [{"text": "💰 Make Investment", "callback_data": "invest"}]
+                    [
+                        {"text": "📊 Portfolio", "callback_data": "portfolio"},
+                        {"text": "💰 Invest", "callback_data": "invest"}
+                    ],
+                    [
+                        {"text": "💸 Withdraw", "callback_data": "withdraw"},
+                        {"text": "👤 Profile", "callback_data": "profile"}
+                    ],
+                    [{"text": "🛟 Support", "callback_data": "support"}]
                 ]
             }
             
@@ -2940,10 +2948,11 @@ def telegram_webhook(update: TelegramUpdate):
 📊 Earn 4-20% APY based on your membership tier
 🌍 No downloads required - everything in Telegram
 
-<b>🚀 Ready to start your DeFi journey?</b>
-Tap "Launch VonVault" below to access your investment dashboard!
+<b>🚀 Choose an option below:</b>
+• Launch VonVault for full access
+• Use quick actions for specific features
 
-<i>Start with just $100 and automatically upgrade through 5 membership tiers (Basic → Elite)</i>"""
+<i>All options require the same secure login process</i>"""
             
             send_telegram_message(chat_id, welcome_text, keyboard)
             

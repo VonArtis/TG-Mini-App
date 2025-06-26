@@ -96,133 +96,106 @@ export const useAuth = () => {
     }
   };
 
-  // Login with email/password
-  const login = async (email: string, password: string): Promise<User | null> => {
-    setLoading(true);
-    try {
-      // Simulate login API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const userData: User = {
-        id: 'user_' + Date.now(),
-        token: 'login_token_' + Date.now(),
-        user_id: 'user_' + Date.now(),
-        email,
-        type: 'login'
-      };
-      // Save token to secure storage for API calls
-      secureStorage.setToken(userData.token);
-      
-      // Save user to both state and localStorage
-      setUser(userData);
-      localStorage.setItem('currentUser', JSON.stringify(userData));
-      
-      return userData;
-    } catch (error) {
-      console.error('Login error:', error);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Signup with user data - ADMIN SUPPORT ADDED
+  // Real API authentication methods
+  
+  // Signup with user data - REAL API INTEGRATION
   const signup = async (userData: { name: string; email: string; password: string; phone: string; countryCode: string }): Promise<User | null> => {
     setLoading(true);
     try {
-      // Special handling for admin emails
-      if (userData.email === 'admin@vonartis.com' || userData.email === 'security@vonartis.com') {
-        // Create admin user with proper token structure
+      const response = await apiService.signup({
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        phone: userData.phone,
+        country_code: userData.countryCode
+      });
+      
+      if (response && response.user && response.token) {
         const user: User = {
-          id: 'admin_' + Date.now(),
-          user_id: 'admin_' + Date.now(),
-          name: userData.name,
-          first_name: userData.name.split(' ')[0] || userData.name,
-          last_name: userData.name.split(' ').slice(1).join(' ') || '',
-          email: userData.email,
-          phone: `${userData.countryCode}${userData.phone}`,
-          token: generateAdminJWT(userData.email), // Valid admin JWT
-          password: userData.password,
-          email_verified: false,
-          phone_verified: false,
+          id: response.user.id,
+          user_id: response.user.user_id,
+          name: response.user.name,
+          first_name: response.user.first_name,
+          last_name: response.user.last_name,
+          email: response.user.email,
+          phone: response.user.phone,
+          token: response.token,
+          email_verified: response.user.email_verified,
+          phone_verified: response.user.phone_verified,
           crypto_connected: false,
           bank_connected: false,
-          investment_tier: 'basic',
+          investment_tier: response.user.membership_level,
           total_investment: 0,
-          created_at: new Date().toISOString(),
-          is_admin: true
+          created_at: response.user.created_at,
+          type: 'email',
+          is_admin: response.user.is_admin || false
         };
         
-        // Save token to secure storage for immediate API access
+        // Save token to secure storage
         secureStorage.setToken(user.token);
         
         // Save user to both state and localStorage
         setUser(user);
         localStorage.setItem('currentUser', JSON.stringify(user));
-        console.log('Admin user created and authenticated:', user);
+        console.log('User created and authenticated via API:', user);
         
         return user;
       }
       
-      // Regular user signup (simulate API call for now)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const user: User = {
-        id: 'user_' + Date.now(),
-        user_id: 'user_' + Date.now(),
-        name: userData.name,
-        first_name: userData.name.split(' ')[0] || userData.name,
-        last_name: userData.name.split(' ').slice(1).join(' ') || '',
-        email: userData.email,
-        phone: `${userData.countryCode}${userData.phone}`,
-        token: 'user_token_' + Date.now(),
-        password: userData.password,
-        email_verified: false,
-        phone_verified: false,
-        crypto_connected: false,
-        bank_connected: false,
-        investment_tier: 'basic',
-        total_investment: 0,
-        created_at: new Date().toISOString()
-      };
-      
-      secureStorage.setToken(user.token);
-      setUser(user);
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      console.log('User created and authenticated:', user);
-      
-      return user;
-    } catch (error) {
+      throw new Error('Invalid response from signup API');
+    } catch (error: any) {
       console.error('Signup error:', error);
-      return null;
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  // Generate a proper JWT token for admin users
-  const generateAdminJWT = (email: string): string => {
-    const header = {
-      alg: 'HS256',
-      typ: 'JWT'
-    };
-    
-    const payload = {
-      user_id: 'admin_' + Date.now(),
-      email: email,
-      iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
-      is_admin: true
-    };
-    
-    // Create proper JWT structure
-    const encodedHeader = btoa(JSON.stringify(header)).replace(/=/g, '');
-    const encodedPayload = btoa(JSON.stringify(payload)).replace(/=/g, '');
-    
-    // For this demo, use a recognizable signature
-    const signature = 'admin_' + btoa(email + Date.now()).replace(/=/g, '');
-    
-    return `${encodedHeader}.${encodedPayload}.${signature}`;
+  // Login with email/password - REAL API INTEGRATION
+  const login = async (email: string, password: string): Promise<User | null> => {
+    setLoading(true);
+    try {
+      const response = await apiService.login({ email, password });
+      
+      if (response && response.user && response.token) {
+        const user: User = {
+          id: response.user.id,
+          user_id: response.user.user_id,
+          name: response.user.name,
+          first_name: response.user.first_name,
+          last_name: response.user.last_name,
+          email: response.user.email,
+          phone: response.user.phone,
+          token: response.token,
+          email_verified: response.user.email_verified,
+          phone_verified: response.user.phone_verified,
+          crypto_connected: false,
+          bank_connected: false,
+          investment_tier: response.user.membership_level,
+          total_investment: 0,
+          created_at: response.user.created_at,
+          type: 'email',
+          is_admin: response.user.is_admin || false
+        };
+        
+        // Save token to secure storage
+        secureStorage.setToken(user.token);
+        
+        // Save user to both state and localStorage
+        setUser(user);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        console.log('User logged in via API:', user);
+        
+        return user;
+      }
+      
+      throw new Error('Invalid response from login API');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Logout

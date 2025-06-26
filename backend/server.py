@@ -743,6 +743,12 @@ def validate_email(email: str) -> bool:
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return bool(re.match(pattern, email))
 
+def validate_email(email: str) -> bool:
+    """Validate email format"""
+    import re
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return bool(re.match(pattern, email))
+
 async def send_email_verification(email: str) -> dict:
     """Send email verification code using Twilio Verify"""
     if not twilio_client or not TWILIO_VERIFY_SERVICE_SID:

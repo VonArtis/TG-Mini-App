@@ -33,20 +33,29 @@ export const EmailVerificationScreen: React.FC<ScreenProps> = ({ onBack, onNavig
     setMessage('');
 
     try {
-      // TODO: Replace with actual API call when backend is ready
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+      // Call real email verification API
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/email/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(user?.token && { 'Authorization': `Bearer ${user.token}` })
+        },
+        body: JSON.stringify({ email })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to send verification email');
+      }
       
       setSent(true);
       setMessage('Verification email sent! Please check your inbox and spam folder.');
       
-      // Auto-advance to next step after showing success message
-      setTimeout(() => {
-        onNavigate?.('sms-verification');
-      }, 3000);
+      // Don't auto-advance - let user control navigation
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Email verification error:', error);
-      setError('Failed to send verification email. Please try again.');
+      setError(error.message || 'Failed to send verification email. Please try again.');
     } finally {
       setLoading(false);
     }

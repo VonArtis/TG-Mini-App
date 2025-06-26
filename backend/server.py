@@ -3866,11 +3866,11 @@ Use the buttons below for quick access:
         print(f"Telegram webhook error: {e}")
         return {"ok": True}
 
+# Include the API routers
+app.include_router(api_v1_router)
+app.include_router(api_legacy_router)
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8001))
     uvicorn.run(app, host="0.0.0.0", port=port)
-
-# Include the API routers
-app.include_router(api_v1_router)
-app.include_router(api_legacy_router)

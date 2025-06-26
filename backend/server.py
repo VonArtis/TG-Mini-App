@@ -1337,6 +1337,52 @@ def health_check_v1():
         "version": "1.0.0",
         "api_version": "v1"
     }
+
+# Authentication endpoints  
+@api_v1_router.post("/auth/signup")
+@limiter.limit("5/minute")
+async def user_signup_v1(request: Request, user_data: UserSignup):
+    """Create new user account with email/password - API v1"""
+    return await user_signup_impl(request, user_data)
+
+@api_v1_router.post("/auth/login")
+@limiter.limit("10/minute")
+async def user_login_v1(request: Request, login_data: UserLogin):
+    """Authenticate user with email/password - API v1"""
+    return await user_login_impl(request, login_data)
+
+@api_v1_router.get("/auth/me")
+async def get_current_user_v1(authorization: str = Header(...)):
+    """Get current authenticated user information - API v1"""
+    return await get_current_user_impl(authorization)
+
+# Admin endpoints
+@api_v1_router.get("/admin/overview")
+def get_admin_overview_v1(authorization: str = Header(...)):
+    """Get admin dashboard overview - API v1"""
+    return get_admin_overview_impl(authorization)
+
+@api_v1_router.get("/admin/users")
+def get_admin_users_v1(
+    authorization: str = Header(...),
+    page: int = 1,
+    limit: int = 20,
+    search: str = None,
+    filter_verified: bool = None
+):
+    """Get users list for admin - API v1"""
+    return get_admin_users_impl(authorization, page, limit, search, filter_verified)
+
+# 2FA endpoints
+@api_v1_router.post("/auth/totp/setup")
+async def setup_totp_2fa_v1(authorization: str = Header(...)):
+    """Setup TOTP 2FA - API v1"""
+    return await setup_totp_2fa_impl(authorization)
+
+@api_v1_router.post("/auth/totp/verify")
+async def verify_totp_2fa_v1(request: dict, authorization: str = Header(...)):
+    """Verify TOTP 2FA code - API v1"""
+    return await verify_totp_2fa_impl(request, authorization)
 # ===== IMPLEMENTATION FUNCTIONS FOR API VERSIONING =====
 
 async def user_signup_impl(request: Request, user_data: UserSignup):

@@ -230,7 +230,7 @@ export const SMSVerificationScreen: React.FC<ScreenProps> = ({ onBack, onNavigat
       
       // Navigate to 2FA setup
       setTimeout(() => {
-        onNavigate?.('two-factor-setup');
+        onNavigate?.('2fa-setup');
       }, 1500);
       
     } catch (error: any) {

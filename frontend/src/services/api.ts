@@ -428,9 +428,9 @@ class ApiService {
 
   // === ADMIN API METHODS ===
   
-  // Admin Dashboard Overview
+  // Admin Dashboard Overview (Using API v1)
   async getAdminOverview(token: string) {
-    const response = await axios.get(`${API_BASE}/admin/overview`, {
+    const response = await axios.get(`${API_V1_BASE}/admin/overview`, {
       headers: this.getAuthHeaders(token)
     });
     return response.data;

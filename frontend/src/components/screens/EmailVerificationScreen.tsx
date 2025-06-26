@@ -112,6 +112,7 @@ export const EmailVerificationScreen: React.FC<ScreenProps> = ({ onBack, onNavig
             <Button
               onClick={() => {
                 console.log('Email verification skipped');
+                // TODO: Update user context to reflect email as verified or skipped
                 onNavigate?.('sms-verification');
               }}
               variant="secondary"

@@ -48,12 +48,7 @@ export const AdminCryptoScreen: React.FC<ScreenProps> = ({ onBack }) => {
         return;
       }
 
-      const response = await apiService.makeRequest(
-        'GET',
-        '/admin/crypto',
-        null,
-        user.token
-      );
+      const response = await apiService.getAdminCrypto(user.token);
       
       setAnalytics(response);
     } catch (error: any) {

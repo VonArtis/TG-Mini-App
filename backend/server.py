@@ -2877,6 +2877,215 @@ def get_system_health(authorization: str = Header(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get system health: {str(e)}")
 
+# === TELEGRAM BOT COMMAND HANDLERS ===
+
+class TelegramUpdate(BaseModel):
+    update_id: int
+    message: Optional[Dict[str, Any]] = None
+    callback_query: Optional[Dict[str, Any]] = None
+
+def send_telegram_message(chat_id: int, text: str, reply_markup: Optional[Dict] = None):
+    """Send message via Telegram Bot API"""
+    bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not bot_token:
+        return False
+    
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": text,
+        "parse_mode": "HTML"
+    }
+    
+    if reply_markup:
+        payload["reply_markup"] = reply_markup
+    
+    try:
+        response = requests.post(url, json=payload)
+        return response.status_code == 200
+    except Exception as e:
+        print(f"Error sending Telegram message: {e}")
+        return False
+
+@app.post("/api/telegram/webhook")
+def telegram_webhook(update: TelegramUpdate):
+    """Handle Telegram bot commands"""
+    try:
+        if not update.message:
+            return {"ok": True}
+        
+        chat_id = update.message.get("chat", {}).get("id")
+        text = update.message.get("text", "")
+        user = update.message.get("from", {})
+        username = user.get("username", "")
+        first_name = user.get("first_name", "User")
+        
+        if not chat_id:
+            return {"ok": True}
+        
+        # Handle different commands
+        if text == "/start":
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "🚀 Launch VonVault", "web_app": {"url": "https://www.vonartis.app"}}],
+                    [{"text": "📊 View Portfolio", "callback_data": "portfolio"}],
+                    [{"text": "💰 Make Investment", "callback_data": "invest"}]
+                ]
+            }
+            
+            welcome_text = f"""🏦 <b>Welcome to VonVault, {first_name}!</b>
+
+💰 <b>Professional DeFi investing made simple</b>
+🔐 Bank-grade security with enterprise protection
+📊 Earn 4-20% APY based on your membership tier
+🌍 No downloads required - everything in Telegram
+
+<b>🚀 Ready to start your DeFi journey?</b>
+Tap "Launch VonVault" below to access your investment dashboard!
+
+<i>Start with just $100 and automatically upgrade through 5 membership tiers (Basic → Elite)</i>"""
+            
+            send_telegram_message(chat_id, welcome_text, keyboard)
+            
+        elif text == "/portfolio":
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "📊 View Dashboard", "web_app": {"url": "https://www.vonartis.app"}}],
+                    [{"text": "💰 Make Investment", "callback_data": "invest"}]
+                ]
+            }
+            
+            portfolio_text = f"""📊 <b>Your VonVault Portfolio</b>
+
+Access your complete investment dashboard to view:
+• 💰 Current investments and returns
+• 📈 Performance analytics 
+• 🏆 Membership tier progress
+• 💳 Connected accounts
+
+<b>Tap "View Dashboard" to see your real-time portfolio!</b>"""
+            
+            send_telegram_message(chat_id, portfolio_text, keyboard)
+            
+        elif text == "/invest":
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "💰 Create Investment", "web_app": {"url": "https://www.vonartis.app"}}],
+                    [{"text": "🏆 View Membership Tiers", "callback_data": "tiers"}]
+                ]
+            }
+            
+            invest_text = f"""💰 <b>Investment Opportunities</b>
+
+<b>🏆 Tier-Based Returns:</b>
+🌱 Basic: 4% APY ($0-$19K)
+🥉 Club: 6% APY ($20K-$49K) 
+🥈 Premium: 8-10% APY ($50K-$99K)
+🥇 VIP: 12-14% APY ($100K-$249K)
+💎 Elite: 16-20% APY ($250K+)
+
+<b>🚀 Start with just $100 and grow your tier automatically!</b>
+
+Tap "Create Investment" to get started."""
+            
+            send_telegram_message(chat_id, invest_text, keyboard)
+            
+        elif text == "/withdraw":
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "💸 Withdraw Funds", "web_app": {"url": "https://www.vonartis.app"}}],
+                    [{"text": "🏦 Manage Accounts", "callback_data": "accounts"}]
+                ]
+            }
+            
+            withdraw_text = f"""💸 <b>Withdraw Your Funds</b>
+
+Access your funds anytime with our secure withdrawal system:
+• 🏦 Direct to bank account
+• 🪙 To crypto wallets
+• ⚡ Instant processing
+• 🔐 Multi-factor verification
+
+<b>Your money, your control!</b>
+
+Tap "Withdraw Funds" to access withdrawal options."""
+            
+            send_telegram_message(chat_id, withdraw_text, keyboard)
+            
+        elif text == "/profile":
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "👤 Manage Profile", "web_app": {"url": "https://www.vonartis.app"}}],
+                    [{"text": "🔐 Security Settings", "callback_data": "security"}]
+                ]
+            }
+            
+            profile_text = f"""👤 <b>Profile & Settings</b>
+
+Manage your VonVault account:
+• 📝 Update personal information
+• 🔐 Security & 2FA settings
+• 🌍 Language preferences  
+• 🔗 Connected accounts
+• 📊 Membership status
+
+<b>Keep your account secure and up to date!</b>
+
+Tap "Manage Profile" to access your settings."""
+            
+            send_telegram_message(chat_id, profile_text, keyboard)
+            
+        elif text == "/support":
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "💬 Get Help", "url": "https://t.me/VonVaultSupport"}],
+                    [{"text": "📖 Help Center", "web_app": {"url": "https://www.vonartis.app"}}]
+                ]
+            }
+            
+            support_text = f"""🛟 <b>VonVault Support</b>
+
+Need help? We're here for you 24/7:
+
+• 💬 Live chat with our support team
+• 📖 Comprehensive help documentation
+• 🎓 Investment guides and tutorials
+• 🔐 Security best practices
+
+<b>📞 Response time: Usually under 1 hour</b>
+
+Our team is ready to help you succeed with DeFi investing!"""
+            
+            send_telegram_message(chat_id, support_text, keyboard)
+            
+        else:
+            # Handle unknown commands
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "🚀 Launch VonVault", "web_app": {"url": "https://www.vonartis.app"}}]
+                ]
+            }
+            
+            help_text = f"""🤖 <b>VonVault Bot Commands</b>
+
+Available commands:
+/start - Welcome and launch VonVault
+/portfolio - View your investment dashboard  
+/invest - Create new investment plan
+/withdraw - Withdraw funds to bank/crypto
+/profile - Manage account settings
+/support - Get help and support
+
+<b>Or tap "Launch VonVault" for full access!</b>"""
+            
+            send_telegram_message(chat_id, help_text, keyboard)
+        
+        return {"ok": True}
+        
+    except Exception as e:
+        print(f"Telegram webhook error: {e}")
+        return {"ok": True}
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8001))

@@ -2516,6 +2516,368 @@ async def create_transaction_from_wallet(wallet_id: str, authorization: str = He
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create transaction: {str(e)}")
 
+# === ADMIN DASHBOARD ENDPOINTS ===
+
+# Admin authentication helper
+def require_admin_auth(authorization: str) -> str:
+    """Enhanced JWT validation for admin users"""
+    user_id = require_auth(authorization)
+    
+    # Get user from database
+    user = db.users.find_one({"user_id": user_id})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    # Check admin status (you can add admin field to user collection)
+    # For now, we'll use a simple email-based check
+    admin_emails = [
+        "admin@vonvault.com", 
+        "harry@vonvault.com",
+        # Add your admin email here
+    ]
+    
+    user_email = user.get("email", "")
+    if user_email not in admin_emails and not user.get("is_admin", False):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    return user_id
+
+# Admin Dashboard Overview
+@app.get("/api/admin/overview")
+def get_admin_overview(authorization: str = Header(...)):
+    """Get admin dashboard overview with key metrics"""
+    require_admin_auth(authorization)
+    
+    try:
+        # User metrics
+        total_users = db.users.count_documents({})
+        verified_users = db.users.count_documents({
+            "email_verified": True, 
+            "phone_verified": True
+        })
+        users_with_investments = db.users.count_documents({
+            "membership_level": {"$ne": "none"}
+        })
+        
+        # Investment metrics
+        total_investments = list(db.investments.aggregate([
+            {"$group": {"_id": None, "total": {"$sum": "$amount"}, "count": {"$sum": 1}}}
+        ]))
+        investment_data = total_investments[0] if total_investments else {"total": 0, "count": 0}
+        
+        # Membership distribution
+        membership_counts = list(db.users.aggregate([
+            {"$group": {"_id": "$membership_level", "count": {"$sum": 1}}}
+        ]))
+        
+        # Recent signups (last 7 days)
+        seven_days_ago = (datetime.utcnow() - timedelta(days=7)).isoformat()
+        recent_signups = db.users.count_documents({
+            "created_at": {"$gte": seven_days_ago}
+        })
+        
+        # Active investments (last 30 days)
+        thirty_days_ago = (datetime.utcnow() - timedelta(days=30)).isoformat()
+        recent_investments = db.investments.count_documents({
+            "created_at": {"$gte": thirty_days_ago}
+        })
+        
+        return {
+            "users": {
+                "total": total_users,
+                "verified": verified_users,
+                "with_investments": users_with_investments,
+                "recent_signups": recent_signups
+            },
+            "investments": {
+                "total_amount": investment_data["total"],
+                "total_count": investment_data["count"],
+                "recent_count": recent_investments
+            },
+            "membership_distribution": {item["_id"]: item["count"] for item in membership_counts},
+            "verification_rate": (verified_users / total_users * 100) if total_users > 0 else 0
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get admin overview: {str(e)}")
+
+# User Management
+@app.get("/api/admin/users")
+def get_all_users(
+    page: int = 1, 
+    limit: int = 50,
+    search: str = None,
+    filter_verified: bool = None,
+    authorization: str = Header(...)
+):
+    """Get all users with pagination and filtering"""
+    require_admin_auth(authorization)
+    
+    try:
+        skip = (page - 1) * limit
+        
+        # Build query
+        query = {}
+        if search:
+            query["$or"] = [
+                {"email": {"$regex": search, "$options": "i"}},
+                {"first_name": {"$regex": search, "$options": "i"}},
+                {"last_name": {"$regex": search, "$options": "i"}},
+                {"user_id": {"$regex": search, "$options": "i"}}
+            ]
+        
+        if filter_verified is not None:
+            query["email_verified"] = filter_verified
+            query["phone_verified"] = filter_verified
+        
+        # Get users with pagination
+        users = list(db.users.find(query).skip(skip).limit(limit).sort("created_at", -1))
+        total_count = db.users.count_documents(query)
+        
+        # Format user data for admin view
+        formatted_users = []
+        for user in users:
+            # Get user's investment summary
+            user_investments = list(db.investments.find({"user_id": user.get("user_id", "")}))
+            total_invested = sum(inv.get("amount", 0) for inv in user_investments)
+            
+            formatted_users.append({
+                "id": str(user.get("_id", "")),
+                "user_id": user.get("user_id", ""),
+                "email": user.get("email", ""),
+                "name": f"{user.get('first_name', '')} {user.get('last_name', '')}".strip(),
+                "phone": user.get("phone", ""),
+                "email_verified": user.get("email_verified", False),
+                "phone_verified": user.get("phone_verified", False),
+                "membership_level": user.get("membership_level", "none"),
+                "total_invested": total_invested,
+                "crypto_connected": user.get("crypto_connected", False),
+                "bank_connected": user.get("bank_connected", False),
+                "created_at": user.get("created_at", ""),
+                "last_login": user.get("last_login", ""),
+                "connected_wallets_count": len(user.get("connected_wallets", []))
+            })
+        
+        return {
+            "users": formatted_users,
+            "pagination": {
+                "current_page": page,
+                "total_pages": (total_count + limit - 1) // limit,
+                "total_count": total_count,
+                "per_page": limit
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get users: {str(e)}")
+
+# User Details
+@app.get("/api/admin/users/{user_id}")
+def get_user_details(user_id: str, authorization: str = Header(...)):
+    """Get detailed user information"""
+    require_admin_auth(authorization)
+    
+    try:
+        # Get user
+        user = db.users.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Get user's investments
+        investments = list(db.investments.find({"user_id": user_id}))
+        
+        # Get crypto transactions
+        crypto_transactions = list(db.crypto_transactions.find({"user_id": user_id}))
+        
+        # Get membership status
+        membership_status = get_membership_status(user_id)
+        
+        return {
+            "user": {
+                "id": str(user.get("_id", "")),
+                "user_id": user.get("user_id", ""),
+                "email": user.get("email", ""),
+                "first_name": user.get("first_name", ""),
+                "last_name": user.get("last_name", ""),
+                "phone": user.get("phone", ""),
+                "email_verified": user.get("email_verified", False),
+                "phone_verified": user.get("phone_verified", False),
+                "crypto_connected": user.get("crypto_connected", False),
+                "bank_connected": user.get("bank_connected", False),
+                "created_at": user.get("created_at", ""),
+                "last_login": user.get("last_login", ""),
+                "connected_wallets": user.get("connected_wallets", []),
+                "primary_wallet_id": user.get("primary_wallet_id", ""),
+                "totp_2fa_enabled": user.get("totp_2fa_enabled", False),
+                "sms_2fa_enabled": user.get("sms_2fa_enabled", False),
+                "email_2fa_enabled": user.get("email_2fa_enabled", False)
+            },
+            "investments": investments,
+            "crypto_transactions": crypto_transactions,
+            "membership": membership_status
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get user details: {str(e)}")
+
+# Investment Analytics
+@app.get("/api/admin/investments")
+def get_investment_analytics(authorization: str = Header(...)):
+    """Get investment analytics for admin dashboard"""
+    require_admin_auth(authorization)
+    
+    try:
+        # Total investments by membership level
+        investments_by_level = list(db.investments.aggregate([
+            {
+                "$lookup": {
+                    "from": "users",
+                    "localField": "user_id",
+                    "foreignField": "user_id",
+                    "as": "user"
+                }
+            },
+            {"$unwind": "$user"},
+            {
+                "$group": {
+                    "_id": "$user.membership_level",
+                    "total_amount": {"$sum": "$amount"},
+                    "count": {"$sum": 1}
+                }
+            }
+        ]))
+        
+        # Investments over time (last 30 days)
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        daily_investments = list(db.investments.aggregate([
+            {
+                "$match": {
+                    "created_at": {"$gte": thirty_days_ago.isoformat()}
+                }
+            },
+            {
+                "$group": {
+                    "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": {"$dateFromString": {"dateString": "$created_at"}}}},
+                    "total_amount": {"$sum": "$amount"},
+                    "count": {"$sum": 1}
+                }
+            },
+            {"$sort": {"_id": 1}}
+        ]))
+        
+        # Top investors
+        top_investors = list(db.investments.aggregate([
+            {
+                "$group": {
+                    "_id": "$user_id",
+                    "total_invested": {"$sum": "$amount"},
+                    "investment_count": {"$sum": 1}
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "users",
+                    "localField": "_id",
+                    "foreignField": "user_id",
+                    "as": "user"
+                }
+            },
+            {"$unwind": "$user"},
+            {
+                "$project": {
+                    "user_id": "$_id",
+                    "total_invested": 1,
+                    "investment_count": 1,
+                    "email": "$user.email",
+                    "name": {"$concat": ["$user.first_name", " ", "$user.last_name"]},
+                    "membership_level": "$user.membership_level"
+                }
+            },
+            {"$sort": {"total_invested": -1}},
+            {"$limit": 10}
+        ]))
+        
+        return {
+            "investments_by_level": investments_by_level,
+            "daily_investments": daily_investments,
+            "top_investors": top_investors
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get investment analytics: {str(e)}")
+
+# Crypto Analytics
+@app.get("/api/admin/crypto")
+async def get_crypto_analytics(authorization: str = Header(...)):
+    """Get crypto analytics for admin dashboard"""
+    require_admin_auth(authorization)
+    
+    try:
+        # Total users with crypto wallets
+        users_with_crypto = db.users.count_documents({"crypto_connected": True})
+        
+        # Wallet distribution
+        wallet_types = list(db.users.aggregate([
+            {"$unwind": "$connected_wallets"},
+            {
+                "$group": {
+                    "_id": "$connected_wallets.type",
+                    "count": {"$sum": 1}
+                }
+            }
+        ]))
+        
+        # Get business crypto balances
+        business_balances = await crypto_service.get_all_wallet_balances()
+        
+        # Recent transactions
+        recent_transactions = list(db.crypto_transactions.find().sort("created_at", -1).limit(20))
+        
+        return {
+            "users_with_crypto": users_with_crypto,
+            "wallet_distribution": wallet_types,
+            "business_balances": business_balances,
+            "recent_transactions": recent_transactions
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get crypto analytics: {str(e)}")
+
+# System Health
+@app.get("/api/admin/system")
+def get_system_health(authorization: str = Header(...)):
+    """Get system health and monitoring data"""
+    require_admin_auth(authorization)
+    
+    try:
+        # Database stats
+        db_stats = db.command("dbStats")
+        
+        # Collection counts
+        collections = {
+            "users": db.users.count_documents({}),
+            "investments": db.investments.count_documents({}),
+            "crypto_transactions": db.crypto_transactions.count_documents({}),
+            "user_deletions": db.user_deletions.count_documents({})
+        }
+        
+        # Recent errors (you'd implement error logging)
+        # For now, return placeholder
+        recent_errors = []
+        
+        return {
+            "database": {
+                "size_mb": db_stats.get("dataSize", 0) / (1024 * 1024),
+                "collections": collections
+            },
+            "uptime": "System running normally",
+            "recent_errors": recent_errors,
+            "last_updated": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get system health: {str(e)}")
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8001))

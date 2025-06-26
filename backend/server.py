@@ -2909,8 +2909,172 @@ def send_telegram_message(chat_id: int, text: str, reply_markup: Optional[Dict] 
 
 @app.post("/api/telegram/webhook")
 def telegram_webhook(update: TelegramUpdate):
-    """Handle Telegram bot commands"""
+    """Handle Telegram bot commands and callback queries"""
     try:
+        # Handle callback queries (inline button presses)
+        if update.callback_query:
+            callback_data = update.callback_query.get("data", "")
+            chat_id = update.callback_query.get("message", {}).get("chat", {}).get("id")
+            user = update.callback_query.get("from", {})
+            first_name = user.get("first_name", "User")
+            
+            if not chat_id:
+                return {"ok": True}
+            
+            # Handle inline button presses
+            if callback_data == "portfolio":
+                keyboard = {
+                    "inline_keyboard": [
+                        [{"text": "📊 View Dashboard", "web_app": {"url": "https://www.vonartis.app"}}],
+                        [{"text": "← Back to Menu", "callback_data": "main_menu"}]
+                    ]
+                }
+                
+                portfolio_text = f"""📊 <b>Your VonVault Portfolio</b>
+
+Access your complete investment dashboard to view:
+• 💰 Current investments and returns
+• 📈 Performance analytics 
+• 🏆 Membership tier progress
+• 💳 Connected accounts
+
+<b>Note:</b> You'll need to login/verify to access your data
+
+<b>Tap "View Dashboard" to see your real-time portfolio!</b>"""
+                
+                send_telegram_message(chat_id, portfolio_text, keyboard)
+                
+            elif callback_data == "invest":
+                keyboard = {
+                    "inline_keyboard": [
+                        [{"text": "💰 Create Investment", "web_app": {"url": "https://www.vonartis.app"}}],
+                        [{"text": "← Back to Menu", "callback_data": "main_menu"}]
+                    ]
+                }
+                
+                invest_text = f"""💰 <b>Investment Opportunities</b>
+
+<b>🏆 Tier-Based Returns:</b>
+🌱 Basic: 4% APY ($0-$19K)
+🥉 Club: 6% APY ($20K-$49K) 
+🥈 Premium: 8-10% APY ($50K-$99K)
+🥇 VIP: 12-14% APY ($100K-$249K)
+💎 Elite: 16-20% APY ($250K+)
+
+<b>🚀 Start with just $100 and grow your tier automatically!</b>
+
+<b>Note:</b> Full verification required for investments
+
+Tap "Create Investment" to get started."""
+                
+                send_telegram_message(chat_id, invest_text, keyboard)
+                
+            elif callback_data == "withdraw":
+                keyboard = {
+                    "inline_keyboard": [
+                        [{"text": "💸 Withdraw Funds", "web_app": {"url": "https://www.vonartis.app"}}],
+                        [{"text": "← Back to Menu", "callback_data": "main_menu"}]
+                    ]
+                }
+                
+                withdraw_text = f"""💸 <b>Withdraw Your Funds</b>
+
+Access your funds anytime with our secure withdrawal system:
+• 🏦 Direct to bank account
+• 🪙 To crypto wallets
+• ⚡ Instant processing
+• 🔐 Multi-factor verification required
+
+<b>Your money, your control!</b>
+
+<b>Note:</b> Verification required for withdrawals
+
+Tap "Withdraw Funds" to access withdrawal options."""
+                
+                send_telegram_message(chat_id, withdraw_text, keyboard)
+                
+            elif callback_data == "profile":
+                keyboard = {
+                    "inline_keyboard": [
+                        [{"text": "👤 Manage Profile", "web_app": {"url": "https://www.vonartis.app"}}],
+                        [{"text": "← Back to Menu", "callback_data": "main_menu"}]
+                    ]
+                }
+                
+                profile_text = f"""👤 <b>Profile & Settings</b>
+
+Manage your VonVault account:
+• 📝 Update personal information
+• 🔐 Security & 2FA settings
+• 🌍 Language preferences  
+• 🔗 Connected accounts
+• 📊 Membership status
+
+<b>Keep your account secure and up to date!</b>
+
+Tap "Manage Profile" to access your settings."""
+                
+                send_telegram_message(chat_id, profile_text, keyboard)
+                
+            elif callback_data == "support":
+                keyboard = {
+                    "inline_keyboard": [
+                        [{"text": "💬 Get Help", "url": "https://t.me/VonVaultSupport"}],
+                        [{"text": "📖 Help Center", "web_app": {"url": "https://www.vonartis.app"}}],
+                        [{"text": "← Back to Menu", "callback_data": "main_menu"}]
+                    ]
+                }
+                
+                support_text = f"""🛟 <b>VonVault Support</b>
+
+Need help? We're here for you 24/7:
+
+• 💬 Live chat with our support team
+• 📖 Comprehensive help documentation
+• 🎓 Investment guides and tutorials
+• 🔐 Security best practices
+
+<b>📞 Response time: Usually under 1 hour</b>
+
+Our team is ready to help you succeed with DeFi investing!"""
+                
+                send_telegram_message(chat_id, support_text, keyboard)
+                
+            elif callback_data == "main_menu":
+                # Show main menu again
+                keyboard = {
+                    "inline_keyboard": [
+                        [{"text": "🚀 Launch VonVault", "web_app": {"url": "https://www.vonartis.app"}}],
+                        [
+                            {"text": "📊 Portfolio", "callback_data": "portfolio"},
+                            {"text": "💰 Invest", "callback_data": "invest"}
+                        ],
+                        [
+                            {"text": "💸 Withdraw", "callback_data": "withdraw"},
+                            {"text": "👤 Profile", "callback_data": "profile"}
+                        ],
+                        [{"text": "🛟 Support", "callback_data": "support"}]
+                    ]
+                }
+                
+                menu_text = f"""🏦 <b>VonVault Main Menu</b>
+
+Choose an option below to get started:
+
+<b>🚀 Launch VonVault</b> - Full app access
+<b>📊 Portfolio</b> - View your investments  
+<b>💰 Invest</b> - Create new investment
+<b>💸 Withdraw</b> - Access your funds
+<b>👤 Profile</b> - Manage settings
+<b>🛟 Support</b> - Get help
+
+<i>All financial features require secure verification</i>"""
+                
+                send_telegram_message(chat_id, menu_text, keyboard)
+                
+            return {"ok": True}
+        
+        # Handle text messages/commands
         if not update.message:
             return {"ok": True}
         

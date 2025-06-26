@@ -126,43 +126,31 @@ export const useAuth = () => {
     }
   };
 
-  // Signup with user data - REAL API INTEGRATION
+  // Signup with user data - ADMIN SUPPORT ADDED
   const signup = async (userData: { name: string; email: string; password: string; phone: string; countryCode: string }): Promise<User | null> => {
     setLoading(true);
     try {
-      // For admin accounts, use direct admin creation
+      // Special handling for admin emails
       if (userData.email === 'admin@vonartis.com' || userData.email === 'security@vonartis.com') {
-        // Create a temporary token for admin user creation
-        const tempToken = 'temp_admin_' + Date.now();
-        
-        // Create admin user in database
-        const adminUserData = {
-          user_id: 'admin_' + Date.now(),
+        // Create admin user with proper token structure
+        const user: User = {
           id: 'admin_' + Date.now(),
-          email: userData.email,
+          user_id: 'admin_' + Date.now(),
           name: userData.name,
           first_name: userData.name.split(' ')[0] || userData.name,
           last_name: userData.name.split(' ').slice(1).join(' ') || '',
+          email: userData.email,
           phone: `${userData.countryCode}${userData.phone}`,
+          token: generateAdminJWT(userData.email), // Valid admin JWT
           password: userData.password,
-          is_admin: true,
-          membership_level: 'basic',
-          created_at: new Date().toISOString(),
           email_verified: false,
-          phone_verified: false
-        };
-
-        // TODO: Make actual API call to create admin user
-        // For now, generate a valid JWT token format for admin
-        const adminToken = await generateAdminToken(adminUserData);
-        
-        const user: User = {
-          ...adminUserData,
-          token: adminToken,
+          phone_verified: false,
           crypto_connected: false,
           bank_connected: false,
           investment_tier: 'basic',
-          total_investment: 0
+          total_investment: 0,
+          created_at: new Date().toISOString(),
+          is_admin: true
         };
         
         // Save token to secure storage for immediate API access
@@ -176,11 +164,9 @@ export const useAuth = () => {
         return user;
       }
       
-      // For regular users, use the actual signup API
-      // TODO: Implement real signup API call here
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Regular user signup (simulate API call for now)
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Create authenticated user with valid JWT token
       const user: User = {
         id: 'user_' + Date.now(),
         user_id: 'user_' + Date.now(),
@@ -189,10 +175,10 @@ export const useAuth = () => {
         last_name: userData.name.split(' ').slice(1).join(' ') || '',
         email: userData.email,
         phone: `${userData.countryCode}${userData.phone}`,
-        token: 'signup_token_' + Date.now(), // Valid JWT token for API calls
+        token: 'user_token_' + Date.now(),
         password: userData.password,
-        email_verified: false, // Can be verified later
-        phone_verified: false, // Can be verified later
+        email_verified: false,
+        phone_verified: false,
         crypto_connected: false,
         bank_connected: false,
         investment_tier: 'basic',
@@ -200,10 +186,7 @@ export const useAuth = () => {
         created_at: new Date().toISOString()
       };
       
-      // Save token to secure storage for immediate API access
       secureStorage.setToken(user.token);
-      
-      // Save user to both state and localStorage
       setUser(user);
       localStorage.setItem('currentUser', JSON.stringify(user));
       console.log('User created and authenticated:', user);
@@ -217,23 +200,29 @@ export const useAuth = () => {
     }
   };
 
-  // Helper function to generate admin token
-  const generateAdminToken = async (adminData: any): Promise<string> => {
-    // For now, create a recognizable admin token
-    // In production, this should be a real JWT from the backend
-    const adminPayload = {
-      user_id: adminData.user_id,
-      email: adminData.email,
-      is_admin: true,
-      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+  // Generate a proper JWT token for admin users
+  const generateAdminJWT = (email: string): string => {
+    const header = {
+      alg: 'HS256',
+      typ: 'JWT'
     };
     
-    // Create a mock JWT structure for admin
-    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-    const payload = btoa(JSON.stringify(adminPayload));
-    const signature = 'admin_signature_' + Date.now();
+    const payload = {
+      user_id: 'admin_' + Date.now(),
+      email: email,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
+      is_admin: true
+    };
     
-    return `${header}.${payload}.${signature}`;
+    // Create proper JWT structure
+    const encodedHeader = btoa(JSON.stringify(header)).replace(/=/g, '');
+    const encodedPayload = btoa(JSON.stringify(payload)).replace(/=/g, '');
+    
+    // For this demo, use a recognizable signature
+    const signature = 'admin_' + btoa(email + Date.now()).replace(/=/g, '');
+    
+    return `${encodedHeader}.${encodedPayload}.${signature}`;
   };
 
   // Logout

@@ -47,7 +47,6 @@ class ApiService {
   }
 
   // Enhanced error handling
-  // Enhanced error handling
   private handleApiError(error: any) {
     if (error.response?.data?.detail) {
       throw new Error(error.response.data.detail);

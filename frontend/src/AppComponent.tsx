@@ -66,6 +66,12 @@ const AppRouter: React.FC = () => {
       'wallet-manager': 'Wallet Manager - VonVault',
       'available-funds': 'Available Funds - VonVault',
       'membership-status': 'Membership - VonVault',
+      'admin-plans': 'Investment Plans - VonVault',
+      'admin-dashboard': 'Admin Dashboard - VonVault',
+      'admin-users': 'User Management - VonVault',
+      'admin-user-details': 'User Details - VonVault',
+      'admin-investments': 'Investment Analytics - VonVault',
+      'admin-crypto': 'Crypto Analytics - VonVault',
       'privacy-policy': 'Privacy Policy - VonVault',
       'terms-of-service': 'Terms of Service - VonVault',
       'edit-profile': 'Edit Profile - VonVault'

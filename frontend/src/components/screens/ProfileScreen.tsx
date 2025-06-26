@@ -321,22 +321,29 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
           </div>
         </Card>
 
-        {/* Admin Section */}
-        <Card className="border-purple-500/50">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white font-semibold">Admin Panel</p>
-              <p className="text-sm text-gray-400">Manage investment plans</p>
+        {/* Admin Section - Only show for admin users */}
+        {(user?.email === 'admin@vonvault.com' || 
+          user?.email === 'harry@vonvault.com' || 
+          user?.email?.includes('admin')) && (
+          <Card className="border-purple-500/50 bg-gradient-to-r from-purple-900/30 to-purple-800/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white font-semibold flex items-center gap-2">
+                  <span>🛠️</span>
+                  Admin Dashboard
+                </p>
+                <p className="text-sm text-gray-400">Full system administration</p>
+              </div>
+              <Button
+                onClick={() => onNavigate?.('admin-dashboard')}
+                size="sm"
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                Open Dashboard
+              </Button>
             </div>
-            <Button
-              onClick={() => onNavigate?.('admin-plans')}
-              size="sm"
-              className="bg-purple-600 hover:bg-purple-700"
-            >
-              Manage Plans
-            </Button>
-          </div>
-        </Card>
+          </Card>
+        )}
 
         {/* Profile Deletion Section */}
         <Card className="border-red-500/50">

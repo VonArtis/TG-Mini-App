@@ -307,7 +307,7 @@ export const Enhanced2FASetupScreen: React.FC<ScreenProps> = ({ onNavigate }) =>
               Enhanced 2FA Enabled!
             </h2>
             <p className="text-gray-300 mb-6">
-              Your account now has enterprise-grade security
+              Your account now has enterprise-grade security. You can now make investments of any amount, including high-value transactions over $20,000.
             </p>
           </div>
 

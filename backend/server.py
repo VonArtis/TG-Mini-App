@@ -1325,6 +1325,18 @@ def root():
 def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
+
+# ===== API V1 ENDPOINTS =====
+
+# Health check
+@api_v1_router.get("/health")
+def health_check_v1():
+    return {
+        "status": "healthy", 
+        "timestamp": datetime.utcnow().isoformat(),
+        "version": "1.0.0",
+        "api_version": "v1"
+    }
 # ===== IMPLEMENTATION FUNCTIONS FOR API VERSIONING =====
 
 async def user_signup_impl(request: Request, user_data: UserSignup):

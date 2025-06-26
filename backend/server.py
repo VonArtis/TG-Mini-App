@@ -361,6 +361,32 @@ class CryptoTransaction(BaseModel):
     created_at: str = None
     confirmed_at: Optional[str] = None
 
+# User Management Models
+class UserSignup(BaseModel):
+    name: str
+    email: str
+    password: str
+    phone: str
+    country_code: str
+    
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class UserResponse(BaseModel):
+    id: str
+    user_id: str
+    name: str
+    first_name: str
+    last_name: str
+    email: str
+    phone: str
+    email_verified: bool
+    phone_verified: bool
+    membership_level: str
+    created_at: str
+    is_admin: Optional[bool] = False
+
 # 2FA Models
 class SMSSendRequest(BaseModel):
     phone_number: str

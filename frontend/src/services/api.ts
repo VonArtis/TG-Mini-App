@@ -468,9 +468,71 @@ class ApiService {
     return response.data;
   }
 
-  // Admin System Status
+  // Admin System Status (Using API v1)
   async getAdminSystem(token: string) {
-    const response = await axios.get(`${API_BASE}/admin/system`, {
+    const response = await axios.get(`${API_V1_BASE}/admin/system`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  // Phase 2 Enhancement: Biometric WebAuthn 2FA APIs
+  async beginBiometricRegistration(token: string, deviceName?: string) {
+    const response = await axios.post(`${API_V1_BASE}/auth/webauthn/register/begin`, {
+      device_name: deviceName || 'Device'
+    }, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async completeBiometricRegistration(token: string, credentialData: any) {
+    const response = await axios.post(`${API_V1_BASE}/auth/webauthn/register/complete`, 
+      credentialData, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async beginBiometricAuthentication(token: string) {
+    const response = await axios.post(`${API_V1_BASE}/auth/webauthn/authenticate/begin`, {}, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async completeBiometricAuthentication(token: string, verificationData: any) {
+    const response = await axios.post(`${API_V1_BASE}/auth/webauthn/authenticate/complete`, 
+      verificationData, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  // Phase 2 Enhancement: Push Notification 2FA APIs
+  async registerPushNotifications(token: string, pushToken: string, deviceType: string, deviceName?: string) {
+    const response = await axios.post(`${API_V1_BASE}/auth/push/register`, {
+      token: pushToken,
+      device_type: deviceType,
+      device_name: deviceName || 'Device'
+    }, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async sendPushNotification(token: string) {
+    const response = await axios.post(`${API_V1_BASE}/auth/push/send`, {}, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async verifyPushNotification(token: string, challengeId: string, challengeCode: string) {
+    const response = await axios.post(`${API_V1_BASE}/auth/push/verify`, {
+      challenge_id: challengeId,
+      challenge_code: challengeCode
+    }, {
       headers: this.getAuthHeaders(token)
     });
     return response.data;

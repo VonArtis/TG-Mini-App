@@ -58,12 +58,7 @@ export const AdminUserDetailsScreen: React.FC<ScreenProps & { userId?: string }>
         return;
       }
 
-      const response = await apiService.makeRequest(
-        'GET',
-        `/admin/users/${userId}`,
-        null,
-        user.token
-      );
+      const response = await apiService.getAdminUserDetails(user.token, userId);
       
       setUserDetails(response);
     } catch (error: any) {

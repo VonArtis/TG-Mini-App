@@ -1408,6 +1408,43 @@ async def setup_totp_2fa_v1(authorization: str = Header(...)):
 async def verify_totp_2fa_v1(request: dict, authorization: str = Header(...)):
     """Verify TOTP 2FA code - API v1"""
     return await verify_totp_2fa_impl(request, authorization)
+
+# Phase 2 Enhancement: Biometric WebAuthn 2FA endpoints
+@api_v1_router.post("/auth/webauthn/register/begin")
+async def webauthn_register_begin_v1(request: BiometricSetupRequest, authorization: str = Header(...)):
+    """Begin WebAuthn biometric registration - API v1"""
+    return await webauthn_register_begin_impl(request, authorization)
+
+@api_v1_router.post("/auth/webauthn/register/complete")
+async def webauthn_register_complete_v1(request: WebAuthnRegistration, authorization: str = Header(...)):
+    """Complete WebAuthn biometric registration - API v1"""
+    return await webauthn_register_complete_impl(request, authorization)
+
+@api_v1_router.post("/auth/webauthn/authenticate/begin")
+async def webauthn_authenticate_begin_v1(request: dict, authorization: str = Header(...)):
+    """Begin WebAuthn biometric authentication - API v1"""
+    return await webauthn_authenticate_begin_impl(request, authorization)
+
+@api_v1_router.post("/auth/webauthn/authenticate/complete")
+async def webauthn_authenticate_complete_v1(request: WebAuthnVerification, authorization: str = Header(...)):
+    """Complete WebAuthn biometric authentication - API v1"""
+    return await webauthn_authenticate_complete_impl(request, authorization)
+
+# Phase 2 Enhancement: Push Notification 2FA endpoints
+@api_v1_router.post("/auth/push/register")
+async def push_notification_register_v1(request: PushNotificationToken, authorization: str = Header(...)):
+    """Register device for push notification 2FA - API v1"""
+    return await push_notification_register_impl(request, authorization)
+
+@api_v1_router.post("/auth/push/send")
+async def push_notification_send_v1(request: dict, authorization: str = Header(...)):
+    """Send push notification 2FA challenge - API v1"""
+    return await push_notification_send_impl(request, authorization)
+
+@api_v1_router.post("/auth/push/verify")
+async def push_notification_verify_v1(request: dict, authorization: str = Header(...)):
+    """Verify push notification 2FA response - API v1"""
+    return await push_notification_verify_impl(request, authorization)
 # ===== IMPLEMENTATION FUNCTIONS FOR API VERSIONING =====
 
 async def user_signup_impl(request: Request, user_data: UserSignup):

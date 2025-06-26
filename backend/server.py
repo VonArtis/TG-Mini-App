@@ -491,6 +491,10 @@ class UserResponse(BaseModel):
     membership_level: str
     created_at: str
     is_admin: Optional[bool] = False
+    # Phase 2A: Enhanced 2FA fields
+    biometric_2fa_enabled: Optional[bool] = False
+    push_2fa_enabled: Optional[bool] = False
+    enhanced_2fa_enabled: Optional[bool] = False
 
 # WebAuthn/Biometric 2FA Models - Phase 2 Enhancement
 class WebAuthnRegistration(BaseModel):

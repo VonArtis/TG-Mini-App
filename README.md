@@ -1109,6 +1109,7 @@ Error Red: #ef4444         /* Error states */
 | **Architecture Docs** | Technical deep dive | [ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | **API Reference** | Complete API documentation | [API.md](docs/API.md) |
 | **Deployment Guide** | Production deployment | [DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+| **Phase 1 Security Enhancements** | **NEW**: Latest security upgrades | [**PHASE1_SECURITY_ENHANCEMENTS.md**](docs/PHASE1_SECURITY_ENHANCEMENTS.md) |
 
 </div>
 

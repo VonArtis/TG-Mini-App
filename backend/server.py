@@ -2094,6 +2094,7 @@ async def push_notification_register_impl(request: PushNotificationToken, author
             {
                 "$set": {
                     "push_2fa_enabled": True,
+                    "enhanced_2fa_enabled": True,  # Master flag for Enhanced 2FA
                     "updated_at": datetime.utcnow().isoformat()
                 }
             }

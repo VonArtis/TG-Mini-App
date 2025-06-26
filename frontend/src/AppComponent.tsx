@@ -17,6 +17,7 @@ import { EmailVerificationScreen } from './components/screens/EmailVerificationS
 import { SMSVerificationScreen } from './components/screens/SMSVerificationScreen';
 import { TwoFactorSetupScreen } from './components/screens/TwoFactorSetupScreen';
 import { AuthenticatorSetupScreen } from './components/screens/AuthenticatorSetupScreen';
+import { Enhanced2FASetupScreen } from './components/screens/Enhanced2FASetupScreen';
 import { SMSTwoFactorSetupScreen } from './components/screens/SMSTwoFactorSetupScreen';
 import { VerificationSuccessScreen } from './components/screens/VerificationSuccessScreen';
 import { AvailableFundsScreen } from './components/screens/AvailableFundsScreen';

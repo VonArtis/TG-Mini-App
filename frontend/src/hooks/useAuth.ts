@@ -10,22 +10,48 @@ export const useAuth = () => {
 
   // Check for existing session on mount
   useEffect(() => {
-    const token = secureStorage.getToken();
-    const savedUser = localStorage.getItem('currentUser');
-    
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
-        console.log('Restored user from localStorage:', userData);
-      } catch (error) {
-        console.error('Error parsing saved user data:', error);
+    const validateExistingSession = async () => {
+      const token = secureStorage.getToken();
+      const savedUser = localStorage.getItem('currentUser');
+      
+      if (token && savedUser) {
+        try {
+          const userData = JSON.parse(savedUser);
+          
+          // Validate token with backend
+          const response = await apiService.getCurrentUser(token);
+          
+          if (response && response.user) {
+            // Token is valid, update user data from backend
+            const validatedUser: User = {
+              ...userData,
+              ...response.user,
+              token: token
+            };
+            
+            setUser(validatedUser);
+            localStorage.setItem('currentUser', JSON.stringify(validatedUser));
+            console.log('Session restored and validated:', validatedUser);
+          } else {
+            // Token invalid, clear session
+            secureStorage.removeToken();
+            localStorage.removeItem('currentUser');
+            console.log('Invalid token, session cleared');
+          }
+        } catch (error) {
+          console.error('Session validation failed:', error);
+          // Token invalid, clear session
+          secureStorage.removeToken();
+          localStorage.removeItem('currentUser');
+        }
+      } else if (savedUser && !token) {
+        // User data without token, clear it
         localStorage.removeItem('currentUser');
+        console.log('User data without token cleared');
       }
-    } else if (token) {
-      // TODO: Validate token with backend and restore user session
-      console.log('Existing token found, validating session...');
-    }
+    };
+
+    validateExistingSession();
   }, []);
 
   // Authenticate via bank connection

@@ -418,6 +418,20 @@ export const SMSVerificationScreen: React.FC<ScreenProps> = ({ onBack, onNavigat
               {loading ? 'Sending...' : 'Send Verification Code'}
             </Button>
 
+            {/* Skip SMS Button - Available Always */}
+            <Button
+              onClick={() => {
+                console.log('SMS verification skipped from initial screen');
+                onNavigate?.('two-factor-setup');
+              }}
+              variant="secondary"
+              fullWidth
+              size="lg"
+              className="mt-3"
+            >
+              Skip SMS Verification - Setup 2FA
+            </Button>
+
             {error && (
               <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3">
                 <p className="text-red-400 text-sm">{error}</p>

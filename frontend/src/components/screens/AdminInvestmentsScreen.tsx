@@ -48,12 +48,7 @@ export const AdminInvestmentsScreen: React.FC<ScreenProps> = ({ onBack }) => {
         return;
       }
 
-      const response = await apiService.makeRequest(
-        'GET',
-        '/admin/investments',
-        null,
-        user.token
-      );
+      const response = await apiService.getAdminInvestments(user.token);
       
       setAnalytics(response);
     } catch (error: any) {

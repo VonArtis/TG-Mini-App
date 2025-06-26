@@ -90,19 +90,19 @@ class ApiService {
     return response.data;
   }
 
-  // User Management - Signup/Login
+  // User Management - Signup/Login (Using API v1)
   async signup(userData: { name: string; email: string; password: string; phone: string; country_code: string }) {
-    const response = await axios.post(`${API_BASE}/auth/signup`, userData);
+    const response = await axios.post(`${API_V1_BASE}/auth/signup`, userData);
     return response.data;
   }
 
   async login(credentials: { email: string; password: string }) {
-    const response = await axios.post(`${API_BASE}/auth/login`, credentials);
+    const response = await axios.post(`${API_V1_BASE}/auth/login`, credentials);
     return response.data;
   }
 
   async getCurrentUser(token: string) {
-    const response = await axios.get(`${API_BASE}/auth/me`, {
+    const response = await axios.get(`${API_V1_BASE}/auth/me`, {
       headers: this.getAuthHeaders(token)
     });
     return response.data;

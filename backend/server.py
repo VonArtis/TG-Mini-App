@@ -1220,6 +1220,182 @@ def root():
 def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
+# ===== USER MANAGEMENT ENDPOINTS =====
+
+@app.post("/api/auth/signup")
+@limiter.limit("5/minute")
+async def user_signup(request: Request, user_data: UserSignup):
+    """Create new user account with email/password"""
+    try:
+        # Validate email format
+        if not validate_email(user_data.email):
+            raise HTTPException(status_code=400, detail="Invalid email format")
+        
+        # Check if user already exists
+        existing_user = db.users.find_one({"email": user_data.email})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="User with this email already exists")
+        
+        # Hash password
+        hashed_password = hash_password(user_data.password)
+        
+        # Create user document
+        user_id = str(uuid.uuid4())
+        id_number = get_next_user_id()
+        
+        # Check if this is an admin email
+        admin_emails = ["admin@vonartis.com", "security@vonartis.com"]
+        is_admin = user_data.email in admin_emails
+        
+        user_doc = {
+            "id": user_id,
+            "user_id": user_id,
+            "id_number": id_number,
+            "email": user_data.email,
+            "password": hashed_password,
+            "name": user_data.name,
+            "first_name": user_data.name.split(' ')[0] if user_data.name else '',
+            "last_name": ' '.join(user_data.name.split(' ')[1:]) if len(user_data.name.split(' ')) > 1 else '',
+            "phone": f"{user_data.country_code}{user_data.phone}",
+            "country_code": user_data.country_code,
+            "email_verified": False,
+            "phone_verified": False,
+            "membership_level": "basic" if is_admin else "none",
+            "total_invested": 0.0,
+            "crypto_connected": False,
+            "bank_connected": False,
+            "created_at": datetime.utcnow().isoformat(),
+            "last_login": datetime.utcnow().isoformat(),
+            "auth_type": "email",
+            "is_admin": is_admin,
+            "onboarding_complete": False
+        }
+        
+        # Insert user into database
+        result = db.users.insert_one(user_doc)
+        
+        # Generate JWT token
+        token = generate_jwt(user_id)
+        
+        # Prepare response
+        user_response = UserResponse(
+            id=user_id,
+            user_id=user_id,
+            name=user_data.name,
+            first_name=user_doc["first_name"],
+            last_name=user_doc["last_name"],
+            email=user_data.email,
+            phone=user_doc["phone"],
+            email_verified=False,
+            phone_verified=False,
+            membership_level=user_doc["membership_level"],
+            created_at=user_doc["created_at"],
+            is_admin=is_admin
+        )
+        
+        return {
+            "message": "User created successfully",
+            "user": user_response,
+            "token": token,
+            "authenticated": True
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Signup error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create user account")
+
+@app.post("/api/auth/login")
+@limiter.limit("10/minute")
+async def user_login(request: Request, login_data: UserLogin):
+    """Authenticate user with email/password"""
+    try:
+        # Find user by email
+        user = db.users.find_one({"email": login_data.email})
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Verify password
+        if not verify_password(login_data.password, user["password"]):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Update last login
+        db.users.update_one(
+            {"_id": user["_id"]},
+            {"$set": {"last_login": datetime.utcnow().isoformat()}}
+        )
+        
+        # Generate JWT token
+        token = generate_jwt(user["user_id"])
+        
+        # Prepare response
+        user_response = UserResponse(
+            id=user["user_id"],
+            user_id=user["user_id"],
+            name=user.get("name", ""),
+            first_name=user.get("first_name", ""),
+            last_name=user.get("last_name", ""),
+            email=user["email"],
+            phone=user.get("phone", ""),
+            email_verified=user.get("email_verified", False),
+            phone_verified=user.get("phone_verified", False),
+            membership_level=user.get("membership_level", "none"),
+            created_at=user.get("created_at", ""),
+            is_admin=user.get("is_admin", False)
+        )
+        
+        return {
+            "message": "Login successful",
+            "user": user_response,
+            "token": token,
+            "authenticated": True
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Login error: {e}")
+        raise HTTPException(status_code=500, detail="Login failed")
+
+@app.get("/api/auth/me")
+async def get_current_user(authorization: str = Header(...)):
+    """Get current authenticated user information"""
+    try:
+        user_id = require_auth(authorization)
+        
+        # Find user in database
+        user = db.users.find_one({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Prepare response
+        user_response = UserResponse(
+            id=user["user_id"],
+            user_id=user["user_id"],
+            name=user.get("name", ""),
+            first_name=user.get("first_name", ""),
+            last_name=user.get("last_name", ""),
+            email=user["email"],
+            phone=user.get("phone", ""),
+            email_verified=user.get("email_verified", False),
+            phone_verified=user.get("phone_verified", False),
+            membership_level=user.get("membership_level", "none"),
+            created_at=user.get("created_at", ""),
+            is_admin=user.get("is_admin", False)
+        )
+        
+        return {
+            "user": user_response,
+            "authenticated": True
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Get user error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get user information")
+
 # Authentication Endpoints
 @app.post("/api/auth/telegram")
 @limiter.limit("10/minute")  # Rate limit: 10 requests per minute

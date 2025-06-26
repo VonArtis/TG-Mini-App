@@ -227,6 +227,20 @@ export const TwoFactorSetupScreen: React.FC<ScreenProps> = ({ onBack, onNavigate
           }
         </Button>
 
+        {/* Skip Button for Admin/Testing */}
+        <Button
+          onClick={() => {
+            console.log('2FA setup skipped - proceeding to dashboard');
+            onNavigate?.('dashboard');
+          }}
+          variant="secondary"
+          fullWidth
+          size="lg"
+          className="mt-3 border-yellow-500 text-yellow-400 hover:bg-yellow-500/10"
+        >
+          Skip 2FA Setup - Access Dashboard
+        </Button>
+
         {selectedMethod && (
           <p className="text-center text-xs text-gray-500">
             {backupMethod

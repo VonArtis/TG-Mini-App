@@ -56,6 +56,7 @@ const AppRouter: React.FC = () => {
       'sms-verification': 'Verify Phone - VonVault',
       '2fa-setup': 'Setup 2FA - VonVault',
       '2fa-authenticator-setup': 'Setup Authenticator - VonVault',
+      'enhanced-2fa-setup': 'Enhanced 2FA Setup - VonVault',
       '2fa-sms-setup': 'Setup SMS 2FA - VonVault',
       'verification-success': 'Verification Complete - VonVault',
       'dashboard': 'Dashboard - VonVault',

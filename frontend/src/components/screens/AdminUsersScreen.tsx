@@ -151,7 +151,6 @@ export const AdminUsersScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) 
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by email, name, or user ID..."
               className="flex-1"
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
             <Button onClick={handleSearch} disabled={loading}>
               Search

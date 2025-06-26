@@ -9,8 +9,10 @@ import type {
   MembershipTiersResponse
 } from '../types';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API_BASE = `${BACKEND_URL}/api`;
+const API_V1_BASE = `${BACKEND_URL}/api/v1`;  // Use v1 APIs for new features
+const API_LEGACY_BASE = `${BACKEND_URL}/api`; // Keep legacy for existing features
 
 // Input validation utilities
 class InputValidator {

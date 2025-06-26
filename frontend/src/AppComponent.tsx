@@ -43,6 +43,7 @@ import './App.css';
 // Main App Router Component
 const AppRouter: React.FC = () => {
   const [screen, setScreen] = useState<ScreenType>('welcome');
+  const [userDetailsParams, setUserDetailsParams] = useState<any>(null);
 
   // Update document title based on current screen
   useEffect(() => {

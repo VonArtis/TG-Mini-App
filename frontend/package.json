@@ -4,9 +4,9 @@
   "description": "VonVault DeFi Telegram Mini App Frontend",
   "private": true,
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "audit": "yarn audit --level moderate",
     "audit-fix": "yarn audit --fix",

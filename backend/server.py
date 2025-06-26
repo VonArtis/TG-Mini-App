@@ -2,7 +2,7 @@ from fastapi import FastAPI, APIRouter, Header, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, validator
-import requests
+import requests  # For Telegram bot API calls
 import os
 from dotenv import load_dotenv
 from eth_account.messages import encode_defunct

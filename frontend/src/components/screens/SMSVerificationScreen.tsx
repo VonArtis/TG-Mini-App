@@ -205,23 +205,38 @@ export const SMSVerificationScreen: React.FC<ScreenProps> = ({ onBack, onNavigat
     setError('');
 
     try {
-      // TODO: Replace with actual API call when backend is ready
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
+      const fullPhone = `${countryCode}${phoneNumber}`;
       
-      // For demo, accept any 6-digit code
-      if (otp.length === 6) {
-        setMessage('Phone number verified successfully!');
-        setTimeout(() => {
-          onNavigate?.('verification-success');
-        }, 2000);
-      } else {
-        throw new Error('Invalid code');
+      // Call real SMS verification API
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/sms/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(user?.token && { 'Authorization': `Bearer ${user.token}` })
+        },
+        body: JSON.stringify({ 
+          phone_number: fullPhone,
+          code: otp 
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Invalid verification code');
       }
+
+      // Success - phone verified
+      setMessage('Phone verified successfully!');
       
-    } catch (error) {
-      console.error('OTP verification error:', error);
+      // Navigate to 2FA setup
+      setTimeout(() => {
+        onNavigate?.('two-factor-setup');
+      }, 1500);
+      
+    } catch (error: any) {
+      console.error('SMS verification error:', error);
+      setError(error.message || 'Invalid verification code. Please try again.');
       setOtpError(true);
-      setError('Invalid verification code. Please try again.');
     } finally {
       setVerifying(false);
     }

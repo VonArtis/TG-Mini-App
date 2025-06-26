@@ -171,17 +171,29 @@ export const SMSVerificationScreen: React.FC<ScreenProps> = ({ onBack, onNavigat
     try {
       const fullPhone = `${countryCode}${phoneNumber}`;
       
-      // TODO: Replace with actual API call when backend is ready
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+      // Call real SMS verification API
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/sms/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(user?.token && { 'Authorization': `Bearer ${user.token}` })
+        },
+        body: JSON.stringify({ phone_number: fullPhone })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to send SMS verification');
+      }
       
       setCodeSent(true);
       setMessage(`6-digit verification code sent to ${fullPhone}`);
       setResendCount(resendCount + 1);
       setCountdown(60); // 60 second cooldown
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('SMS sending error:', error);
-      setError('Failed to send SMS. Please check your phone number and try again.');
+      setError(error.message || 'Failed to send SMS. Please check your phone number and try again.');
     } finally {
       setLoading(false);
     }

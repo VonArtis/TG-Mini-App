@@ -215,6 +215,12 @@ const AppRouter: React.FC = () => {
             onNavigate={setScreen}
           />
         );
+      case 'enhanced-2fa-setup':
+        return (
+          <Enhanced2FASetupScreen 
+            onNavigate={setScreen}
+          />
+        );
       case '2fa-sms-setup':
         return (
           <SMSTwoFactorSetupScreen 

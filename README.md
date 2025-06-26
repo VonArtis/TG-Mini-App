@@ -732,7 +732,7 @@ frontend/src/
 │   ├── common/           # Reusable UI library
 │   └── layout/           # Navigation & layouts
 ├── hooks/                # Custom React hooks
-├── services/             # API communication
+├── services/             # API communication (v1 + legacy)
 ├── context/              # Global state management
 ├── types/                # TypeScript definitions
 └── utils/                # Helper functions

@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 import pymongo
 from bson import ObjectId
 import uuid
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import asyncio
 import aiohttp
 from web3 import Web3

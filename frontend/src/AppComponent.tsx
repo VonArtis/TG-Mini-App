@@ -329,7 +329,46 @@ const AppRouter: React.FC = () => {
       case 'admin-plans':
         return (
           <AdminPlansScreen 
-            onBack={() => setScreen('dashboard')} 
+            onBack={() => setScreen('admin-dashboard')} 
+          />
+        );
+      case 'admin-dashboard':
+        return (
+          <AdminDashboardScreen 
+            onBack={() => setScreen('dashboard')}
+            onNavigate={setScreen}
+          />
+        );
+      case 'admin-users':
+        return (
+          <AdminUsersScreen 
+            onBack={() => setScreen('admin-dashboard')}
+            onNavigate={(screen, params) => {
+              if (screen === 'admin-user-details' && params?.userId) {
+                setUserDetailsParams(params);
+              }
+              setScreen(screen);
+            }}
+          />
+        );
+      case 'admin-user-details':
+        return (
+          <AdminUserDetailsScreen 
+            onBack={() => setScreen('admin-users')}
+            onNavigate={setScreen}
+            userId={userDetailsParams?.userId}
+          />
+        );
+      case 'admin-investments':
+        return (
+          <AdminInvestmentsScreen 
+            onBack={() => setScreen('admin-dashboard')}
+          />
+        );
+      case 'admin-crypto':
+        return (
+          <AdminCryptoScreen 
+            onBack={() => setScreen('admin-dashboard')}
           />
         );
       case 'membership-status':

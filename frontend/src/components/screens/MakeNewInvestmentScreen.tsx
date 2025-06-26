@@ -404,6 +404,35 @@ export const MakeNewInvestmentScreen: React.FC<ScreenProps> = ({ onBack, onNavig
             className="text-xl"
           />
           
+          {/* Enhanced 2FA Requirement Indicator */}
+          {amount && parseFloat(amount) >= 20000 && (
+            <div className="mt-4 p-3 bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">🛡️</span>
+                <span className="text-sm font-semibold text-blue-400">Enhanced Security Required</span>
+                <div className="px-2 py-1 bg-blue-900/50 rounded text-xs text-blue-300">
+                  $20k+
+                </div>
+              </div>
+              <p className="text-xs text-gray-300 mb-2">
+                Investments of $20,000 or more require Enhanced 2FA for your protection.
+              </p>
+              <div className="flex items-center gap-2">
+                {apiService.hasEnhanced2FA(user!) ? (
+                  <div className="flex items-center gap-1 text-xs text-green-400">
+                    <span>✅</span>
+                    <span>Enhanced 2FA enabled</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-xs text-orange-400">
+                    <span>⚠️</span>
+                    <span>Enhanced 2FA setup required</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
           <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
             <div className="p-3 bg-gray-800 rounded-lg">
               <div className="text-gray-400">Minimum</div>

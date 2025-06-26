@@ -150,78 +150,35 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
               View Details
             </Button>
           </div>
-          
-          {membershipStatus ? (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <MembershipBadge level={membershipStatus.level} size="lg" />
-                <div>
-                  <p className="text-white font-semibold text-lg">
-                    {membershipStatus.emoji} {membershipStatus.level_name}
-                  </p>
-                  <p className="text-gray-400 text-sm">Current membership tier</p>
+          <MembershipBadge level={user?.investment_tier || 'basic'} />
+        </Card>
+
+        {/* Enhanced 2FA Security - Phase 2 Feature */}
+        <Card className="border-green-500/30 bg-gradient-to-r from-green-900/20 to-blue-900/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white font-semibold flex items-center gap-2">
+                <span>🛡️</span>
+                Enhanced 2FA Security
+              </p>
+              <p className="text-sm text-gray-400">Biometric & Push Notification 2FA</p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="px-2 py-1 bg-green-900/50 rounded text-xs text-green-400">
+                  NEW: Phase 2
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-400">Total Invested</p>
-                  <p className="text-white font-semibold">{formatAmount(membershipStatus.total_invested)}</p>
+                <div className="px-2 py-1 bg-blue-900/50 rounded text-xs text-blue-400">
+                  Device-Based Security
                 </div>
-                <div>
-                  <p className="text-sm text-gray-400">Available Plans</p>
-                  <p className="text-white font-semibold">{membershipStatus.available_plans?.length || 0}</p>
-                </div>
-              </div>
-              
-              {membershipStatus.next_level && (
-                <div className="bg-gray-800/50 rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm text-gray-400">Progress to {membershipStatus.next_level_name}</p>
-                    <p className="text-sm text-purple-400 font-medium">
-                      {membershipStatus.amount_to_next ? formatAmount(membershipStatus.amount_to_next) + ' to go' : 'Achieved!'}
-                    </p>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${Math.min(100, (membershipStatus.total_invested / (membershipStatus.total_invested + (membershipStatus.amount_to_next || 0))) * 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <MembershipBadge level="club" size="lg" />
-                <div>
-                  <p className="text-white font-semibold text-lg">
-                    🥉 Club Member
-                  </p>
-                  <p className="text-gray-400 text-sm">Starting membership tier</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-400">Total Invested</p>
-                  <p className="text-white font-semibold">$0</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-400">Available Plans</p>
-                  <p className="text-white font-semibold">3</p>
-                </div>
-              </div>
-              
-              <div className="bg-gray-800/50 rounded-lg p-3">
-                <p className="text-sm text-gray-400 mb-2">Ready to start investing</p>
-                <p className="text-sm text-purple-400">Connect a bank account or crypto wallet to begin</p>
               </div>
             </div>
-          )}
+            <Button
+              onClick={() => onNavigate?.('enhanced-2fa-setup')}
+              size="sm"
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Setup Enhanced 2FA
+            </Button>
+          </div>
         </Card>
 
         {/* Account Status */}

@@ -72,6 +72,11 @@ export interface User {
   // === EXISTING FIELDS ===
   bank_connected?: boolean;
   crypto_connected?: boolean;
+  
+  // === VERIFICATION STATUS ===
+  email_verified?: boolean;
+  phone_verified?: boolean;
+  
   type?: 'bank' | 'crypto' | 'login' | 'signup';
   auth_type?: string;
   created_at?: string;

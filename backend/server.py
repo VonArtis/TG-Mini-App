@@ -2528,12 +2528,11 @@ def require_admin_auth(authorization: str) -> str:
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     
-    # Check admin status (you can add admin field to user collection)
-    # For now, we'll use a simple email-based check
+    # Check admin status with your vonartis.com admin emails
     admin_emails = [
-        "admin@vonvault.com", 
-        "harry@vonvault.com",
-        # Add your admin email here
+        "admin@vonartis.com",
+        "security@vonartis.com",
+        # VonArtis domain admin access only
     ]
     
     user_email = user.get("email", "")

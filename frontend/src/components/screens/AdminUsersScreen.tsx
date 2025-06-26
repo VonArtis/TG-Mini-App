@@ -64,8 +64,8 @@ export const AdminUsersScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) 
         {
           page: currentPage,
           limit: USERS_PER_PAGE,
-          search: searchTerm,
-          filter: filterBy
+          search: searchQuery.trim() || undefined,
+          filter_verified: filterVerified !== null ? filterVerified : undefined
         }
       );
       

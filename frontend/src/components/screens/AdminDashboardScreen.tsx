@@ -43,12 +43,7 @@ export const AdminDashboardScreen: React.FC<ScreenProps> = ({ onBack, onNavigate
         return;
       }
 
-      const response = await apiService.makeRequest(
-        'GET',
-        '/admin/overview',
-        null,
-        user.token
-      );
+      const response = await apiService.getAdminOverview(user.token);
       
       setOverview(response);
     } catch (error: any) {

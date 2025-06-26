@@ -227,6 +227,9 @@ export const useAuth = () => {
   // Logout
   const logout = () => {
     setUser(null);
+    secureStorage.removeToken();
+    localStorage.removeItem('currentUser');
+    console.log('User logged out, session cleared');
   };
 
   // Check if user is authenticated

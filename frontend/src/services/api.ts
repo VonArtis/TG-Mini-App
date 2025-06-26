@@ -47,13 +47,35 @@ class ApiService {
   }
 
   // Enhanced error handling
+  // Enhanced error handling
   private handleApiError(error: any) {
-    if (error.response?.status === 401) {
-      // Token expired or invalid - clear and redirect to login
-      secureStorage.removeToken();
-      window.location.href = '/login';
+    if (error.response?.data?.detail) {
+      throw new Error(error.response.data.detail);
     }
-    throw error;
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    if (error.message) {
+      throw new Error(error.message);
+    }
+    throw new Error('An unexpected error occurred');
+  }
+
+  // Generic API request method for admin endpoints
+  async makeRequest(method: 'GET' | 'POST' | 'PUT' | 'DELETE', endpoint: string, data?: any, token?: string) {
+    try {
+      const config = {
+        method: method.toLowerCase(),
+        url: `${API_BASE}${endpoint}`,
+        headers: this.getAuthHeaders(token),
+        ...(data && { data })
+      };
+
+      const response = await axios(config);
+      return response.data;
+    } catch (error) {
+      this.handleApiError(error);
+    }
   }
 
   // Authentication

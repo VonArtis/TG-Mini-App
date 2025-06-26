@@ -231,6 +231,14 @@ export const TwoFactorSetupScreen: React.FC<ScreenProps> = ({ onBack, onNavigate
         <Button
           onClick={() => {
             console.log('2FA setup skipped - proceeding to dashboard');
+            
+            // Mark verification as completed so user doesn't see this flow again
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (currentUser.email) {
+              localStorage.setItem(`verification_${currentUser.email}`, 'completed');
+              console.log(`Verification marked as completed for ${currentUser.email}`);
+            }
+            
             onNavigate?.('dashboard');
           }}
           variant="secondary"

@@ -494,7 +494,7 @@ export const SMSVerificationScreen: React.FC<ScreenProps> = ({ onBack, onNavigat
                 onClick={() => {
                   console.log('SMS verification skipped');
                   // TODO: Update user context to reflect phone as verified or skipped
-                  onNavigate?.('two-factor-setup');
+                  onNavigate?.('2fa-setup');
                 }}
                 variant="outline"
                 size="sm"

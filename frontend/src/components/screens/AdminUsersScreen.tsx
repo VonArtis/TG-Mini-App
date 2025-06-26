@@ -57,24 +57,14 @@ export const AdminUsersScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) 
         return;
       }
 
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: '20'
-      });
-
-      if (searchQuery.trim()) {
-        params.append('search', searchQuery.trim());
-      }
-
-      if (filterVerified !== null) {
-        params.append('filter_verified', filterVerified.toString());
-      }
-
-      const response = await apiService.makeRequest(
-        'GET',
-        `/admin/users?${params.toString()}`,
-        null,
-        user.token
+      const response = await apiService.getAdminUsers(
+        user.token,
+        {
+          page: currentPage,
+          limit: USERS_PER_PAGE,
+          search: searchTerm,
+          filter: filterBy
+        }
       );
       
       setUsers(response.users);

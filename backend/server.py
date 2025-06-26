@@ -63,6 +63,70 @@ async def add_security_headers(request, call_next):
     response.headers["Content-Security-Policy"] = "default-src 'self'"
     return response
 
+# Request/Response logging middleware  
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Enhanced request/response logging for security monitoring"""
+    import time
+    import logging
+    
+    # Setup logging
+    logger = logging.getLogger("vonvault.api")
+    
+    # Record request start time
+    start_time = time.time()
+    
+    # Extract request information
+    client_ip = request.client.host if request.client else "unknown"
+    user_agent = request.headers.get("user-agent", "unknown")
+    method = request.method
+    url = str(request.url)
+    
+    # Check for authentication header
+    auth_header = request.headers.get("authorization", "")
+    is_authenticated = bool(auth_header.startswith("Bearer "))
+    
+    try:
+        # Process request
+        response = await call_next(request)
+        
+        # Calculate processing time
+        process_time = time.time() - start_time
+        
+        # Log request details
+        logger.info(
+            f"API_REQUEST | "
+            f"IP:{client_ip} | "
+            f"METHOD:{method} | "
+            f"URL:{url} | "
+            f"STATUS:{response.status_code} | "
+            f"TIME:{process_time:.3f}s | "
+            f"AUTH:{is_authenticated} | "
+            f"UA:{user_agent[:50]}"
+        )
+        
+        # Log security events
+        if response.status_code == 401:
+            logger.warning(f"SECURITY_EVENT | UNAUTHORIZED_ACCESS | IP:{client_ip} | URL:{url}")
+        elif response.status_code == 403:
+            logger.warning(f"SECURITY_EVENT | FORBIDDEN_ACCESS | IP:{client_ip} | URL:{url}")
+        elif response.status_code >= 500:
+            logger.error(f"SERVER_ERROR | STATUS:{response.status_code} | IP:{client_ip} | URL:{url}")
+            
+        return response
+        
+    except Exception as e:
+        # Log exceptions
+        process_time = time.time() - start_time
+        logger.error(
+            f"API_EXCEPTION | "
+            f"IP:{client_ip} | "
+            f"URL:{url} | "
+            f"ERROR:{str(e)} | "
+            f"TIME:{process_time:.3f}s"
+        )
+        raise
+
 # CORS Configuration - Restrict to production domains
 ALLOWED_ORIGINS = [
     "https://www.vonartis.app",

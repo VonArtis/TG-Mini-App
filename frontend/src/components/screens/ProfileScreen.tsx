@@ -321,10 +321,9 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
           </div>
         </Card>
 
-        {/* Admin Section - Only show for admin users */}
-        {(user?.email === 'admin@vonvault.com' || 
-          user?.email === 'harry@vonvault.com' || 
-          user?.email?.includes('admin')) && (
+        {/* Admin Section - Only show for vonartis.com admin users */}
+        {(user?.email === 'admin@vonartis.com' || 
+          user?.email === 'security@vonartis.com') && (
           <Card className="border-purple-500/50 bg-gradient-to-r from-purple-900/30 to-purple-800/30">
             <div className="flex items-center justify-between">
               <div>
@@ -332,7 +331,7 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
                   <span>🛠️</span>
                   Admin Dashboard
                 </p>
-                <p className="text-sm text-gray-400">Full system administration</p>
+                <p className="text-sm text-gray-400">VonArtis system administration</p>
               </div>
               <Button
                 onClick={() => onNavigate?.('admin-dashboard')}

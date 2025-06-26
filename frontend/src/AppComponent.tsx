@@ -21,6 +21,11 @@ import { SMSTwoFactorSetupScreen } from './components/screens/SMSTwoFactorSetupS
 import { VerificationSuccessScreen } from './components/screens/VerificationSuccessScreen';
 import { AvailableFundsScreen } from './components/screens/AvailableFundsScreen';
 import { AdminPlansScreen } from './components/screens/AdminPlansScreen';
+import { AdminDashboardScreen } from './components/screens/AdminDashboardScreen';
+import { AdminUsersScreen } from './components/screens/AdminUsersScreen';
+import { AdminUserDetailsScreen } from './components/screens/AdminUserDetailsScreen';
+import { AdminInvestmentsScreen } from './components/screens/AdminInvestmentsScreen';
+import { AdminCryptoScreen } from './components/screens/AdminCryptoScreen';
 import { PrivacyPolicyScreen } from './components/screens/PrivacyPolicyScreen';
 import { TermsOfServiceScreen } from './components/screens/TermsOfServiceScreen';
 import { EditProfileScreen } from './components/screens/EditProfileScreen';

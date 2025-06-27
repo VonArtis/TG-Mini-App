@@ -529,23 +529,23 @@ class ApiService {
   }
 
   // Phase 2 Enhancement: Enhanced 2FA Conditional Logic
-  checkEnhanced2FARequired: (user: User, investmentAmount: number): boolean => {
+  checkEnhanced2FARequired(user: User, investmentAmount: number): boolean {
     // Enhanced 2FA mandatory for investments ≥ $20,000
     const ENHANCED_2FA_THRESHOLD = 20000;
     return investmentAmount >= ENHANCED_2FA_THRESHOLD;
-  },
+  }
 
   // Check if user has Enhanced 2FA enabled
-  hasEnhanced2FA: (user: User): boolean => {
+  hasEnhanced2FA(user: User): boolean {
     // Check if user has any enhanced 2FA methods enabled
     // This would be set when they complete biometric or push setup
     return user.biometric_2fa_enabled || user.push_2fa_enabled || false;
-  },
+  }
 
   // Validate Enhanced 2FA for high-value operations
-  validateEnhanced2FAForInvestment: (user: User, amount: number) => {
-    const requiresEnhanced = apiService.checkEnhanced2FARequired(user, amount);
-    const hasEnhanced = apiService.hasEnhanced2FA(user);
+  validateEnhanced2FAForInvestment(user: User, amount: number) {
+    const requiresEnhanced = this.checkEnhanced2FARequired(user, amount);
+    const hasEnhanced = this.hasEnhanced2FA(user);
     
     return {
       required: requiresEnhanced,
@@ -556,7 +556,7 @@ class ApiService {
         ? `Enhanced 2FA is required for investments of $20,000 or more. Please set up biometric or push notification authentication to proceed.`
         : null
     };
-  },
+  }
 }
 
 export const apiService = new ApiService();

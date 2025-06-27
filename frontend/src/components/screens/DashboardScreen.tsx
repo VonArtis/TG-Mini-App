@@ -6,9 +6,11 @@ import { FullScreenLoader } from '../common/LoadingSpinner';
 import { MembershipBadge } from '../common/MembershipBadge';
 import { EnhancedProgressBar } from '../common/EnhancedProgressBar';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../hooks/useLanguage';
 
 export const DashboardScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
   
   // === PHASE 2C: MULTI-WALLET DASHBOARD INTEGRATION ===
   const { 

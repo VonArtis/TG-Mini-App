@@ -7,12 +7,14 @@ import { Input } from '../common/Input';
 import { MembershipBadge } from '../common/MembershipBadge';
 import { useApp } from '../../context/AppContext';
 import { useMembership } from '../../hooks/useMembership';
+import { useLanguage } from '../../hooks/useLanguage';
 import { apiService } from '../../services/api';
 import { secureStorage } from '../../utils/secureStorage';
 
 export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
   const { user, setUser, connected_wallets } = useApp();
   const { membershipStatus, fetchMembershipStatus } = useMembership(user);
+  const { currentLanguage, availableLanguages, changeLanguage, t } = useLanguage();
   
   // Profile deletion state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -103,37 +105,37 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
 
   return (
     <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8">
-      <ScreenHeader title="Profile & Settings" onBack={onBack} />
+      <ScreenHeader title={t('profile:title')} onBack={onBack} />
 
       <div className="space-y-4">
         {/* User Information */}
         <Card>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Personal Information</h3>
+            <h3 className="text-lg font-semibold text-white">{t('profile:sections.personalInfo.title')}</h3>
             <Button onClick={handleEditProfile} size="sm" variant="secondary">
-              Edit
+              {t('buttons.edit')}
             </Button>
           </div>
           
           <div className="space-y-3">
             <div>
-              <p className="text-sm text-gray-400">Name</p>
-              <p className="text-white font-medium">{user?.name || 'Not provided'}</p>
+              <p className="text-sm text-gray-400">{t('profile:sections.personalInfo.name')}</p>
+              <p className="text-white font-medium">{user?.name || t('profile:sections.personalInfo.notProvided')}</p>
             </div>
             
             <div>
-              <p className="text-sm text-gray-400">Email</p>
-              <p className="text-white font-medium">{user?.email || 'Not provided'}</p>
+              <p className="text-sm text-gray-400">{t('profile:sections.personalInfo.email')}</p>
+              <p className="text-white font-medium">{user?.email || t('profile:sections.personalInfo.notProvided')}</p>
             </div>
             
             <div>
-              <p className="text-sm text-gray-400">User ID</p>
+              <p className="text-sm text-gray-400">{t('profile:sections.personalInfo.userId')}</p>
               <p className="text-white font-medium text-sm">{user?.id || user?.user_id || 'Not available'}</p>
             </div>
             
             <div>
-              <p className="text-sm text-gray-400">Phone</p>
-              <p className="text-white font-medium">{user?.phone || 'Not provided'}</p>
+              <p className="text-sm text-gray-400">{t('profile:sections.personalInfo.phone')}</p>
+              <p className="text-white font-medium">{user?.phone || t('profile:sections.personalInfo.notProvided')}</p>
             </div>
           </div>
         </Card>
@@ -141,13 +143,13 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
         {/* Membership Status */}
         <Card className="border-purple-500/30">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Membership Status</h3>
+            <h3 className="text-lg font-semibold text-white">{t('profile:sections.membership.title')}</h3>
             <Button 
               onClick={() => onNavigate?.('membership-status')} 
               size="sm" 
               variant="secondary"
             >
-              View Details
+              {t('profile:sections.membership.viewDetails')}
             </Button>
           </div>
           <MembershipBadge level={user?.investment_tier || 'basic'} />
@@ -209,8 +211,8 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
         <Card className="border-blue-500/30">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-white">Language & Region</h3>
-              <p className="text-sm text-gray-400">Choose your preferred language</p>
+              <h3 className="text-lg font-semibold text-white">{t('profile:sections.language.title')}</h3>
+              <p className="text-sm text-gray-400">{t('profile:sections.language.subtitle')}</p>
             </div>
             <span className="text-2xl">🌍</span>
           </div>
@@ -218,44 +220,39 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
           <div className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">
-                Display Language
+                {t('profile:sections.language.displayLanguage')}
               </label>
               <select 
                 className="w-full p-3 bg-gray-900 border border-blue-500/50 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                defaultValue="en"
-                onChange={(e) => {
-                  // TODO: Implement language change logic
-                  console.log('Language changed to:', e.target.value);
-                  alert(`Language changed to: ${e.target.options[e.target.selectedIndex].text}`);
+                value={currentLanguage.code}
+                onChange={async (e) => {
+                  const success = await changeLanguage(e.target.value);
+                  if (success) {
+                    alert(t('profile:sections.language.changeSuccess'));
+                  } else {
+                    alert(t('profile:sections.language.changeError'));
+                  }
                 }}
               >
-                <option value="en">🇺🇸 English</option>
-                <option value="es">🇪🇸 Español (Spanish)</option>
-                <option value="fr">🇫🇷 Français (French)</option>
-                <option value="de">🇩🇪 Deutsch (German)</option>
-                <option value="it">🇮🇹 Italiano (Italian)</option>
-                <option value="pt">🇵🇹 Português (Portuguese)</option>
-                <option value="ru">🇷🇺 Русский (Russian)</option>
-                <option value="zh">🇨🇳 中文 (Chinese)</option>
-                <option value="ja">🇯🇵 日本語 (Japanese)</option>
-                <option value="ko">🇰🇷 한국어 (Korean)</option>
-                <option value="ar">🇸🇦 العربية (Arabic)</option>
-                <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
-                <option value="tr">🇹🇷 Türkçe (Turkish)</option>
-                <option value="pl">🇵🇱 Polski (Polish)</option>
-                <option value="nl">🇳🇱 Nederlands (Dutch)</option>
+                {availableLanguages.map((lang) => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.flag} {lang.name}
+                  </option>
+                ))}
               </select>
             </div>
             
-            <div className="bg-blue-900/20 rounded-lg p-3">
-              <div className="flex items-center space-x-2">
-                <span className="text-blue-400">ℹ️</span>
-                <div>
-                  <p className="text-sm text-blue-300 font-medium">Coming Soon</p>
-                  <p className="text-xs text-blue-400">Full multi-language support is in development. Interface will be translated in the next update.</p>
+            {availableLanguages.length > 2 && (
+              <div className="bg-blue-900/20 rounded-lg p-3">
+                <div className="flex items-center space-x-2">
+                  <span className="text-blue-400">ℹ️</span>
+                  <div>
+                    <p className="text-sm text-blue-300 font-medium">{t('profile:sections.language.comingSoon')}</p>
+                    <p className="text-xs text-blue-400">{t('profile:sections.language.developmentNote')}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </Card>
 

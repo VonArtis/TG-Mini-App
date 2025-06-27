@@ -1253,7 +1253,7 @@ Plus, Telegram's security model adds an extra layer of protection to user accoun
 <br>
 Several key innovations set us apart:
 
-1. **Security First**: 9.2/10 rating vs industry average of 5.4/10
+1. **Security First**: **9.7/10 rating** vs industry average of 5.4/10
 2. **Traditional Bridge**: Real bank integration, not just crypto
 3. **Mobile Native**: Built specifically for Telegram users
 4. **Tier System**: Progressive rewards that grow with you

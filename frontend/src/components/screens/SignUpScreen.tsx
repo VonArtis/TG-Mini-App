@@ -63,41 +63,46 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
 
   return (
     <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8 flex flex-col">
-      <ScreenHeader title="Create Account" onBack={onGoToLogin} />
+      {/* Language Selector in Header */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector variant="compact" />
+      </div>
+      
+      <ScreenHeader title={t('auth:signup.title')} onBack={onGoToLogin} />
 
       <div className="space-y-5">
         <Input
-          label="Full Name"
+          label={t('auth:signup.nameLabel')}
           value={form.name}
           onChange={handleChange('name')}
-          placeholder="Enter your full name"
+          placeholder={t('auth:signup.namePlaceholder')}
           required
           error={errors.name}
         />
         
         <Input
-          label="Email Address"
+          label={t('auth:signup.emailLabel')}
           type="email"
           value={form.email}
           onChange={handleChange('email')}
-          placeholder="Enter your email"
+          placeholder={t('auth:signup.emailPlaceholder')}
           required
           error={errors.email}
         />
         
         <Input
-          label="Password"
+          label={t('auth:signup.passwordLabel')}
           type="password"
           value={form.password}
           onChange={handleChange('password')}
-          placeholder="Enter your password"
+          placeholder={t('auth:signup.passwordPlaceholder')}
           required
           error={errors.password}
         />
         
         <div className="space-y-1">
           <label className="block text-sm font-medium text-white">
-            Phone Number <span className="text-red-400 ml-1">*</span>
+            {t('auth:signup.phoneLabel')} <span className="text-red-400 ml-1">*</span>
           </label>
           <div className="flex gap-2">
             <select
@@ -160,7 +165,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
               type="tel"
               value={form.phone}
               onChange={handleChange('phone')}
-              placeholder="123 456 7890"
+              placeholder={t('auth:signup.phonePlaceholder')}
               required
               error={errors.phone}
               className="flex-1"
@@ -176,19 +181,19 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
             className="mt-1 mr-2 accent-purple-600"
           />
           <p className="text-sm text-gray-400">
-            I agree to VonVault's{' '}
+            {t('auth:signup.termsPrefix')}{' '}
             <span 
               className="text-purple-400 cursor-pointer hover:text-purple-300 transition-colors underline"
               onClick={() => onNavigate?.('terms-of-service')}
             >
-              Terms of Service
+              {t('auth:signup.termsOfService')}
             </span>{' '}
-            and{' '}
+            {t('auth:signup.and')}{' '}
             <span 
               className="text-purple-400 cursor-pointer hover:text-purple-300 transition-colors underline"
               onClick={() => onNavigate?.('privacy-policy')}
             >
-              Privacy Policy
+              {t('auth:signup.privacyPolicy')}
             </span>
           </p>
         </div>
@@ -202,16 +207,16 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           fullWidth
           size="lg"
         >
-          Create Account
+          {t('auth:signup.createAccountButton')}
         </Button>
         
         <p className="text-center text-sm text-white mt-4">
-          Already have an account?{' '}
+          {t('auth:signup.haveAccountPrefix')}{' '}
           <span 
             className="text-purple-400 font-medium cursor-pointer hover:text-purple-300 transition-colors" 
             onClick={onGoToLogin}
           >
-            Sign In
+            {t('auth:signup.signInLink')}
           </span>
         </p>
       </div>

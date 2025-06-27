@@ -18,15 +18,15 @@ export const LoginScreen: React.FC<AuthScreenProps> = ({ onLogin, onCreateAccoun
     const newErrors: { email?: string; password?: string } = {};
     
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('auth:login.validation.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = t('auth:login.validation.emailInvalid');
     }
     
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('auth:login.validation.passwordRequired');
     } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = t('auth:login.validation.passwordTooShort');
     }
     
     setErrors(newErrors);

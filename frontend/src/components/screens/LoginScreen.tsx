@@ -3,7 +3,9 @@ import type { AuthScreenProps } from '../../types';
 import { ScreenHeader } from '../layout/ScreenHeader';
 import { Input } from '../common/Input';
 import { Button } from '../common/Button';
+import { LanguageSelector } from '../common/LanguageSelector';
 import { useAuth } from '../../hooks/useAuth';
+import { useLanguage } from '../../hooks/useLanguage';
 
 export const LoginScreen: React.FC<AuthScreenProps> = ({ onLogin, onCreateAccount, onBack }) => {
   const [email, setEmail] = useState('');

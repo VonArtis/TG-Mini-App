@@ -40,7 +40,7 @@ export const LoginScreen: React.FC<AuthScreenProps> = ({ onLogin, onCreateAccoun
     if (user && onLogin) {
       onLogin(user);
     } else {
-      setErrors({ password: 'Invalid email or password' });
+      setErrors({ password: t('auth:login.validation.invalidCredentials') });
     }
   };
 

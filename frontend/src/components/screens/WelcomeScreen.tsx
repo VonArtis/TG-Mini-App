@@ -2,6 +2,8 @@ import React from 'react';
 import type { AuthScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { MobileLayout } from '../layout/MobileLayout';
+import { LanguageSelector } from '../common/LanguageSelector';
+import { useLanguage } from '../../hooks/useLanguage';
 
 export const WelcomeScreen: React.FC<AuthScreenProps> = ({ onSignIn, onCreateAccount, onNavigate }) => {
   return (

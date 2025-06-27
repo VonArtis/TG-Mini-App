@@ -27,23 +27,23 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!form.name) newErrors.name = 'Name is required';
+    if (!form.name) newErrors.name = t('auth:signup.validation.nameRequired');
     if (!form.email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('auth:signup.validation.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = t('auth:signup.validation.emailInvalid');
     }
     if (!form.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('auth:signup.validation.passwordRequired');
     } else if (form.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = t('auth:signup.validation.passwordTooShort');
     }
     if (!form.phone) {
-      newErrors.phone = 'Phone number is required';
+      newErrors.phone = t('auth:signup.validation.phoneRequired');
     } else if (!/^\d{10,15}$/.test(form.phone.replace(/\s+/g, ''))) {
-      newErrors.phone = 'Please enter a valid phone number';
+      newErrors.phone = t('auth:signup.validation.phoneInvalid');
     }
-    if (!agreed) newErrors.terms = 'You must agree to Terms of Service';
+    if (!agreed) newErrors.terms = t('auth:signup.validation.termsRequired');
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

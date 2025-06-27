@@ -5,6 +5,7 @@ import { Button } from '../common/Button';
 import { FullScreenLoader } from '../common/LoadingSpinner';
 import { MembershipBadge } from '../common/MembershipBadge';
 import { EnhancedProgressBar } from '../common/EnhancedProgressBar';
+import { LanguageSelector } from '../common/LanguageSelector';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../hooks/useLanguage';
 

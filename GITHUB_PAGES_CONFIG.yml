@@ -1,0 +1,21 @@
+theme: cayman
+title: "VonVault - World's Most Secure DeFi Platform"
+description: "Experience the future of finance with 9.7/10 security rating, 15+ languages, and enterprise-grade DeFi innovation"
+
+# Site settings
+url: "https://vonartis.github.io"
+baseurl: "/VonVault-Documentation"
+
+# GitHub repository
+github:
+  repository_name: "VonVault-Documentation"
+  owner_name: "VonArtis"
+
+# Custom variables
+show_downloads: false
+google_analytics: # Add your GA code if you want analytics
+
+# Professional colors matching VonVault branding
+cayman:
+  project_name: "VonVault"
+  project_tagline: "World's Most Secure DeFi Platform"

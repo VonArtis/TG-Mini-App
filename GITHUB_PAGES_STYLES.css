@@ -1,0 +1,100 @@
+/* Custom CSS for VonVault Documentation */
+
+/* Header styling */
+.page-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 3rem 0;
+}
+
+.project-name {
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.project-tagline {
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.9);
+  margin-top: 1rem;
+}
+
+/* Button styling */
+.btn {
+  background: linear-gradient(45deg, #9333ea, #7c3aed);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+}
+
+/* Content styling */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  line-height: 1.6;
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  background: white;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table th {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: bold;
+}
+
+table td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+table tr:hover {
+  background-color: #f8f9ff;
+}
+
+/* Badge styling */
+img[src*="shields.io"] {
+  margin: 0.2rem;
+  border-radius: 4px;
+}
+
+/* Achievement styling */
+h3:contains("Achievement") {
+  color: #9333ea;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .project-name {
+    font-size: 2rem;
+  }
+  
+  .main-content {
+    padding: 1rem;
+  }
+  
+  table {
+    font-size: 0.9rem;
+  }
+}

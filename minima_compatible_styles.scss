@@ -1,0 +1,114 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+/* VonVault Custom Styling for Minima Theme */
+.site-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border-top: none !important;
+}
+
+.site-title, .site-title:visited {
+  color: white !important;
+  font-size: 2rem !important;
+  font-weight: bold !important;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.4) !important;
+}
+
+.site-nav .page-link {
+  color: rgba(255,255,255,0.9) !important;
+}
+
+.site-nav .page-link:hover {
+  color: white !important;
+}
+
+/* Content styling */
+.page-content {
+  padding-top: 2rem !important;
+}
+
+.wrapper {
+  max-width: 1200px !important;
+}
+
+/* Table styling */
+table {
+  border-collapse: collapse !important;
+  margin: 2rem 0 !important;
+  background: white !important;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  border: none !important;
+}
+
+table th {
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  color: white !important;
+  padding: 1.2rem !important;
+  text-align: left !important;
+  font-weight: bold !important;
+  border: none !important;
+}
+
+table td {
+  padding: 1.2rem !important;
+  border-bottom: 1px solid #eee !important;
+  border-left: none !important;
+  border-right: none !important;
+  vertical-align: top !important;
+}
+
+table tr:hover {
+  background-color: #f8f9ff !important;
+}
+
+/* Heading styling */
+h1 {
+  color: #4c1d95 !important;
+  border-bottom: 2px solid #e5e7eb !important;
+  padding-bottom: 0.5rem !important;
+}
+
+h2 {
+  color: #4c1d95 !important;
+  border-bottom: 2px solid #e5e7eb !important;
+  padding-bottom: 0.5rem !important;
+}
+
+h3 {
+  color: #7c3aed !important;
+}
+
+/* Link styling */
+a {
+  color: #7c3aed !important;
+}
+
+a:hover {
+  color: #9333ea !important;
+}
+
+/* Badge styling */
+img[src*="shields.io"] {
+  margin: 0.3rem !important;
+  border-radius: 4px !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .site-title {
+    font-size: 1.5rem !important;
+  }
+  
+  table {
+    font-size: 0.9rem !important;
+  }
+  
+  table th, table td {
+    padding: 0.8rem !important;
+  }
+}

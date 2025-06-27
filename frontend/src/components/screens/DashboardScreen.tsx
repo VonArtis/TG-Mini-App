@@ -190,11 +190,14 @@ export const DashboardScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-            Dashboard
+            {t('dashboard:title')}
           </h1>
-          <p className="text-gray-400 text-sm mt-1">Welcome back to VonVault</p>
+          <p className="text-gray-400 text-sm mt-1">{t('dashboard:welcome')}</p>
         </div>
         <div className="flex items-center gap-3">
+          {/* Language Selector - Globe Icon */}
+          <LanguageSelector variant="icon-only" />
+          
           {/* Wallet Status Indicator */}
           {user?.crypto_connected ? (
             <div className="flex items-center gap-2 bg-green-900/30 border border-green-500/30 rounded-lg px-3 py-2">

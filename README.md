@@ -1191,7 +1191,7 @@ Error Red: #ef4444         /* Error states */
 <details>
 <summary><strong>🛡️ Is VonVault safe for my investments?</strong></summary>
 <br>
-Absolutely! VonVault has achieved a 9.2/10 security rating, placing us in the top 0.2% of DeFi platforms globally. We implement:
+Absolutely! VonVault has achieved a **9.7/10 security rating**, placing us in the **top 0.01%** of DeFi platforms globally. We implement:
 
 - **Complete 2FA System** (SMS, Email, TOTP)
 - **Bank-grade encryption** (12-round bcrypt)

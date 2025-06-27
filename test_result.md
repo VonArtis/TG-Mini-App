@@ -340,6 +340,7 @@ test_plan:
   current_focus:
     - "Profile Deletion Backend Endpoint"
     - "Profile Deletion UI Implementation"
+    - "Multi-language functionality"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

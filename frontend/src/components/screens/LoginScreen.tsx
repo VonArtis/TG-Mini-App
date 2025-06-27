@@ -12,6 +12,7 @@ export const LoginScreen: React.FC<AuthScreenProps> = ({ onLogin, onCreateAccoun
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const { login, loading } = useAuth();
+  const { t } = useLanguage();
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};

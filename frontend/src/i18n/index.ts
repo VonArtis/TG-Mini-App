@@ -41,17 +41,20 @@ const resources = {
   en: {
     common: enCommon,
     dashboard: enDashboard,
-    profile: enProfile
+    profile: enProfile,
+    auth: enAuth
   },
   es: {
     common: esCommon,
     dashboard: esDashboard,
-    profile: esProfile
+    profile: esProfile,
+    auth: esAuth
   },
   fr: {
     common: frCommon,
     dashboard: enDashboard, // Fallback to English
-    profile: frProfile
+    profile: frProfile,
+    auth: frAuth
   }
   // Other languages will fallback to English for now
 };

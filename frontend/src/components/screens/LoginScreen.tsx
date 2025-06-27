@@ -46,25 +46,30 @@ export const LoginScreen: React.FC<AuthScreenProps> = ({ onLogin, onCreateAccoun
 
   return (
     <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8 flex flex-col">
-      <ScreenHeader title="Welcome Back" onBack={onBack} />
+      {/* Language Selector in Header */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector variant="compact" />
+      </div>
+      
+      <ScreenHeader title={t('auth:login.title')} onBack={onBack} />
 
       <div className="space-y-5">
         <Input
-          label="Email Address"
+          label={t('auth:login.emailLabel')}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
+          placeholder={t('auth:login.emailPlaceholder')}
           required
           error={errors.email}
         />
         
         <Input
-          label="Password"
+          label={t('auth:login.passwordLabel')}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password"
+          placeholder={t('auth:login.passwordPlaceholder')}
           required
           error={errors.password}
         />
@@ -77,16 +82,16 @@ export const LoginScreen: React.FC<AuthScreenProps> = ({ onLogin, onCreateAccoun
           fullWidth
           size="lg"
         >
-          Sign In
+          {t('auth:login.signInButton')}
         </Button>
         
         <p className="text-center text-sm text-white mt-4">
-          Don't have an account?{' '}
+          {t('auth:login.noAccountPrefix')}{' '}
           <span 
             className="text-purple-400 font-medium cursor-pointer hover:text-purple-300 transition-colors" 
             onClick={onCreateAccount}
           >
-            Create Account
+            {t('auth:login.createAccountLink')}
           </span>
         </p>
       </div>

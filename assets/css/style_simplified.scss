@@ -1,0 +1,117 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+.page-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 4rem 0;
+}
+
+.project-name {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+  margin-bottom: 1rem;
+}
+
+.project-tagline {
+  font-size: 1.3rem;
+  color: rgba(255,255,255,0.95);
+  font-weight: 300;
+}
+
+.btn {
+  background: linear-gradient(45deg, #9333ea, #7c3aed);
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+  margin: 0.5rem;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+  text-decoration: none;
+}
+
+.main-content {
+  max-width: 1200px;
+  line-height: 1.7;
+  font-size: 1.1rem;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 2rem 0;
+  background: white;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+}
+
+table th {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 1.2rem;
+  text-align: left;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+table td {
+  padding: 1.2rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: top;
+}
+
+table tr:hover {
+  background-color: #f8f9ff;
+}
+
+h1, h2 {
+  color: #4c1d95;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+h3 {
+  color: #7c3aed;
+}
+
+a {
+  color: #7c3aed;
+}
+
+a:hover {
+  color: #9333ea;
+}
+
+@media (max-width: 768px) {
+  .project-name {
+    font-size: 2.5rem;
+  }
+  
+  .project-tagline {
+    font-size: 1.1rem;
+  }
+  
+  .main-content {
+    padding: 1rem;
+  }
+  
+  table {
+    font-size: 0.9rem;
+  }
+  
+  table th, table td {
+    padding: 0.8rem;
+  }
+}

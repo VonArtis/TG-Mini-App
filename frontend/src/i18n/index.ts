@@ -67,7 +67,7 @@ i18n
     resources,
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'dashboard', 'profile'],
+    ns: ['common', 'dashboard', 'profile', 'auth'],
     
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],

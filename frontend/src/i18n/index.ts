@@ -6,13 +6,16 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import enCommon from '../locales/en/common.json';
 import enDashboard from '../locales/en/dashboard.json';
 import enProfile from '../locales/en/profile.json';
+import enAuth from '../locales/en/auth.json';
 
 import esCommon from '../locales/es/common.json';
 import esDashboard from '../locales/es/dashboard.json';
 import esProfile from '../locales/es/profile.json';
+import esAuth from '../locales/es/auth.json';
 
 import frCommon from '../locales/fr/common.json';
 import frProfile from '../locales/fr/profile.json';
+import frAuth from '../locales/fr/auth.json';
 
 // Define supported languages
 export const SUPPORTED_LANGUAGES = [

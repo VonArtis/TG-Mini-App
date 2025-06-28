@@ -833,8 +833,8 @@ def format_phone_number(phone: str) -> str:
     return cleaned
 
 async def send_sms_verification(phone_number: str) -> dict:
-    """Send SMS verification code using Twilio Verify"""
-    if not twilio_client or not TWILIO_VERIFY_SERVICE_SID:
+    """Send SMS verification code using Vonage"""
+    if not vonage_client:
         raise HTTPException(status_code=503, detail="SMS service not available")
     
     try:
@@ -845,20 +845,40 @@ async def send_sms_verification(phone_number: str) -> dict:
         if not validate_phone_number(formatted_phone):
             raise HTTPException(status_code=400, detail="Invalid phone number format")
         
-        # Send verification via Twilio Verify
-        verification = twilio_client.verify.v2.services(TWILIO_VERIFY_SERVICE_SID) \
-            .verifications.create(to=formatted_phone, channel='sms')
+        # Generate 6-digit verification code
+        verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
         
-        return {
-            "status": verification.status,
-            "phone_number": formatted_phone,
-            "message": f"Verification code sent to {formatted_phone}"
+        # Send SMS via Vonage
+        response = vonage_client.sms.send_message({
+            "from": "VonVault",
+            "to": formatted_phone,
+            "text": f"Your VonVault verification code is: {verification_code}. Valid for 10 minutes."
+        })
+        
+        # Store verification code in database
+        verification_data = {
+            "contact": formatted_phone,
+            "code": verification_code,
+            "provider": "vonage",
+            "type": "sms",
+            "created_at": datetime.utcnow(),
+            "expires_at": datetime.utcnow() + timedelta(minutes=10),
+            "verified": False,
+            "attempts": 0
         }
-    except TwilioException as e:
-        print(f"Twilio SMS error: {e}")
-        raise HTTPException(status_code=400, detail=f"SMS sending failed: {str(e)}")
+        await db.verification_codes.insert_one(verification_data)
+        
+        if response["messages"][0]["status"] == "0":
+            return {
+                "status": "pending",
+                "phone_number": formatted_phone,
+                "message": f"Verification code sent to {formatted_phone}"
+            }
+        else:
+            raise Exception(f"Vonage SMS failed: {response['messages'][0]['error-text']}")
+            
     except Exception as e:
-        print(f"SMS sending error: {e}")
+        print(f"Vonage SMS error: {e}")
         raise HTTPException(status_code=500, detail="Failed to send SMS verification")
 
 async def verify_sms_code(phone_number: str, code: str) -> dict:

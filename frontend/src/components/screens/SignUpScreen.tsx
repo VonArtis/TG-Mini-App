@@ -631,6 +631,100 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           {loadingState.isLoading ? loadingState.message : t('auth:signup.createAccountButton')}
         </Button>
         
+        {/* Smart Loading Overlay */}
+        {loadingState.isLoading && (
+          <AnimatePresence>
+            <motion.div
+              className="mt-4 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex items-center space-x-3">
+                {/* Animated loading indicator */}
+                <motion.div
+                  className="flex space-x-1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-2 h-2 bg-purple-400 rounded-full"
+                      animate={{
+                        y: [0, -8, 0],
+                        opacity: [0.5, 1, 0.5]
+                      }}
+                      transition={{
+                        duration: 0.8,
+                        repeat: Infinity,
+                        delay: i * 0.2,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  ))}
+                </motion.div>
+                
+                {/* Stage-specific messages */}
+                <div className="flex-1">
+                  <motion.p
+                    className="text-purple-300 text-sm font-medium"
+                    key={loadingState.message}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {loadingState.message}
+                  </motion.p>
+                  
+                  {/* Stage progress indicators */}
+                  <div className="flex items-center space-x-2 mt-2">
+                    {['validating', 'creating', 'securing', 'finalizing'].map((stage, index) => (
+                      <motion.div
+                        key={stage}
+                        className={`w-2 h-2 rounded-full ${
+                          loadingState.stage === stage 
+                            ? 'bg-purple-400' 
+                            : index < ['validating', 'creating', 'securing', 'finalizing'].indexOf(loadingState.stage)
+                              ? 'bg-green-400'
+                              : 'bg-gray-600'
+                        }`}
+                        animate={{
+                          scale: loadingState.stage === stage ? [1, 1.3, 1] : 1
+                        }}
+                        transition={{
+                          duration: 0.5,
+                          repeat: loadingState.stage === stage ? Infinity : 0
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Stage icon */}
+                <motion.div
+                  key={loadingState.stage}
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 300, 
+                    damping: 20 
+                  }}
+                  className="text-lg"
+                >
+                  {loadingState.stage === 'validating' && '🔍'}
+                  {loadingState.stage === 'creating' && '⚙️'}
+                  {loadingState.stage === 'securing' && '🔐'}
+                  {loadingState.stage === 'finalizing' && '✨'}
+                </motion.div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        )}
+        
         {/* Display signup error */}
         {errors.submit && (
           <div className="mt-3 bg-red-900/20 rounded-lg p-3">

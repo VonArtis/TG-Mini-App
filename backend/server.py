@@ -245,8 +245,8 @@ vonage_sms = None
 if VONAGE_API_KEY and VONAGE_API_SECRET:
     try:
         import vonage
-        vonage_client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
-        vonage_sms = vonage.Sms(vonage_client)
+        vonage_client = vonage.Vonage(vonage.Auth(api_key=VONAGE_API_KEY, api_secret=VONAGE_API_SECRET))
+        vonage_sms = vonage_client.sms
         print("Vonage client initialized successfully")
     except Exception as e:
         print(f"Failed to initialize Vonage client: {e}")

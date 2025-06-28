@@ -17,6 +17,17 @@ import frCommon from '../locales/fr/common.json';
 import frProfile from '../locales/fr/profile.json';
 import frAuth from '../locales/fr/auth.json';
 
+import deCommon from '../locales/de/common.json';
+import deAuth from '../locales/de/auth.json';
+
+import itCommon from '../locales/it/common.json';
+import itAuth from '../locales/it/auth.json';
+
+import ptCommon from '../locales/pt/common.json';
+import ptAuth from '../locales/pt/auth.json';
+
+import zhCommon from '../locales/zh/common.json';
+
 // Define supported languages
 export const SUPPORTED_LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },

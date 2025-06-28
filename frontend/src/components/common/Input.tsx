@@ -75,7 +75,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
       </div>
       
       {error && (
-        <p className="text-red-400 text-sm">{error}</p>
+        <p className="text-red-400 dark:text-red-400 light:text-red-600 text-sm">{error}</p>
       )}
     </div>
   );

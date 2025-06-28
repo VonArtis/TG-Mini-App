@@ -6,7 +6,8 @@ import type {
   InvestmentPlansResponse,
   InvestmentsResponse,
   MembershipStatus,
-  MembershipTiersResponse
+  MembershipTiersResponse,
+  User
 } from '../types';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';

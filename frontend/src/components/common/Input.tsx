@@ -28,7 +28,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   error,
   prefix,
   className = '',
-  step
+  step,
+  inputMode,
+  autoComplete
 }, ref) => {
   return (
     <div className={`space-y-1 ${className}`}>

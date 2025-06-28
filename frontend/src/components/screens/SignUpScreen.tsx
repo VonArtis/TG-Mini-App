@@ -623,11 +623,12 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
       <div className="mt-8">
         <Button
           onClick={handleSignUp}
-          loading={loading}
+          loading={loadingState.isLoading}
           fullWidth
           size="lg"
+          disabled={loadingState.isLoading}
         >
-          {t('auth:signup.createAccountButton')}
+          {loadingState.isLoading ? loadingState.message : t('auth:signup.createAccountButton')}
         </Button>
         
         {/* Display signup error */}

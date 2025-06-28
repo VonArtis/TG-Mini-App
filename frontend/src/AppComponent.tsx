@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { ScreenType, User } from './types';
 import { AppProvider } from './context/AppContext';
+import { useApp } from './context/AppContext';
 import { useAuth } from './hooks/useAuth';
 
 // Screen imports

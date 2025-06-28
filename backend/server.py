@@ -837,7 +837,7 @@ def format_phone_number(phone: str) -> str:
 
 async def send_sms_verification(phone_number: str) -> dict:
     """Send SMS verification code using Vonage"""
-    if not vonage_client:
+    if not vonage_sms:
         raise HTTPException(status_code=503, detail="SMS service not available")
     
     try:
@@ -852,7 +852,7 @@ async def send_sms_verification(phone_number: str) -> dict:
         verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
         
         # Send SMS via Vonage
-        response = vonage_client.send_message({
+        response = vonage_sms.send_message({
             "from": "VonVault",
             "to": formatted_phone,
             "text": f"Your VonVault verification code is: {verification_code}. Valid for 10 minutes."

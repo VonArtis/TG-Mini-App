@@ -26,6 +26,15 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({
   showPassword,
   onToggleVisibility
 }, ref) => {
+  const [capsLockOn, setCapsLockOn] = useState(false);
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Detect caps lock state
+    if (e.getModifierState) {
+      setCapsLockOn(e.getModifierState('CapsLock'));
+    }
+  };
+
   return (
     <div className={`w-full ${className}`}>
       {label && (

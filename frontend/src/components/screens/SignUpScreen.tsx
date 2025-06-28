@@ -537,8 +537,11 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           <PasswordStrength password={form.password} />
         </motion.div>
         
-        {/* Confirm Password Input */}
-        <div>
+        {/* Confirm Password Input with Shake Animation */}
+        <motion.div
+          animate={shakeErrors.confirmPassword ? { x: [0, -10, 10, -10, 10, 0] } : {}}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
           <PasswordInput
             ref={confirmPasswordRef}
             label="Confirm Password"
@@ -584,7 +587,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
               </motion.div>
             </AnimatePresence>
           )}
-        </div>
+        </motion.div>
         
         {/* Enhanced Phone Input with Auto-formatting */}
         <div className="space-y-1">

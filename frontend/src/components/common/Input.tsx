@@ -57,6 +57,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
           required={required}
           disabled={disabled}
           step={step}
+          inputMode={inputMode}
+          autoComplete={autoComplete}
           className={`
             w-full px-4 py-3
             ${prefix ? 'pl-12' : ''}

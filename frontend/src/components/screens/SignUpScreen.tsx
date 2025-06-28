@@ -208,6 +208,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           placeholder={t('auth:signup.namePlaceholder')}
           required
           error={errors.name}
+          autoComplete="given-name"
         />
         
         {/* Enhanced Email Input with Smart Validation */}

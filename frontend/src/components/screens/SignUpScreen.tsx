@@ -471,8 +471,11 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           />
         </motion.div>
         
-        {/* Enhanced Email Input with Smart Validation */}
-        <div>
+        {/* Enhanced Email Input with Smart Validation and Shake Animation */}
+        <motion.div
+          animate={shakeErrors.email ? { x: [0, -10, 10, -10, 10, 0] } : {}}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
           <EmailInput
             ref={emailRef}
             label={t('auth:signup.emailLabel')}
@@ -511,7 +514,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
               </p>
             </div>
           )}
-        </div>
+        </motion.div>
         
         {/* Enhanced Password Input with Strength Indicator */}
         <div>

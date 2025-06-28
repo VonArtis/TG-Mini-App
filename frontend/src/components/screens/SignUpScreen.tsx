@@ -564,7 +564,11 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
             <select
               value={form.countryCode}
               onChange={(e) => setForm({ ...form, countryCode: e.target.value })}
-              className="p-3 bg-gray-900 border border-purple-500 rounded-lg text-white focus:border-purple-400 focus:outline-none w-48"
+              className={`p-3 bg-gray-900 border rounded-lg text-white focus:border-purple-400 focus:outline-none w-48 transition-all duration-200 ${
+                countryDetection.detected && countryDetection.method === 'ip'
+                  ? 'border-green-500 shadow-sm shadow-green-500/20'
+                  : 'border-purple-500'
+              }`}
             >
               <option value="+54">🇦🇷 Argentina (+54)</option>
               <option value="+43">🇦🇹 Austria (+43)</option>

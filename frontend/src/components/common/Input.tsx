@@ -1,5 +1,5 @@
 // Reusable input component
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 interface InputProps {
   label?: string;
@@ -15,7 +15,7 @@ interface InputProps {
   step?: string;
 }
 
-export const Input: React.FC<InputProps> = ({
+export const Input = forwardRef<HTMLInputElement, InputProps>(({
   label,
   type = 'text',
   value,
@@ -27,7 +27,7 @@ export const Input: React.FC<InputProps> = ({
   prefix,
   className = '',
   step
-}) => {
+}, ref) => {
   return (
     <div className={`space-y-1 ${className}`}>
       {label && (

@@ -28,6 +28,17 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // Smart loading states
+  const [loadingState, setLoadingState] = useState<{
+    isLoading: boolean;
+    message: string;
+    stage: 'idle' | 'validating' | 'creating' | 'securing' | 'finalizing';
+  }>({
+    isLoading: false,
+    message: '',
+    stage: 'idle'
+  });
+
   // Field refs for auto-focus
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);

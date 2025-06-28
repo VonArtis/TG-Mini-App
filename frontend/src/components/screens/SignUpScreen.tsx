@@ -737,7 +737,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         <div className="flex items-start">
           <input

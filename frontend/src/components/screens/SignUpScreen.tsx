@@ -255,6 +255,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
         {/* Enhanced Password Input with Strength Indicator */}
         <div>
           <PasswordInput
+            ref={passwordRef}
             label={t('auth:signup.passwordLabel')}
             value={form.password}
             onChange={handleChange('password')}

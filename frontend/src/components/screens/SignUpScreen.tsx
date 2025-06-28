@@ -139,7 +139,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [emailValidation, setEmailValidation] = useState<EmailValidationResult>({ isValid: true, type: 'valid' });
   const [phoneFormatted, setPhoneFormatted] = useState('');
-  const { signup, loading } = useAuth();
+  const { loading } = useAuth();
   const { t } = useLanguage();
 
   // Auto-format phone number as user types

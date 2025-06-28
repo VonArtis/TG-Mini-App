@@ -243,8 +243,14 @@ VONAGE_API_SECRET = os.getenv("VONAGE_API_SECRET")
 vonage_client = None
 if VONAGE_API_KEY and VONAGE_API_SECRET:
     try:
-        import vonage
-        vonage_client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
+        from vonage import Vonage, Auth
+        from vonage_sms import SmsClient
+        
+        # Create an Auth instance with API key and secret
+        auth = Auth(api_key=VONAGE_API_KEY, api_secret=VONAGE_API_SECRET)
+        
+        # Initialize the Vonage client
+        vonage_client = Vonage(auth=auth)
         print("Vonage client initialized successfully")
     except Exception as e:
         print(f"Failed to initialize Vonage client: {e}")

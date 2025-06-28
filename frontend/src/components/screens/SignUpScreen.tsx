@@ -89,6 +89,13 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
       }
     }
     
+    // Confirm password validation
+    if (!form.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (form.password !== form.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
     // Smart phone validation
     if (!form.phone) {
       newErrors.phone = t('auth:signup.validation.phoneRequired');

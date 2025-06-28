@@ -882,27 +882,45 @@ async def send_sms_verification(phone_number: str) -> dict:
         raise HTTPException(status_code=500, detail="Failed to send SMS verification")
 
 async def verify_sms_code(phone_number: str, code: str) -> dict:
-    """Verify SMS code using Twilio Verify"""
-    if not twilio_client or not TWILIO_VERIFY_SERVICE_SID:
-        raise HTTPException(status_code=503, detail="SMS service not available")
-    
+    """Verify SMS code using Vonage (stored in database)"""
     try:
-        # Format phone number
         formatted_phone = format_phone_number(phone_number)
         
-        # Verify code via Twilio Verify
-        verification_check = twilio_client.verify.v2.services(TWILIO_VERIFY_SERVICE_SID) \
-            .verification_checks.create(to=formatted_phone, code=code)
+        # Check verification code in database
+        verification = await db.verification_codes.find_one({
+            "contact": formatted_phone,
+            "code": code,
+            "type": "sms",
+            "verified": False,
+            "expires_at": {"$gt": datetime.utcnow()},
+            "attempts": {"$lt": 3}
+        })
         
-        is_valid = verification_check.status == 'approved'
-        
-        return {
-            "valid": is_valid,
-            "status": verification_check.status,
-            "phone_number": formatted_phone
-        }
-    except TwilioException as e:
-        print(f"Twilio verification error: {e}")
+        if verification:
+            # Mark as verified
+            await db.verification_codes.update_one(
+                {"_id": verification["_id"]},
+                {"$set": {"verified": True, "verified_at": datetime.utcnow()}}
+            )
+            return {
+                "valid": True,
+                "status": "approved",
+                "phone_number": formatted_phone
+            }
+        else:
+            # Increment attempts
+            await db.verification_codes.update_one(
+                {"contact": formatted_phone, "verified": False, "type": "sms"},
+                {"$inc": {"attempts": 1}}
+            )
+            return {
+                "valid": False,
+                "status": "failed",
+                "phone_number": formatted_phone
+            }
+            
+    except Exception as e:
+        print(f"SMS verification error: {e}")
         return {
             "valid": False,
             "status": "failed",

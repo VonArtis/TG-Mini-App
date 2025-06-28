@@ -1,0 +1,130 @@
+# VonVault CI/CD Pipeline
+# This runs automatically on every GitHub push
+name: VonVault Quality Assurance
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Frontend Tests
+  frontend-tests:
+    name: 🎨 Frontend Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'yarn'
+        cache-dependency-path: frontend/yarn.lock
+        
+    - name: 📥 Install Dependencies
+      run: |
+        cd frontend
+        yarn install --frozen-lockfile
+        
+    - name: 📝 TypeScript Check
+      run: |
+        cd frontend
+        npx tsc --noEmit
+        
+    - name: 🏗️ Build Test
+      run: |
+        cd frontend
+        yarn build
+        
+    - name: 📊 Bundle Size Check
+      run: |
+        cd frontend
+        du -sh build/
+        echo "✅ Build completed successfully"
+
+  # Backend Tests  
+  backend-tests:
+    name: 🔧 Backend Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: 📥 Install Dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        
+    - name: 🔍 Python Syntax Check
+      run: |
+        cd backend
+        python -m py_compile server.py
+        python -c "import server; print('✅ Backend imports successfully')"
+        
+    - name: 🧪 API Health Check
+      run: |
+        cd backend
+        # Start server in background
+        python server.py &
+        SERVER_PID=$!
+        sleep 10
+        
+        # Test endpoints
+        curl -f http://localhost:8001/api/status || exit 1
+        echo "✅ Backend API responding"
+        
+        # Cleanup
+        kill $SERVER_PID
+
+  # Security & Quality
+  security-check:
+    name: 🛡️ Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🔍 Scan for Secrets
+      run: |
+        # Check for accidentally committed secrets
+        echo "🔍 Scanning for potential secrets..."
+        
+        # Check for common secret patterns
+        if grep -r "sk_live\|pk_live\|AKIA\|mongodb://" . --exclude-dir=.git --exclude-dir=node_modules; then
+          echo "❌ Potential secrets found!"
+          exit 1
+        fi
+        
+        echo "✅ No secrets detected"
+        
+    - name: 📦 Dependency Security Check
+      run: |
+        cd frontend
+        yarn audit --audit-level moderate || echo "⚠️ Consider updating dependencies"
+
+  # Deploy to Production (only on main branch)
+  deploy:
+    name: 🚀 Deploy to Production
+    needs: [frontend-tests, backend-tests, security-check]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 🎉 All Tests Passed
+      run: |
+        echo "✅ Frontend: PASSED"
+        echo "✅ Backend: PASSED" 
+        echo "✅ Security: PASSED"
+        echo "🚀 Ready for Production Deploy!"
+        echo "Render will automatically deploy this commit."

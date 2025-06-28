@@ -45,9 +45,33 @@ export const useAuth = () => {
           localStorage.removeItem('currentUser');
         }
       } else if (savedUser && !token) {
-        // User data without token, clear it
-        localStorage.removeItem('currentUser');
-        console.log('User data without token cleared');
+        try {
+          const userData = JSON.parse(savedUser);
+          
+          // Check if this is a recently created user (within last 5 minutes)
+          // This handles the case where user just signed up and is in verification flow
+          if (userData.created_at) {
+            const createdTime = new Date(userData.created_at).getTime();
+            const currentTime = Date.now();
+            const timeDiff = currentTime - createdTime;
+            const fiveMinutes = 5 * 60 * 1000;
+            
+            if (timeDiff < fiveMinutes) {
+              // Recent signup, keep user data for verification flow
+              setUser(userData);
+              console.log('Recent signup detected, keeping user data for verification:', userData);
+              return;
+            }
+          }
+          
+          // Old user data without token, clear it
+          localStorage.removeItem('currentUser');
+          console.log('Old user data without token cleared');
+        } catch (error) {
+          // Invalid JSON, clear it
+          localStorage.removeItem('currentUser');
+          console.log('Invalid user data cleared');
+        }
       }
     };
 

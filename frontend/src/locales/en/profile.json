@@ -33,7 +33,7 @@
       "subtitle": "Choose your preferred language",
       "displayLanguage": "Display Language",
       "comingSoon": "Multi-Language Support Available",
-      "developmentNote": "Select your preferred language. Full translations are available for English, Spanish, and French. Other languages use English fallbacks and will be fully translated in future updates.",
+      "developmentNote": "Choose your preferred language. Full translations available for English, Spanish, French, German, Italian, Portuguese, Russian, Japanese, Korean, Arabic, Hindi, Turkish, Polish, and Dutch. Dashboard and profile sections use English fallbacks for newer languages.",
       "changeSuccess": "Language changed successfully!",
       "changeError": "Failed to change language. Please try again."
     },

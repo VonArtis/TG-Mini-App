@@ -1,5 +1,5 @@
 // Password input component with visibility toggle
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 
 interface PasswordInputProps {
   label?: string;

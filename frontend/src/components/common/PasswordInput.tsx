@@ -1,5 +1,6 @@
 // Password input component with visibility toggle
 import React, { forwardRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface PasswordInputProps {
   label?: string;

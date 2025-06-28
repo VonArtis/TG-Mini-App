@@ -14,6 +14,7 @@ import { formatPhoneNumber, validatePhoneNumber, cleanPhoneNumber, getUserCountr
 import { validateEmailSmart, EmailValidationResult } from '../../utils/emailValidator';
 
 export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogin, onNavigate }) => {
+  const { user } = useAuth(); // Get current user for verification status
   const [form, setForm] = useState({
     name: '',
     email: '',

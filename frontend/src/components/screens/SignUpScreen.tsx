@@ -228,6 +228,14 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
             required
             error={errors.confirmPassword}
           />
+          
+          {/* Password Match Indicator */}
+          {form.confirmPassword && form.password && form.password === form.confirmPassword && !errors.confirmPassword && (
+            <div className="mt-2 flex items-center space-x-2">
+              <span className="text-green-400 text-sm">✓</span>
+              <span className="text-green-400 text-sm font-medium">Passwords match</span>
+            </div>
+          )}
         </div>
         
         {/* Enhanced Phone Input with Auto-formatting */}

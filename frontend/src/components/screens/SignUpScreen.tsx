@@ -217,6 +217,45 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
       
       <ScreenHeader title={t('auth:signup.title')} onBack={onGoToLogin} />
 
+      {/* Form Progress Indicator */}
+      <motion.div 
+        className="mb-6"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-gray-400">Form Progress</span>
+          <span className="text-sm font-medium text-white">{progress}%</span>
+        </div>
+        
+        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+          <motion.div
+            className={`h-full rounded-full transition-all duration-500 ${
+              progress < 40 ? 'bg-red-500' : 
+              progress < 80 ? 'bg-yellow-500' : 
+              'bg-green-500'
+            }`}
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 100, 
+              damping: 20 
+            }}
+          />
+        </div>
+        
+        {/* Progress milestones */}
+        <div className="flex justify-between mt-1 text-xs text-gray-500">
+          <span className={progress >= 20 ? 'text-green-400' : ''}>Name</span>
+          <span className={progress >= 40 ? 'text-green-400' : ''}>Email</span>
+          <span className={progress >= 60 ? 'text-green-400' : ''}>Password</span>
+          <span className={progress >= 80 ? 'text-green-400' : ''}>Confirm</span>
+          <span className={progress >= 100 ? 'text-green-400' : ''}>Phone</span>
+        </div>
+      </motion.div>
+
       <div className="space-y-5">
         <Input
           ref={nameRef}

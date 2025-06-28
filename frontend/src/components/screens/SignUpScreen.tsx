@@ -16,15 +16,41 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     email: '',
     password: '',
     phone: '',
-    countryCode: '+1'
+    countryCode: getUserCountryCode() // Auto-detect user's country
   });
   const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [emailValidation, setEmailValidation] = useState<EmailValidationResult>({ isValid: true, type: 'valid' });
+  const [phoneFormatted, setPhoneFormatted] = useState('');
   const { signup, loading } = useAuth();
   const { t } = useLanguage();
 
+  // Auto-format phone number as user types
+  useEffect(() => {
+    const formatted = formatPhoneNumber(form.phone, form.countryCode);
+    setPhoneFormatted(formatted);
+  }, [form.phone, form.countryCode]);
+
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [field]: e.target.value });
+    const value = e.target.value;
+    
+    if (field === 'phone') {
+      // Only allow numeric input for phone
+      const cleaned = value.replace(/\D/g, '');
+      setForm({ ...form, [field]: cleaned });
+    } else if (field === 'email') {
+      setForm({ ...form, [field]: value });
+      // Real-time email validation
+      const validation = validateEmailSmart(value);
+      setEmailValidation(validation);
+    } else {
+      setForm({ ...form, [field]: value });
+    }
+    
+    // Clear error for this field
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: '' });
+    }
   };
 
   const validateForm = () => {

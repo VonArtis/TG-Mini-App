@@ -373,6 +373,18 @@ frontend:
         agent: "testing"
         comment: "Comprehensive code review of multi-language functionality across all key screens: 1) Welcome Screen has a compact language selector in the top-right corner with 15+ language options including flags. Text for 'VonVault', 'Sign In', 'Create Account', and terms properly translates. 2) Login Screen has a language selector in the top-right corner, with 'Welcome Back', 'Email Address', 'Password', validation messages, and account creation text properly translated. 3) Sign Up Screen has a language selector in the top-right corner with all form labels and validation messages properly translated. 4) Dashboard Screen has a globe icon language selector in the header area that shows current language flag and properly translates 'Dashboard' and welcome text. 5) Profile Screen has a full dropdown in the 'Language & Region' section that properly translates all profile text. 6) Language persistence is implemented using localStorage for consistent experience across screens and page refreshes. UI testing was not possible due to preview unavailability, but code analysis confirms proper implementation with good translation quality for Spanish and French."
 
+  - task: "Signup and Profile Workflow"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/AppComponent.tsx, /app/frontend/src/components/screens/ProfileScreen.tsx, /app/frontend/src/hooks/useMembership.ts"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Tested the signup and profile workflow to debug the issue where user details aren't saved and membership status doesn't load when skipping verification. Found that the signup process works correctly and user data is properly saved in localStorage. The skip verification flow also works as expected, with the user being able to skip email verification, SMS verification, and 2FA setup. However, there are issues with accessing the profile screen. When trying to click on 'Profile & Settings' in the dashboard, the element was not found. When trying to log in with a created user, we were redirected to the email verification screen instead of the dashboard. The user data is correctly stored in localStorage, but there seems to be an issue with the navigation to the profile screen and possibly with the membership status loading."
+
 backend:
   - task: "Enhanced User Model with Multi-Wallet Support"
     implemented: true

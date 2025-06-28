@@ -525,11 +525,11 @@ frontend:
 
   - task: "Caps Lock detection in password fields"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/components/common/PasswordInput.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -537,6 +537,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Caps Lock detection is not working as expected. When turning on Caps Lock and typing in the password fields, the warning 'Caps Lock is on' does not appear. The feature is implemented in the code (PasswordInput.tsx lines 32-39 and 111-133) but is not functioning in the UI. No DOM elements containing 'Caps Lock' text were found during testing."
+      - working: true
+        agent: "testing"
+        comment: "Caps Lock detection is now working correctly after the fix. The component properly detects Caps Lock state using the keyDown and keyUp event handlers. When Caps Lock is enabled, a yellow warning message 'Caps Lock is on' appears below the password field with a triangle icon. The warning disappears when Caps Lock is turned off. This functionality works in both the password and confirm password fields. The fix changed handleKeyPress to handleKeyDown and handleKeyUp, and added both onKeyDown and onKeyUp event handlers to detect caps lock changes more reliably."
 
   - task: "Mobile keyboard optimization"
     implemented: true

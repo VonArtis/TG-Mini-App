@@ -589,8 +589,12 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           )}
         </motion.div>
         
-        {/* Enhanced Phone Input with Auto-formatting */}
-        <div className="space-y-1">
+        {/* Enhanced Phone Input with Auto-formatting and Shake Animation */}
+        <motion.div 
+          className="space-y-1"
+          animate={shakeErrors.phone ? { x: [0, -10, 10, -10, 10, 0] } : {}}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
           <label className="block text-sm font-medium text-white">
             {t('auth:signup.phoneLabel')} <span className="text-red-400 ml-1">*</span>
           </label>

@@ -118,13 +118,13 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
   const handleSignUp = async () => {
     if (!validateForm()) return;
 
-    // Extract confirmPassword before sending to API
-    const { confirmPassword, ...signupData } = form;
+    // Extract confirmPassword and countryCode, then add country_code
+    const { confirmPassword, countryCode, ...signupData } = form;
     
     const user = await signup({
       ...signupData,
       phone: cleanPhoneNumber(form.phone), // Clean phone number for API
-      country_code: form.countryCode  // Convert camelCase to snake_case for API
+      country_code: countryCode  // Convert camelCase to snake_case for API
     });
     
     if (user && onContinue) {

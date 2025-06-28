@@ -618,6 +618,61 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
               <option value="+84">🇻🇳 Vietnam (+84)</option>
             </select>
             
+            {/* Smart Country Detection Indicator */}
+            <div className="absolute top-full left-0 mt-1 z-10">
+              {countryDetection.isDetecting ? (
+                <motion.div
+                  className="flex items-center space-x-2 text-xs text-blue-400"
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <motion.div
+                    className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear"
+                    }}
+                  />
+                  <span>Detecting your location...</span>
+                </motion.div>
+              ) : countryDetection.detected && (
+                <AnimatePresence>
+                  <motion.div
+                    className="flex items-center space-x-2 text-xs text-green-400"
+                    initial={{ opacity: 0, y: -5, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -5, scale: 0.9 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 300, 
+                      damping: 20 
+                    }}
+                  >
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 500, 
+                        delay: 0.1 
+                      }}
+                    >
+                      {countryDetection.method === 'ip' ? '🌍' : '🌐'}
+                    </motion.span>
+                    <span>
+                      {countryDetection.method === 'ip' 
+                        ? `Auto-detected: ${countryDetection.countryName}`
+                        : `Detected from browser: ${countryDetection.countryName}`
+                      }
+                    </span>
+                  </motion.div>
+                </AnimatePresence>
+              )}
+            </div>
+            
             {/* Phone input with auto-formatting */}
             <div className="flex-1">
               <Input

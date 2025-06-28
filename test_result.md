@@ -475,6 +475,8 @@ user_problem_statement: "Phase 2 multi-wallet functionality implementation for V
 
 user_problem_statement: "Test the signup and profile workflow to debug the issue where user details aren't saved and membership status doesn't load when skipping verification."
 
+user_problem_statement: "I need to thoroughly test the recent UX improvements we implemented in the VonVault signup form."
+
 frontend:
   - task: "Multi-language functionality"
     implemented: true

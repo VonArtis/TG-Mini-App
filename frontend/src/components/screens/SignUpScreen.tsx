@@ -32,6 +32,43 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus logic
+  useEffect(() => {
+    // Focus name field when component mounts
+    if (nameRef.current) {
+      nameRef.current.focus();
+    }
+  }, []);
+
+  // Auto-focus next field when current field is completed
+  useEffect(() => {
+    // Name is complete (at least 2 words, 3+ chars each)
+    if (form.name.trim().length >= 6 && form.name.includes(' ') && emailRef.current && !form.email) {
+      emailRef.current.focus();
+    }
+  }, [form.name, form.email]);
+
+  useEffect(() => {
+    // Email is complete (valid format)
+    if (form.email && validateEmail(form.email) && passwordRef.current && !form.password) {
+      passwordRef.current.focus();
+    }
+  }, [form.email, form.password]);
+
+  useEffect(() => {
+    // Password is complete (meets strength requirements)
+    if (form.password.length >= 8 && confirmPasswordRef.current && !form.confirmPassword) {
+      confirmPasswordRef.current.focus();
+    }
+  }, [form.password, form.confirmPassword]);
+
+  useEffect(() => {
+    // Confirm password matches
+    if (form.confirmPassword && form.password === form.confirmPassword && phoneRef.current && !form.phone) {
+      phoneRef.current.focus();
+    }
+  }, [form.confirmPassword, form.password, form.phone]);
   const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [emailValidation, setEmailValidation] = useState<EmailValidationResult>({ isValid: true, type: 'valid' });

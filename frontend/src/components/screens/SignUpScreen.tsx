@@ -351,6 +351,15 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           {t('auth:signup.createAccountButton')}
         </Button>
         
+        {/* Display signup error */}
+        {errors.submit && (
+          <div className="mt-3 bg-red-900/20 rounded-lg p-3">
+            <p className="text-red-400 text-sm text-center">
+              {errors.submit}
+            </p>
+          </div>
+        )}
+        
         <p className="text-center text-sm text-white mt-4">
           {t('auth:signup.haveAccountPrefix')}{' '}
           <span 

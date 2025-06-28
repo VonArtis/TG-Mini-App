@@ -852,8 +852,7 @@ async def send_sms_verification(phone_number: str) -> dict:
         verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
         
         # Send SMS via Vonage
-        print(f"Vonage SMS client methods: {dir(vonage_sms)}")
-        response = vonage_sms.send_message({
+        response = vonage_sms.send({
             "from": "VonVault",
             "to": formatted_phone,
             "text": f"Your VonVault verification code is: {verification_code}. Valid for 10 minutes."

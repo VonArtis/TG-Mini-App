@@ -214,9 +214,6 @@ BCRYPT_ROUNDS = int(os.getenv("BCRYPT_ROUNDS", "12"))
 MAX_LOGIN_ATTEMPTS = int(os.getenv("MAX_LOGIN_ATTEMPTS", "5"))
 LOCKOUT_DURATION_MINUTES = int(os.getenv("LOCKOUT_DURATION_MINUTES", "15"))
 
-# SMS 2FA Configuration
-SMS_2FA_ENABLED = False  # Disabled until new SMS provider is configured
-
 # Vonage Configuration for SMS verification
 VONAGE_API_KEY = os.getenv("VONAGE_API_KEY")
 VONAGE_API_SECRET = os.getenv("VONAGE_API_SECRET")

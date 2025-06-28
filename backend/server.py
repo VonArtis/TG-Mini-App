@@ -1436,6 +1436,25 @@ def health_check_v1():
     }
 
 # Authentication endpoints  
+@app.get("/auth/check-email")
+async def check_email_availability(email: str):
+    """Check if email is available for registration"""
+    try:
+        # Validate email format first
+        if not validate_email(email):
+            return {"available": False, "reason": "invalid_format"}
+        
+        # Check if user already exists
+        existing_user = db.users.find_one({"email": email})
+        if existing_user:
+            return {"available": False, "reason": "already_exists"}
+        
+        return {"available": True}
+        
+    except Exception as e:
+        print(f"Email check error: {e}")
+        return {"available": None, "reason": "error"}
+
 @api_v1_router.post("/auth/signup")
 @limiter.limit("5/minute")
 async def user_signup_v1(request: Request, user_data: UserSignup):

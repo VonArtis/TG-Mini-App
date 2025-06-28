@@ -191,19 +191,43 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     }
   };
 
-  // Calculate form completion progress
+  // Calculate form completion progress based on verification status
   const calculateProgress = () => {
-    const fields = ['name', 'email', 'password', 'confirmPassword', 'phone'];
-    let completedFields = 0;
+    let completedSteps = 0;
+    const totalSteps = 5; // Form fields + Email + Phone + 2FA + Terms
     
-    // Check each field for completion and validity
-    if (form.name.trim().length >= 6 && form.name.includes(' ') && !errors.name) completedFields++;
-    if (form.email && emailValidation.isValid && !errors.email) completedFields++;
-    if (form.password && form.password.length >= 8 && !errors.password) completedFields++;
-    if (form.confirmPassword && form.password === form.confirmPassword && !errors.confirmPassword) completedFields++;
-    if (form.phone && validatePhoneNumber(form.phone) && !errors.phone) completedFields++;
+    // Step 1: Basic form completion (name, email, password, confirm, phone)
+    const hasValidName = form.name.trim().length >= 6 && form.name.includes(' ') && !errors.name;
+    const hasValidEmail = form.email && emailValidation.isValid && !errors.email;
+    const hasValidPassword = form.password && form.password.length >= 8 && !errors.password;
+    const hasValidConfirmPassword = form.confirmPassword && form.password === form.confirmPassword && !errors.confirmPassword;
+    const hasValidPhone = form.phone && validatePhoneNumber(form.phone) && !errors.phone;
     
-    return Math.round((completedFields / fields.length) * 100);
+    if (hasValidName && hasValidEmail && hasValidPassword && hasValidConfirmPassword && hasValidPhone) {
+      completedSteps++; // Form complete = 20%
+    }
+    
+    // Step 2: Email verified (20%)
+    if (user?.email_verified) {
+      completedSteps++;
+    }
+    
+    // Step 3: Phone verified (20%) 
+    if (user?.phone_verified) {
+      completedSteps++;
+    }
+    
+    // Step 4: 2FA enabled (20%)
+    if (user?.biometric_2fa_enabled || user?.push_2fa_enabled) {
+      completedSteps++;
+    }
+    
+    // Step 5: Terms agreed (20%)
+    if (agreed) {
+      completedSteps++;
+    }
+    
+    return Math.round((completedSteps / totalSteps) * 100);
   };
 
   const progress = calculateProgress();

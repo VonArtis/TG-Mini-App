@@ -198,6 +198,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           <PasswordStrength password={form.password} />
         </div>
         
+        {/* Enhanced Phone Input with Auto-formatting */}
         <div className="space-y-1">
           <label className="block text-sm font-medium text-white">
             {t('auth:signup.phoneLabel')} <span className="text-red-400 ml-1">*</span>
@@ -259,15 +260,25 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
               <option value="+1">🇺🇸 United States (+1)</option>
               <option value="+84">🇻🇳 Vietnam (+84)</option>
             </select>
-            <Input
-              type="tel"
-              value={form.phone}
-              onChange={handleChange('phone')}
-              placeholder={t('auth:signup.phonePlaceholder')}
-              required
-              error={errors.phone}
-              className="flex-1"
-            />
+            
+            {/* Phone input with auto-formatting */}
+            <div className="flex-1">
+              <Input
+                type="tel"
+                value={phoneFormatted}
+                onChange={handleChange('phone')}
+                placeholder={t('auth:signup.phonePlaceholder')}
+                required
+                error={errors.phone}
+                className="flex-1"
+              />
+              {/* Show cleaned number count */}
+              {form.phone && (
+                <p className="text-xs text-gray-400 mt-1">
+                  {form.phone.length} digits entered
+                </p>
+              )}
+            </div>
           </div>
         </div>
 

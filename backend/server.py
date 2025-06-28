@@ -1531,6 +1531,12 @@ async def user_signup_impl(request: Request, user_data: UserSignup):
         if existing_user:
             raise HTTPException(status_code=400, detail="User with this email already exists")
         
+        # Check if phone number already exists
+        formatted_phone = f"{user_data.country_code}{user_data.phone.replace('+', '').replace('-', '').replace(' ', '')}"
+        existing_phone = db.users.find_one({"phone": formatted_phone})
+        if existing_phone:
+            raise HTTPException(status_code=400, detail="User with this phone number already exists")
+        
         # Hash password
         hashed_password = hash_password(user_data.password)
         

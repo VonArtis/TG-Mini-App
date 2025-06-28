@@ -89,6 +89,8 @@ const AppRouter: React.FC = () => {
   const handleSignup = (userData: User) => {
     // Save user data for verification tracking
     localStorage.setItem('currentUser', JSON.stringify(userData));
+    console.log('Signup completed, user data saved:', userData);
+    console.log('Context user after signup:', contextUser);
     
     // IMPORTANT: Also update the AppContext user state immediately
     // This ensures user data is available in profile screen even if verification is skipped

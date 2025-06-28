@@ -77,6 +77,7 @@ export const EmailInput = forwardRef<HTMLInputElement, EmailInputProps>(({
       
       <div className="relative">
         <input
+          ref={ref}
           type="email"
           value={value}
           onChange={onChange}

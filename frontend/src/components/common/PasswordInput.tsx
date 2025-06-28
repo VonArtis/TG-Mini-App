@@ -37,6 +37,18 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    if (preventCopyPaste) {
+      e.preventDefault();
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLInputElement>) => {
+    if (preventCopyPaste) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className={`w-full ${className}`}>
       {label && (

@@ -191,6 +191,23 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     }
   };
 
+  // Calculate form completion progress
+  const calculateProgress = () => {
+    const fields = ['name', 'email', 'password', 'confirmPassword', 'phone'];
+    let completedFields = 0;
+    
+    // Check each field for completion and validity
+    if (form.name.trim().length >= 6 && form.name.includes(' ') && !errors.name) completedFields++;
+    if (form.email && emailValidation.isValid && !errors.email) completedFields++;
+    if (form.password && form.password.length >= 8 && !errors.password) completedFields++;
+    if (form.confirmPassword && form.password === form.confirmPassword && !errors.confirmPassword) completedFields++;
+    if (form.phone && validatePhoneNumber(form.phone) && !errors.phone) completedFields++;
+    
+    return Math.round((completedFields / fields.length) * 100);
+  };
+
+  const progress = calculateProgress();
+
   return (
     <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8 flex flex-col">
       {/* Language Selector in Header */}

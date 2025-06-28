@@ -169,6 +169,16 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     }
   };
 
+  // Trigger shake animation for error fields
+  const triggerShakeError = (fieldName: string) => {
+    setShakeErrors(prev => ({ ...prev, [fieldName]: true }));
+    
+    // Reset shake after animation completes
+    setTimeout(() => {
+      setShakeErrors(prev => ({ ...prev, [fieldName]: false }));
+    }, 600);
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     

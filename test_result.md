@@ -172,7 +172,7 @@ backend:
           comment: "Successfully removed twilio>=9.6.0 and kept vonage>=3.15.0"
 
 frontend:
-  - task: "No frontend changes required"
+  - task: "No frontend changes required for Twilio migration"
     implemented: true
     working: true
     file: "N/A"
@@ -183,6 +183,18 @@ frontend:
         - working: true
           agent: "main"
           comment: "Frontend uses same API endpoints, no changes needed"
+
+  - task: "Add confirm password field to signup screen"
+    implemented: false
+    working: false
+    file: "frontend/src/components/screens/SignupScreen.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "main"
+          comment: "REMINDER: User requested to add confirm password field to signup form for better UX"
 
 metadata:
   created_by: "main_agent"

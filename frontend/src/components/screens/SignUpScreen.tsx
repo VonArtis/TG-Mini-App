@@ -56,23 +56,52 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!form.name) newErrors.name = t('auth:signup.validation.nameRequired');
+    // Name validation
+    if (!form.name.trim()) {
+      newErrors.name = t('auth:signup.validation.nameRequired');
+    }
+    
+    // Enhanced email validation
     if (!form.email) {
       newErrors.email = t('auth:signup.validation.emailRequired');
-    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = t('auth:signup.validation.emailInvalid');
+    } else {
+      const emailCheck = validateEmailSmart(form.email);
+      if (!emailCheck.isValid) {
+        newErrors.email = emailCheck.message || t('auth:signup.validation.emailInvalid');
+      }
     }
+    
+    // Enhanced password validation (minimum 8 characters + complexity)
     if (!form.password) {
       newErrors.password = t('auth:signup.validation.passwordRequired');
-    } else if (form.password.length < 6) {
-      newErrors.password = t('auth:signup.validation.passwordTooShort');
+    } else if (form.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    } else {
+      // Check password complexity
+      const hasUpper = /[A-Z]/.test(form.password);
+      const hasLower = /[a-z]/.test(form.password);
+      const hasNumber = /\d/.test(form.password);
+      const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\?]/.test(form.password);
+      
+      if (!hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+        newErrors.password = 'Password must include uppercase, lowercase, number, and special character';
+      }
     }
+    
+    // Smart phone validation
     if (!form.phone) {
       newErrors.phone = t('auth:signup.validation.phoneRequired');
-    } else if (!/^\d{10,15}$/.test(form.phone.replace(/\s+/g, ''))) {
-      newErrors.phone = t('auth:signup.validation.phoneInvalid');
+    } else {
+      const phoneCheck = validatePhoneNumber(form.phone, form.countryCode);
+      if (!phoneCheck.isValid) {
+        newErrors.phone = phoneCheck.message || t('auth:signup.validation.phoneInvalid');
+      }
     }
-    if (!agreed) newErrors.terms = t('auth:signup.validation.termsRequired');
+    
+    // Terms agreement
+    if (!agreed) {
+      newErrors.terms = t('auth:signup.validation.termsRequired');
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

@@ -26,7 +26,7 @@ export const useEmailAvailability = (email: string) => {
 
       try {
         const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-        const response = await fetch(`${backendUrl}/api/auth/check-email?email=${encodeURIComponent(email)}`);
+        const response = await fetch(`${backendUrl}/auth/check-email?email=${encodeURIComponent(email)}`);
         const data = await response.json();
 
         setAvailability({

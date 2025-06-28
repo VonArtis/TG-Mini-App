@@ -289,10 +289,35 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           
           {/* Password Match Indicator */}
           {form.confirmPassword && form.password && form.password === form.confirmPassword && !errors.confirmPassword && (
-            <div className="mt-2 flex items-center space-x-2">
-              <span className="text-green-400 text-sm">✓</span>
-              <span className="text-green-400 text-sm font-medium">Passwords match</span>
-            </div>
+            <AnimatePresence>
+              <motion.div 
+                className="mt-2 flex items-center space-x-2"
+                initial={{ opacity: 0, y: -10, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.8 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 300, 
+                  damping: 20,
+                  duration: 0.4 
+                }}
+              >
+                <motion.span 
+                  className="text-green-400 text-sm"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 500, 
+                    damping: 15,
+                    delay: 0.1 
+                  }}
+                >
+                  ✓
+                </motion.span>
+                <span className="text-green-400 text-sm font-medium">Passwords match</span>
+              </motion.div>
+            </AnimatePresence>
           )}
         </div>
         

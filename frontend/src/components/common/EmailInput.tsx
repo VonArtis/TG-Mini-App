@@ -82,10 +82,29 @@ export const EmailInput = forwardRef<HTMLInputElement, EmailInputProps>(({
       }
       
       return (
-        <div className="mt-2 flex items-center space-x-2">
-          <span className="text-red-400 text-sm">✗</span>
-          <span className="text-red-400 text-sm">{message}</span>
-        </div>
+        <AnimatePresence>
+          <motion.div 
+            className="mt-2 flex items-center space-x-2"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.span 
+              className="text-red-400 text-sm"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 400, 
+                damping: 20 
+              }}
+            >
+              ✗
+            </motion.span>
+            <span className="text-red-400 text-sm">{message}</span>
+          </motion.div>
+        </AnimatePresence>
       );
     }
 

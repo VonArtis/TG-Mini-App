@@ -380,11 +380,11 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
         transition={{ duration: 0.3 }}
       >
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-400">Form Progress</span>
-          <span className="text-sm font-medium text-white">{progress}%</span>
+          <span className="text-sm text-gray-400 dark:text-gray-400 text-gray-600">Form Progress</span>
+          <span className="text-sm font-medium text-black dark:text-white">{progress}%</span>
         </div>
         
-        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2 overflow-hidden transition-colors duration-300">
           <motion.div
             className={`h-full rounded-full transition-all duration-500 ${
               progress < 40 ? 'bg-red-500' : 

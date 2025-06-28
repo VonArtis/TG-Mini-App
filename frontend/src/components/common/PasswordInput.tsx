@@ -37,6 +37,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({
       
       <div className="relative">
         <input
+          ref={ref}
           type={showPassword ? 'text' : 'password'}
           value={value}
           onChange={onChange}

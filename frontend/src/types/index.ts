@@ -56,7 +56,7 @@ export interface ConnectedWallet {
 }
 
 export interface User {
-  id: string;
+  id?: string;
   user_id?: string; // For backward compatibility
   name?: string;
   first_name?: string;

@@ -632,7 +632,7 @@ As an innovative startup, we're offering exclusive benefits to our early communi
 - 📧 **Email Verification** with secure email confirmation
 - 📱 **SMS Verification** with phone number validation
 - 🔐 **Complete 2FA System** **NEW - LIVE!**
-  - 📲 **SMS-Based 2FA** with Twilio Verify API integration
+  - 📲 **SMS-Based 2FA** with Vonage SMS API integration
   - 📧 **Email-Based 2FA** with backup authentication method
   - 🔐 **TOTP/Authenticator 2FA** (Google Authenticator, Authy, Microsoft Authenticator)
   - 🔑 **Recovery Codes** for backup access

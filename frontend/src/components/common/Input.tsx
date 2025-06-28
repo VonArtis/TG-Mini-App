@@ -62,11 +62,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
           className={`
             w-full px-4 py-3
             ${prefix ? 'pl-12' : ''}
-            bg-gray-800 border rounded-lg
-            text-white placeholder-gray-400
+            bg-gray-800 dark:bg-gray-800 light:bg-white
+            border rounded-lg
+            text-white dark:text-white light:text-black
+            placeholder-gray-400 dark:placeholder-gray-400 light:placeholder-gray-500
             focus:ring-2 focus:ring-blue-500 focus:border-transparent
             transition-all duration-200
-            ${error ? 'border-red-500' : 'border-gray-600'}
+            ${error ? 'border-red-500' : 'border-gray-600 dark:border-gray-600 light:border-gray-300'}
             ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
           `}
         />

@@ -85,7 +85,10 @@ export interface User {
   email_verified?: boolean;
   phone_verified?: boolean;
   
-  type?: 'bank' | 'crypto' | 'login' | 'signup';
+  // === INVESTMENT & MEMBERSHIP ===
+  investment_tier?: string;
+  
+  type?: 'bank' | 'crypto' | 'login' | 'signup' | 'email';
   auth_type?: string;
   created_at?: string;
 }

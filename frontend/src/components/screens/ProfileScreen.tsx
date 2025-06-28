@@ -28,13 +28,19 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
       try {
         const parsedUser = JSON.parse(localStorageUser);
         console.log('User from localStorage:', parsedUser);
+        
+        // If context user is null but localStorage has user data, restore it
+        if (!user && parsedUser) {
+          console.log('Context user is null, but localStorage has user data. Restoring...');
+          setUser(parsedUser);
+        }
       } catch (error) {
         console.error('Error parsing localStorage user:', error);
       }
     } else {
       console.log('No user found in localStorage');
     }
-  }, [user, membershipStatus]);
+  }, [user, membershipStatus, setUser]);
   
   // Profile deletion state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);

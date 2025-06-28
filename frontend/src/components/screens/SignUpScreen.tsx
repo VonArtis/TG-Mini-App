@@ -15,6 +15,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     phone: '',
     countryCode: getUserCountryCode() // Auto-detect user's country
   });

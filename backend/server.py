@@ -926,9 +926,6 @@ async def verify_sms_code(phone_number: str, code: str) -> dict:
             "status": "failed",
             "error": str(e)
         }
-    except Exception as e:
-        print(f"SMS verification error: {e}")
-        raise HTTPException(status_code=500, detail="Failed to verify SMS code")
 
 def validate_email(email: str) -> bool:
     """Validate email format"""

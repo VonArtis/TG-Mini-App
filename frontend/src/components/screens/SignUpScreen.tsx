@@ -208,14 +208,15 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
         
         {/* Enhanced Password Input with Strength Indicator */}
         <div>
-          <Input
+          <PasswordInput
             label={t('auth:signup.passwordLabel')}
-            type="password"
             value={form.password}
             onChange={handleChange('password')}
             placeholder={t('auth:signup.passwordPlaceholder')}
             required
             error={errors.password}
+            showPassword={showPassword}
+            onToggleVisibility={() => setShowPassword(!showPassword)}
           />
           
           {/* Password Strength Indicator */}
@@ -224,14 +225,15 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
         
         {/* Confirm Password Input */}
         <div>
-          <Input
+          <PasswordInput
             label="Confirm Password"
-            type="password"
             value={form.confirmPassword}
             onChange={handleChange('confirmPassword')}
             placeholder="Re-enter your password"
             required
             error={errors.confirmPassword}
+            showPassword={showConfirmPassword}
+            onToggleVisibility={() => setShowConfirmPassword(!showConfirmPassword)}
           />
           
           {/* Password Match Indicator */}

@@ -1,5 +1,6 @@
 // Email input component with real-time availability checking
 import React, { forwardRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEmailAvailability } from '../../hooks/useEmailAvailability';
 
 interface EmailInputProps {

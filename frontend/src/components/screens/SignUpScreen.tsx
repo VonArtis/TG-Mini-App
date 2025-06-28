@@ -362,12 +362,14 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
               <Input
                 ref={phoneRef}
                 type="tel"
+                inputMode="tel"
                 value={phoneFormatted}
                 onChange={handleChange('phone')}
                 placeholder={t('auth:signup.phonePlaceholder')}
                 required
                 error={errors.phone}
                 className="flex-1"
+                autoComplete="tel"
               />
               {/* Show cleaned number count */}
               {form.phone && (

@@ -231,6 +231,23 @@ if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
 else:
     print("Twilio credentials not found - SMS 2FA will not be available")
 
+# Vonage Configuration for SMS/Email verification (Twilio replacement)
+VONAGE_API_KEY = os.getenv("VONAGE_API_KEY")
+VONAGE_API_SECRET = os.getenv("VONAGE_API_SECRET")
+
+# Initialize Vonage client if credentials are available
+vonage_client = None
+if VONAGE_API_KEY and VONAGE_API_SECRET:
+    try:
+        import vonage
+        vonage_client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
+        print("Vonage client initialized successfully")
+    except Exception as e:
+        print(f"Failed to initialize Vonage client: {e}")
+        vonage_client = None
+else:
+    print("Vonage credentials not found - will fallback to Twilio if available")
+
 # Crypto Wallet Configuration - Multi-Network Support
 CRYPTO_WALLETS = {
     "vonvault_business": {

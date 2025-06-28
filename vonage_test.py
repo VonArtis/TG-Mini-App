@@ -14,7 +14,7 @@ with open('/app/frontend/.env', 'r') as f:
             BACKEND_URL = line.strip().split('=')[1].strip('"\'')
             break
 
-API_BASE = f"{BACKEND_URL}/api"
+API_BASE = "http://localhost:8001/api"
 JWT_SECRET = "change-this-to-a-strong-random-secret-key-minimum-32-characters"  # Same as in server.py
 
 # Test results tracking

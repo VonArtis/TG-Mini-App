@@ -272,11 +272,11 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
         
         {/* Progress milestones */}
         <div className="flex justify-between mt-1 text-xs text-gray-500">
-          <span className={progress >= 20 ? 'text-green-400' : ''}>Name</span>
-          <span className={progress >= 40 ? 'text-green-400' : ''}>Email</span>
-          <span className={progress >= 60 ? 'text-green-400' : ''}>Password</span>
-          <span className={progress >= 80 ? 'text-green-400' : ''}>Confirm</span>
-          <span className={progress >= 100 ? 'text-green-400' : ''}>Phone</span>
+          <span className={progress >= 20 ? 'text-green-400' : ''}>Form</span>
+          <span className={progress >= 40 ? 'text-green-400' : ''}>Email ✓</span>
+          <span className={progress >= 60 ? 'text-green-400' : ''}>Phone ✓</span>
+          <span className={progress >= 80 ? 'text-green-400' : ''}>2FA ✓</span>
+          <span className={progress >= 100 ? 'text-green-400' : ''}>Complete</span>
         </div>
         
         {/* Completion message */}

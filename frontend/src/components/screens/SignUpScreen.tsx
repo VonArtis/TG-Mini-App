@@ -10,7 +10,7 @@ import { PasswordInput } from '../common/PasswordInput';
 import { EmailInput } from '../common/EmailInput';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
-import { formatPhoneNumber, validatePhoneNumber, cleanPhoneNumber, getUserCountryCode } from '../../utils/phoneFormatter';
+import { formatPhoneNumber, validatePhoneNumber, cleanPhoneNumber, getUserCountryCode, detectCountryFromIP } from '../../utils/phoneFormatter';
 import { validateEmailSmart, EmailValidationResult } from '../../utils/emailValidator';
 
 export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogin, onNavigate }) => {

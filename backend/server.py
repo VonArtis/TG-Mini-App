@@ -957,7 +957,7 @@ async def send_email_verification(email: str) -> dict:
             "verified": False,
             "attempts": 0
         }
-        await db.verification_codes.insert_one(verification_data)
+        db.verification_codes.insert_one(verification_data)
         
         # For now, we'll just store the code and return success
         # TODO: Implement actual email sending (SMTP, SendGrid, etc.)

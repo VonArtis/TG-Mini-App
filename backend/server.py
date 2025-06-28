@@ -1524,20 +1524,29 @@ async def user_signup_impl(request: Request, user_data: UserSignup):
     print(f"DEBUG V1: Raw request received at user_signup_impl")
     print(f"DEBUG V1: Signup request data: {user_data}")
     try:
+        print(f"DEBUG V1: Starting email validation...")
         # Validate email format
         if not validate_email(user_data.email):
+            print(f"DEBUG V1: Email validation failed")
             raise HTTPException(status_code=400, detail="Invalid email format")
         
+        print(f"DEBUG V1: Email validation passed, checking existing user...")
         # Check if user already exists
         existing_user = db.users.find_one({"email": user_data.email})
         if existing_user:
+            print(f"DEBUG V1: User already exists!")
             raise HTTPException(status_code=400, detail="User with this email already exists")
         
+        print(f"DEBUG V1: No existing user, checking phone validation...")
         # Check if phone number already exists
         formatted_phone = f"{user_data.country_code}{user_data.phone.replace('+', '').replace('-', '').replace(' ', '')}"
+        print(f"DEBUG V1: Formatted phone: {formatted_phone}")
         existing_phone = db.users.find_one({"phone": formatted_phone})
         if existing_phone:
+            print(f"DEBUG V1: Phone already exists!")
             raise HTTPException(status_code=400, detail="User with this phone number already exists")
+        
+        print(f"DEBUG V1: Phone validation passed, continuing...")
         
         # Hash password
         hashed_password = hash_password(user_data.password)

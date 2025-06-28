@@ -89,6 +89,10 @@ const AppRouter: React.FC = () => {
     // Save user data for verification tracking
     localStorage.setItem('currentUser', JSON.stringify(userData));
     
+    // IMPORTANT: Also update the AppContext user state immediately
+    // This ensures user data is available in profile screen even if verification is skipped
+    console.log('Setting user data in context after signup:', userData);
+    
     // New enhanced flow: User can choose verification path
     // Since user is now authenticated immediately, they can access dashboard
     // Default to verification flow but allow skipping

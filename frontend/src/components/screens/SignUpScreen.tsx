@@ -140,25 +140,63 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           error={errors.name}
         />
         
-        <Input
-          label={t('auth:signup.emailLabel')}
-          type="email"
-          value={form.email}
-          onChange={handleChange('email')}
-          placeholder={t('auth:signup.emailPlaceholder')}
-          required
-          error={errors.email}
-        />
+        {/* Enhanced Email Input with Smart Validation */}
+        <div>
+          <Input
+            label={t('auth:signup.emailLabel')}
+            type="email"
+            value={form.email}
+            onChange={handleChange('email')}
+            placeholder={t('auth:signup.emailPlaceholder')}
+            required
+            error={errors.email}
+            className="flex-1"
+          />
+          
+          {/* Email Suggestion */}
+          {emailValidation.type === 'suggestion' && emailValidation.suggestion && (
+            <div className="mt-2 bg-blue-900/20 rounded-lg p-2">
+              <p className="text-sm text-blue-300">
+                💡 {emailValidation.message}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setForm({ ...form, email: emailValidation.suggestion! });
+                  setEmailValidation({ isValid: true, type: 'valid' });
+                }}
+                className="text-blue-400 hover:text-blue-300 text-sm underline mt-1"
+              >
+                Use {emailValidation.suggestion}
+              </button>
+            </div>
+          )}
+          
+          {/* Email Warning */}
+          {emailValidation.type === 'warning' && (
+            <div className="mt-2 bg-yellow-900/20 rounded-lg p-2">
+              <p className="text-sm text-yellow-300">
+                ⚠️ {emailValidation.message}
+              </p>
+            </div>
+          )}
+        </div>
         
-        <Input
-          label={t('auth:signup.passwordLabel')}
-          type="password"
-          value={form.password}
-          onChange={handleChange('password')}
-          placeholder={t('auth:signup.passwordPlaceholder')}
-          required
-          error={errors.password}
-        />
+        {/* Enhanced Password Input with Strength Indicator */}
+        <div>
+          <Input
+            label={t('auth:signup.passwordLabel')}
+            type="password"
+            value={form.password}
+            onChange={handleChange('password')}
+            placeholder={t('auth:signup.passwordPlaceholder')}
+            required
+            error={errors.password}
+          />
+          
+          {/* Password Strength Indicator */}
+          <PasswordStrength password={form.password} />
+        </div>
         
         <div className="space-y-1">
           <label className="block text-sm font-medium text-white">

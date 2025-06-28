@@ -707,7 +707,7 @@ graph TB
         M[CoinGecko Crypto]
         N[Teller Banking]
         O[MetaMask Web3]
-        P[Twilio 2FA]
+        P[Vonage SMS]
     end
     
     A --> F

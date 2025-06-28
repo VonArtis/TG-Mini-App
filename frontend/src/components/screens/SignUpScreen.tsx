@@ -201,6 +201,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
 
       <div className="space-y-5">
         <Input
+          ref={nameRef}
           label={t('auth:signup.nameLabel')}
           value={form.name}
           onChange={handleChange('name')}

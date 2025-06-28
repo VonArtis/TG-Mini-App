@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { AuthScreenProps } from '../../types';
 import { ScreenHeader } from '../layout/ScreenHeader';
 import { Input } from '../common/Input';

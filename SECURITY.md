@@ -299,7 +299,7 @@ ENVIRONMENT=production                # Production mode
 - [x] API authentication
 - [x] Profile deletion safety
 - [x] **Two-Factor Authentication (2FA) - SMS, Email, TOTP**
-- [x] **Twilio Integration** for SMS/Email verification
+- [x] **Vonage Integration** for SMS verification
 - [x] **TOTP Support** with QR code generation
 - [x] **Recovery Codes** system
 

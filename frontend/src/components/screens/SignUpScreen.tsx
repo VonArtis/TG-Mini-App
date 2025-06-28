@@ -363,9 +363,10 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
   const progress = calculateProgress();
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8 flex flex-col">
-      {/* Language Selector in Header */}
-      <div className="absolute top-4 right-4">
+    <div className="min-h-screen bg-black dark:bg-black bg-white light:bg-white text-black dark:text-white px-6 pt-12 pb-8 flex flex-col transition-colors duration-300">
+      {/* Header with Language Selector and Theme Toggle */}
+      <div className="absolute top-4 right-4 flex items-center space-x-2">
+        <ThemeToggle variant="minimal" showLabel={false} />
         <LanguageSelector variant="compact" />
       </div>
       

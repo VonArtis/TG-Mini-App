@@ -355,6 +355,8 @@ agent_communication:
 
 user_problem_statement: "Phase 2 multi-wallet functionality implementation for VonVault DeFi platform - Transform single wallet system to support up to 5 wallets simultaneously with primary wallet management"
 
+user_problem_statement: "Test the signup and profile workflow to debug the issue where user details aren't saved and membership status doesn't load when skipping verification."
+
 frontend:
   - task: "Multi-language functionality"
     implemented: true

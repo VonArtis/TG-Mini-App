@@ -2287,6 +2287,8 @@ async def push_notification_verify_impl(request: dict, authorization: str):
 @limiter.limit("5/minute")
 async def user_signup(request: Request, user_data: UserSignup):
     """Create new user account with email/password"""
+    print(f"DEBUG: Raw request received at /auth/signup")
+    print(f"DEBUG: Request headers: {dict(request.headers)}")
     try:
         # Debug: Print incoming data
         print(f"DEBUG: Signup request data: {user_data}")

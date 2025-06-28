@@ -434,9 +434,9 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
                     delay: 0.1 
                   }}
                 >
-                  <span className="text-green-400 text-lg">🔒</span>
+                  <span className="text-green-400 dark:text-green-400 light:text-green-600 text-lg">🔒</span>
                 </motion.div>
-                <span className="text-green-400 text-sm font-medium">
+                <span className="text-green-400 dark:text-green-400 light:text-green-700 text-sm font-medium">
                   Excellent! Your account is fully verified and secure.
                 </span>
               </div>
@@ -446,7 +446,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
         
         {/* Next steps hint when form is complete but verification pending */}
         {progress >= 20 && progress < 100 && (
-          <div className="mt-2 text-xs text-gray-400">
+          <div className="mt-2 text-xs text-gray-400 dark:text-gray-400 light:text-gray-600">
             {progress < 40 && "Next: Verify your email address"}
             {progress >= 40 && progress < 60 && "Next: Verify your phone number"}
             {progress >= 60 && progress < 80 && "Next: Enable 2FA for security"}

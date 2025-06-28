@@ -206,6 +206,19 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           <PasswordStrength password={form.password} />
         </div>
         
+        {/* Confirm Password Input */}
+        <div>
+          <Input
+            label="Confirm Password"
+            type="password"
+            value={form.confirmPassword}
+            onChange={handleChange('confirmPassword')}
+            placeholder="Re-enter your password"
+            required
+            error={errors.confirmPassword}
+          />
+        </div>
+        
         {/* Enhanced Phone Input with Auto-formatting */}
         <div className="space-y-1">
           <label className="block text-sm font-medium text-white">

@@ -6,6 +6,7 @@ import { Button } from '../common/Button';
 import { LanguageSelector } from '../common/LanguageSelector';
 import { PasswordStrength } from '../common/PasswordStrength';
 import { PasswordInput } from '../common/PasswordInput';
+import { EmailInput } from '../common/EmailInput';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { formatPhoneNumber, validatePhoneNumber, cleanPhoneNumber, getUserCountryCode } from '../../utils/phoneFormatter';

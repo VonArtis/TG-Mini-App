@@ -149,7 +149,7 @@ export const useAuth = () => {
   // Real API authentication methods
   
   // Signup with user data - REAL API INTEGRATION
-  const signup = async (userData: { name: string; email: string; password: string; phone: string; countryCode: string }): Promise<User | null> => {
+  const signup = async (userData: { name: string; email: string; password: string; phone: string; country_code: string }): Promise<User | null> => {
     setLoading(true);
     try {
       const response = await apiService.signup({
@@ -157,7 +157,7 @@ export const useAuth = () => {
         email: userData.email,
         password: userData.password,
         phone: userData.phone,
-        country_code: userData.countryCode
+        country_code: userData.country_code
       });
       
       if (response && response.user && response.token) {

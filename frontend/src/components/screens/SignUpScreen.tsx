@@ -52,7 +52,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
 
   useEffect(() => {
     // Email is complete (valid format)
-    if (form.email && validateEmail(form.email) && passwordRef.current && !form.password) {
+    if (form.email && validateEmailSmart(form.email).isValid && passwordRef.current && !form.password) {
       passwordRef.current.focus();
     }
   }, [form.email, form.password]);

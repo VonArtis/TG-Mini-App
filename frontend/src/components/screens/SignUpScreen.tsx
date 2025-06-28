@@ -283,6 +283,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
             error={errors.confirmPassword}
             showPassword={showConfirmPassword}
             onToggleVisibility={() => setShowConfirmPassword(!showConfirmPassword)}
+            preventCopyPaste={true}
           />
           
           {/* Password Match Indicator */}

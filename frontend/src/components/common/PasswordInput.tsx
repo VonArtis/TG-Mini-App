@@ -1,5 +1,5 @@
 // Password input component with visibility toggle
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 interface PasswordInputProps {
   label?: string;
@@ -14,7 +14,7 @@ interface PasswordInputProps {
   onToggleVisibility: () => void;
 }
 
-export const PasswordInput: React.FC<PasswordInputProps> = ({
+export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({
   label,
   value,
   onChange,
@@ -25,7 +25,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   className = '',
   showPassword,
   onToggleVisibility
-}) => {
+}, ref) => {
   return (
     <div className={`w-full ${className}`}>
       {label && (

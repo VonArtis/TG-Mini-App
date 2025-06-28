@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { AuthScreenProps } from '../../types';
 import { ScreenHeader } from '../layout/ScreenHeader';
 import { Input } from '../common/Input';
 import { Button } from '../common/Button';
 import { LanguageSelector } from '../common/LanguageSelector';
+import { PasswordStrength } from '../common/PasswordStrength';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
+import { formatPhoneNumber, validatePhoneNumber, cleanPhoneNumber, getUserCountryCode } from '../../utils/phoneFormatter';
+import { validateEmailSmart, EmailValidationResult } from '../../utils/emailValidator';
 
 export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogin, onNavigate }) => {
   const [form, setForm] = useState({

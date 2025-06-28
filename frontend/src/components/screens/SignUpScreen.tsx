@@ -182,6 +182,22 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     if (!validateForm()) return;
 
     try {
+      // Stage 1: Validating form data
+      setLoadingState({
+        isLoading: true,
+        message: 'Validating your information...',
+        stage: 'validating'
+      });
+      
+      await new Promise(resolve => setTimeout(resolve, 800)); // Brief validation delay
+      
+      // Stage 2: Creating account
+      setLoadingState({
+        isLoading: true,
+        message: 'Creating your VonVault account...',
+        stage: 'creating'
+      });
+      
       // Extract confirmPassword and countryCode, then add country_code
       const { confirmPassword, countryCode, ...signupData } = form;
       
@@ -191,11 +207,44 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
         country_code: countryCode  // Convert camelCase to snake_case for API
       });
       
+      // Stage 3: Setting up security
+      setLoadingState({
+        isLoading: true,
+        message: 'Setting up security features...',
+        stage: 'securing'
+      });
+      
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Security setup delay
+      
+      // Stage 4: Finalizing
+      setLoadingState({
+        isLoading: true,
+        message: 'Finalizing your account setup...',
+        stage: 'finalizing'
+      });
+      
+      await new Promise(resolve => setTimeout(resolve, 500)); // Final delay
+      
+      // Reset loading state
+      setLoadingState({
+        isLoading: false,
+        message: '',
+        stage: 'idle'
+      });
+      
       if (user && onContinue) {
         onContinue(user);
       }
     } catch (error: any) {
       console.error('Signup error:', error);
+      
+      // Reset loading state on error
+      setLoadingState({
+        isLoading: false,
+        message: '',
+        stage: 'idle'
+      });
+      
       // Show error to user
       setErrors({ 
         submit: error.message || 'Failed to create account. Please try again.' 

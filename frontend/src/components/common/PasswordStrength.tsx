@@ -101,6 +101,7 @@ export const PasswordStrength: React.FC<PasswordStrengthProps> = ({ password, cl
   
   const strength = calculateStrength(password);
   const strengthPercentage = password.length > 0 ? Math.min((strength.score / 4) * 100, 100) : 0;
+  const isStrong = strength.score >= 4;
   
   if (password.length === 0) {
     return null;
@@ -124,59 +125,73 @@ export const PasswordStrength: React.FC<PasswordStrengthProps> = ({ password, cl
         </div>
       </div>
       
-      {/* Requirements Checklist */}
-      <div className="space-y-1">
-        <div className="flex items-center space-x-2">
-          <span className={password.length >= 8 ? 'text-green-400' : 'text-gray-400'}>
-            {password.length >= 8 ? '✓' : '○'}
-          </span>
-          <span className="text-xs text-gray-400">
-            At least 8 characters ({password.length}/8)
-          </span>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <span className={/[A-Z]/.test(password) ? 'text-green-400' : 'text-gray-400'}>
-            {/[A-Z]/.test(password) ? '✓' : '○'}
-          </span>
-          <span className="text-xs text-gray-400">
-            Uppercase letter (A-Z)
-          </span>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <span className={/[a-z]/.test(password) ? 'text-green-400' : 'text-gray-400'}>
-            {/[a-z]/.test(password) ? '✓' : '○'}
-          </span>
-          <span className="text-xs text-gray-400">
-            Lowercase letter (a-z)
-          </span>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <span className={/\d/.test(password) ? 'text-green-400' : 'text-gray-400'}>
-            {/\d/.test(password) ? '✓' : '○'}
-          </span>
-          <span className="text-xs text-gray-400">
-            Number (0-9)
-          </span>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <span className={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\?]/.test(password) ? 'text-green-400' : 'text-gray-400'}>
-            {/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\?]/.test(password) ? '✓' : '○'}
-          </span>
-          <span className="text-xs text-gray-400">
-            Special character (!@#$...)
-          </span>
-        </div>
-      </div>
+      {/* Show requirements only if password is not strong yet */}
+      {!isStrong && (
+        <>
+          {/* Requirements Checklist */}
+          <div className="space-y-1">
+            <div className="flex items-center space-x-2">
+              <span className={password.length >= 8 ? 'text-green-400' : 'text-gray-400'}>
+                {password.length >= 8 ? '✓' : '○'}
+              </span>
+              <span className="text-xs text-gray-400">
+                At least 8 characters ({password.length}/8)
+              </span>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <span className={/[A-Z]/.test(password) ? 'text-green-400' : 'text-gray-400'}>
+                {/[A-Z]/.test(password) ? '✓' : '○'}
+              </span>
+              <span className="text-xs text-gray-400">
+                Uppercase letter (A-Z)
+              </span>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <span className={/[a-z]/.test(password) ? 'text-green-400' : 'text-gray-400'}>
+                {/[a-z]/.test(password) ? '✓' : '○'}
+              </span>
+              <span className="text-xs text-gray-400">
+                Lowercase letter (a-z)
+              </span>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <span className={/\d/.test(password) ? 'text-green-400' : 'text-gray-400'}>
+                {/\d/.test(password) ? '✓' : '○'}
+              </span>
+              <span className="text-xs text-gray-400">
+                Number (0-9)
+              </span>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <span className={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\?]/.test(password) ? 'text-green-400' : 'text-gray-400'}>
+                {/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\?]/.test(password) ? '✓' : '○'}
+              </span>
+              <span className="text-xs text-gray-400">
+                Special character (!@#$...)
+              </span>
+            </div>
+          </div>
+          
+          {/* Additional Feedback */}
+          {strength.feedback.length > 0 && (
+            <div className="bg-blue-900/20 rounded-lg p-2">
+              <p className="text-xs text-blue-300">
+                💡 {strength.feedback.join(', ')}
+              </p>
+            </div>
+          )}
+        </>
+      )}
       
-      {/* Additional Feedback */}
-      {strength.feedback.length > 0 && (
-        <div className="bg-blue-900/20 rounded-lg p-2">
-          <p className="text-xs text-blue-300">
-            💡 {strength.feedback.join(', ')}
+      {/* Success message when strong */}
+      {isStrong && (
+        <div className="bg-green-900/20 rounded-lg p-2">
+          <p className="text-xs text-green-300">
+            ✅ Password meets all requirements!
           </p>
         </div>
       )}

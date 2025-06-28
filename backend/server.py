@@ -241,15 +241,17 @@ VONAGE_API_SECRET = os.getenv("VONAGE_API_SECRET")
 
 # Initialize Vonage client if credentials are available
 vonage_client = None
+vonage_sms = None
 if VONAGE_API_KEY and VONAGE_API_SECRET:
     try:
         import vonage
-        client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
-        vonage_client = vonage.Sms(client)
+        vonage_client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
+        vonage_sms = vonage.Sms(vonage_client)
         print("Vonage client initialized successfully")
     except Exception as e:
         print(f"Failed to initialize Vonage client: {e}")
         vonage_client = None
+        vonage_sms = None
 else:
     print("Vonage credentials not found - SMS verification will not be available")
 

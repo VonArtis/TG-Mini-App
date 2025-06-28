@@ -114,8 +114,55 @@ const resources = {
     dashboard: enDashboard, // Fallback to English
     profile: enProfile, // Fallback to English
     auth: enAuth // Fallback to English
+  },
+  ru: {
+    common: ruCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: ruAuth
+  },
+  ja: {
+    common: jaCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: jaAuth
+  },
+  ko: {
+    common: koCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: koAuth
+  },
+  ar: {
+    common: arCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: arAuth
+  },
+  hi: {
+    common: hiCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: hiAuth
+  },
+  tr: {
+    common: trCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: trAuth
+  },
+  pl: {
+    common: plCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: plAuth
+  },
+  nl: {
+    common: nlCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: nlAuth
   }
-  // Other languages will fallback to English for now
 };
 
 // Initialize i18next

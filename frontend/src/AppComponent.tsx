@@ -45,6 +45,7 @@ import './App.css';
 const AppRouter: React.FC = () => {
   const [screen, setScreen] = useState<ScreenType>('welcome');
   const [userDetailsParams, setUserDetailsParams] = useState<any>(null);
+  const { user: contextUser } = useApp(); // Access user from context for debugging
 
   // Update document title based on current screen
   useEffect(() => {

@@ -13,6 +13,8 @@ interface InputProps {
   prefix?: string;
   className?: string;
   step?: string;
+  inputMode?: 'text' | 'email' | 'tel' | 'url' | 'numeric' | 'decimal' | 'search';
+  autoComplete?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(({

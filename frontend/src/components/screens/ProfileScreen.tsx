@@ -16,6 +16,26 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
   const { membershipStatus, fetchMembershipStatus } = useMembership(user);
   const { currentLanguage, availableLanguages, changeLanguage, t } = useLanguage();
   
+  // Debug logging
+  useEffect(() => {
+    console.log('ProfileScreen mounted');
+    console.log('User from context:', user);
+    console.log('User token:', user?.token);
+    console.log('Membership status:', membershipStatus);
+    
+    const localStorageUser = localStorage.getItem('currentUser');
+    if (localStorageUser) {
+      try {
+        const parsedUser = JSON.parse(localStorageUser);
+        console.log('User from localStorage:', parsedUser);
+      } catch (error) {
+        console.error('Error parsing localStorage user:', error);
+      }
+    } else {
+      console.log('No user found in localStorage');
+    }
+  }, [user, membershipStatus]);
+  
   // Profile deletion state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');

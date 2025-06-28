@@ -216,22 +216,8 @@ BCRYPT_ROUNDS = int(os.getenv("BCRYPT_ROUNDS", "12"))
 MAX_LOGIN_ATTEMPTS = int(os.getenv("MAX_LOGIN_ATTEMPTS", "5"))
 LOCKOUT_DURATION_MINUTES = int(os.getenv("LOCKOUT_DURATION_MINUTES", "15"))
 
-# Twilio Configuration for 2FA SMS
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN") 
-TWILIO_VERIFY_SERVICE_SID = os.getenv("TWILIO_VERIFY_SERVICE_SID")
-
-# Initialize Twilio client if credentials are available
-twilio_client = None
-if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
-    try:
-        twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-        print("Twilio client initialized successfully")
-    except Exception as e:
-        print(f"Failed to initialize Twilio client: {e}")
-        twilio_client = None
-else:
-    print("Twilio credentials not found - SMS 2FA will not be available")
+# SMS 2FA Configuration
+SMS_2FA_ENABLED = False  # Disabled until new SMS provider is configured
 
 # Vonage Configuration for SMS verification
 VONAGE_API_KEY = os.getenv("VONAGE_API_KEY")

@@ -971,28 +971,47 @@ async def send_email_verification(email: str) -> dict:
         raise HTTPException(status_code=500, detail="Failed to send email verification")
 
 async def verify_email_code(email: str, code: str) -> dict:
-    """Verify email code using Twilio Verify"""
-    if not twilio_client or not TWILIO_VERIFY_SERVICE_SID:
-        raise HTTPException(status_code=503, detail="Email service not available")
-    
+    """Verify email code using database storage"""
     try:
         # Validate email
         if not validate_email(email):
             raise HTTPException(status_code=400, detail="Invalid email format")
         
-        # Verify code via Twilio Verify
-        verification_check = twilio_client.verify.v2.services(TWILIO_VERIFY_SERVICE_SID) \
-            .verification_checks.create(to=email, code=code)
+        # Check verification code in database
+        verification = await db.verification_codes.find_one({
+            "contact": email,
+            "code": code,
+            "type": "email",
+            "verified": False,
+            "expires_at": {"$gt": datetime.utcnow()},
+            "attempts": {"$lt": 3}
+        })
         
-        is_valid = verification_check.status == 'approved'
-        
-        return {
-            "valid": is_valid,
-            "status": verification_check.status,
-            "email": email
-        }
-    except TwilioException as e:
-        print(f"Twilio email verification error: {e}")
+        if verification:
+            # Mark as verified
+            await db.verification_codes.update_one(
+                {"_id": verification["_id"]},
+                {"$set": {"verified": True, "verified_at": datetime.utcnow()}}
+            )
+            return {
+                "valid": True,
+                "status": "approved",
+                "email": email
+            }
+        else:
+            # Increment attempts
+            await db.verification_codes.update_one(
+                {"contact": email, "verified": False, "type": "email"},
+                {"$inc": {"attempts": 1}}
+            )
+            return {
+                "valid": False,
+                "status": "failed",
+                "email": email
+            }
+            
+    except Exception as e:
+        print(f"Email verification error: {e}")
         return {
             "valid": False,
             "status": "failed",

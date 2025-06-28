@@ -103,6 +103,7 @@ const AppRouter: React.FC = () => {
   const handleSkipVerification = () => {
     // User chooses to skip verification and go directly to dashboard
     console.log('User skipped verification flow');
+    console.log('Context user state:', contextUser);
     
     // Ensure user data is still available in context
     const currentUser = localStorage.getItem('currentUser');

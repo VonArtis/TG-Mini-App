@@ -885,13 +885,25 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           </AnimatePresence>
         )}
         
-        {/* Display signup error */}
+        {/* Display signup error with Shake Animation */}
         {errors.submit && (
-          <div className="mt-3 bg-red-900/20 rounded-lg p-3">
+          <motion.div 
+            className="mt-3 bg-red-900/20 rounded-lg p-3"
+            initial={{ opacity: 0, scale: 0.9, x: -10 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1, 
+              x: shakeErrors.submit ? [0, -10, 10, -10, 10, 0] : 0 
+            }}
+            transition={{ 
+              duration: shakeErrors.submit ? 0.5 : 0.3,
+              ease: "easeInOut" 
+            }}
+          >
             <p className="text-red-400 text-sm text-center">
               {errors.submit}
             </p>
-          </div>
+          </motion.div>
         )}
         
         <p className="text-center text-sm text-white mt-4">

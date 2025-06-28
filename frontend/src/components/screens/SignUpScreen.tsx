@@ -118,17 +118,25 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
   const handleSignUp = async () => {
     if (!validateForm()) return;
 
-    // Extract confirmPassword and countryCode, then add country_code
-    const { confirmPassword, countryCode, ...signupData } = form;
-    
-    const user = await signup({
-      ...signupData,
-      phone: cleanPhoneNumber(form.phone), // Clean phone number for API
-      country_code: countryCode  // Convert camelCase to snake_case for API
-    });
-    
-    if (user && onContinue) {
-      onContinue(user);
+    try {
+      // Extract confirmPassword and countryCode, then add country_code
+      const { confirmPassword, countryCode, ...signupData } = form;
+      
+      const user = await signup({
+        ...signupData,
+        phone: cleanPhoneNumber(form.phone), // Clean phone number for API
+        country_code: countryCode  // Convert camelCase to snake_case for API
+      });
+      
+      if (user && onContinue) {
+        onContinue(user);
+      }
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      // Show error to user
+      setErrors({ 
+        submit: error.message || 'Failed to create account. Please try again.' 
+      });
     }
   };
 

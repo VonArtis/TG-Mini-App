@@ -112,8 +112,10 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
 
     const user = await signup({
       ...form,
+      phone: cleanPhoneNumber(form.phone), // Clean phone number for API
       countryCode: form.countryCode
     });
+    
     if (user && onContinue) {
       onContinue(user);
     }

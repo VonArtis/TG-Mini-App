@@ -1,5 +1,5 @@
 // Email input component with real-time availability checking
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { useEmailAvailability } from '../../hooks/useEmailAvailability';
 
 interface EmailInputProps {
@@ -13,7 +13,7 @@ interface EmailInputProps {
   className?: string;
 }
 
-export const EmailInput: React.FC<EmailInputProps> = ({
+export const EmailInput = forwardRef<HTMLInputElement, EmailInputProps>(({
   label,
   value,
   onChange,
@@ -22,7 +22,7 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   disabled = false,
   error,
   className = ''
-}) => {
+}, ref) => {
   const { isChecking, isAvailable, reason } = useEmailAvailability(value);
 
   // Determine the status icon and message

@@ -208,7 +208,7 @@ metadata:
 test_plan:
   current_focus:
     - "Vonage SMS verification fully functional"
-    - "Remove old Twilio environment variables from Render"
+    - "Confirm password field added to signup - COMPLETED"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

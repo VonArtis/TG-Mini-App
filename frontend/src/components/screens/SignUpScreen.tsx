@@ -254,6 +254,40 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           <span className={progress >= 80 ? 'text-green-400' : ''}>Confirm</span>
           <span className={progress >= 100 ? 'text-green-400' : ''}>Phone</span>
         </div>
+        
+        {/* Completion message */}
+        {progress === 100 && (
+          <AnimatePresence>
+            <motion.div
+              className="mt-3 p-3 bg-green-900/20 border border-green-500/30 rounded-lg"
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 20 
+              }}
+            >
+              <div className="flex items-center space-x-2">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 500, 
+                    delay: 0.1 
+                  }}
+                >
+                  <span className="text-green-400 text-lg">🎉</span>
+                </motion.div>
+                <span className="text-green-400 text-sm font-medium">
+                  Great! Your form is complete and ready to submit.
+                </span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        )}
       </motion.div>
 
       <div className="space-y-5">

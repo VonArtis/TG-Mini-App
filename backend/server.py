@@ -850,15 +850,11 @@ async def send_sms_verification(phone_number: str) -> dict:
         verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
         
         # Send SMS via Vonage
-        from vonage_sms import SmsMessage
-        
-        message = SmsMessage(
-            to=formatted_phone,
-            from_="VonVault",
-            text=f"Your VonVault verification code is: {verification_code}. Valid for 10 minutes."
-        )
-        
-        response = vonage_client.sms.send(message)
+        response = vonage_client.send_message({
+            "from": "VonVault",
+            "to": formatted_phone,
+            "text": f"Your VonVault verification code is: {verification_code}. Valid for 10 minutes."
+        })
         
         # Store verification code in database
         verification_data = {
@@ -873,15 +869,14 @@ async def send_sms_verification(phone_number: str) -> dict:
         }
         await db.verification_codes.insert_one(verification_data)
         
-        # Check response status
-        if response.status_code == 0:
+        if response["messages"][0]["status"] == "0":
             return {
                 "status": "pending",
                 "phone_number": formatted_phone,
                 "message": f"Verification code sent to {formatted_phone}"
             }
         else:
-            raise Exception(f"Vonage SMS failed: {response.status_code}")
+            raise Exception(f"Vonage SMS failed: {response['messages'][0]['error-text']}")
             
     except Exception as e:
         print(f"Vonage SMS error: {e}")

@@ -237,6 +237,12 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     }
     
     setErrors(newErrors);
+    
+    // Trigger shake animations for fields with errors
+    Object.keys(newErrors).forEach(fieldName => {
+      triggerShakeError(fieldName);
+    });
+    
     return Object.keys(newErrors).length === 0;
   };
 

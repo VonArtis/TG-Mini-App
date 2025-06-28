@@ -273,6 +273,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
         {/* Confirm Password Input */}
         <div>
           <PasswordInput
+            ref={confirmPasswordRef}
             label="Confirm Password"
             value={form.confirmPassword}
             onChange={handleChange('confirmPassword')}

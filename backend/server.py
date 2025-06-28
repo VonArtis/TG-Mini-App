@@ -235,7 +235,7 @@ if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
 else:
     print("Twilio credentials not found - SMS 2FA will not be available")
 
-# Vonage Configuration for SMS/Email verification (Twilio replacement)
+# Vonage Configuration for SMS verification
 VONAGE_API_KEY = os.getenv("VONAGE_API_KEY")
 VONAGE_API_SECRET = os.getenv("VONAGE_API_SECRET")
 
@@ -250,7 +250,7 @@ if VONAGE_API_KEY and VONAGE_API_SECRET:
         print(f"Failed to initialize Vonage client: {e}")
         vonage_client = None
 else:
-    print("Vonage credentials not found - will fallback to Twilio if available")
+    print("Vonage credentials not found - SMS verification will not be available")
 
 # Crypto Wallet Configuration - Multi-Network Support
 CRYPTO_WALLETS = {

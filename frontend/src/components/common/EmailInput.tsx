@@ -32,10 +32,36 @@ export const EmailInput = forwardRef<HTMLInputElement, EmailInputProps>(({
     
     if (isChecking) {
       return (
-        <div className="mt-2 flex items-center space-x-2">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
-          <span className="text-blue-400 text-sm">Checking availability...</span>
-        </div>
+        <motion.div 
+          className="mt-2 flex items-center space-x-2"
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <motion.div 
+            className="flex space-x-1"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {[...Array(3)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="w-1.5 h-1.5 bg-blue-400 rounded-full"
+                animate={{
+                  y: [0, -4, 0],
+                  opacity: [0.4, 1, 0.4]
+                }}
+                transition={{
+                  duration: 0.6,
+                  repeat: Infinity,
+                  delay: i * 0.1,
+                  ease: "easeInOut"
+                }}
+              />
+            ))}
+          </motion.div>
+          <span className="text-blue-400 text-sm">Verifying email availability...</span>
+        </motion.div>
       );
     }
 

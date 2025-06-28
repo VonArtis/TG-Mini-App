@@ -560,7 +560,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           <label className="block text-sm font-medium text-white">
             {t('auth:signup.phoneLabel')} <span className="text-red-400 ml-1">*</span>
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-2 relative">
             <select
               value={form.countryCode}
               onChange={(e) => setForm({ ...form, countryCode: e.target.value })}

@@ -739,7 +739,12 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
           </div>
         </motion.div>
 
-        <div className="flex items-start">
+        {/* Terms Agreement with Shake Animation */}
+        <motion.div 
+          className="flex items-start"
+          animate={shakeErrors.terms ? { x: [0, -10, 10, -10, 10, 0] } : {}}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
           <input
             type="checkbox"
             checked={agreed}
@@ -762,8 +767,17 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
               {t('auth:signup.privacyPolicy')}
             </span>
           </p>
-        </div>
-        {errors.terms && <p className="text-red-400 text-sm">{errors.terms}</p>}
+        </motion.div>
+        {errors.terms && (
+          <motion.p 
+            className="text-red-400 text-sm"
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {errors.terms}
+          </motion.p>
+        )}
       </div>
 
       <div className="mt-8">

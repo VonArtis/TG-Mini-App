@@ -368,6 +368,7 @@ test_plan:
     - "ConnectBankScreen verification gates" 
     - "WithdrawalScreen verification gates"
     - "MakeNewInvestmentScreen verification gates"
+    - "Caps Lock detection in password fields"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

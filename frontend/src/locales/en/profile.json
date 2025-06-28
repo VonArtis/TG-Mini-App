@@ -33,7 +33,7 @@
       "subtitle": "Choose your preferred language",
       "displayLanguage": "Display Language",
       "comingSoon": "Coming Soon",
-      "developmentNote": "Full multi-language support is in development. Interface will be translated in the next update.",
+      "developmentNote": "Select your preferred language. Full translations are available for English, Spanish, and French. Other languages use English fallbacks and will be fully translated in future updates.",
       "changeSuccess": "Language changed successfully!",
       "changeError": "Failed to change language. Please try again."
     },

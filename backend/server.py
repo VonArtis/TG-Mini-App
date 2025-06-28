@@ -890,7 +890,7 @@ async def verify_sms_code(phone_number: str, code: str) -> dict:
         formatted_phone = format_phone_number(phone_number)
         
         # Check verification code in database
-        verification = await db.verification_codes.find_one({
+        verification = db.verification_codes.find_one({
             "contact": formatted_phone,
             "code": code,
             "type": "sms",
@@ -901,7 +901,7 @@ async def verify_sms_code(phone_number: str, code: str) -> dict:
         
         if verification:
             # Mark as verified
-            await db.verification_codes.update_one(
+            db.verification_codes.update_one(
                 {"_id": verification["_id"]},
                 {"$set": {"verified": True, "verified_at": datetime.utcnow()}}
             )
@@ -912,7 +912,7 @@ async def verify_sms_code(phone_number: str, code: str) -> dict:
             }
         else:
             # Increment attempts
-            await db.verification_codes.update_one(
+            db.verification_codes.update_one(
                 {"contact": formatted_phone, "verified": False, "type": "sms"},
                 {"$inc": {"attempts": 1}}
             )

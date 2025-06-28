@@ -124,7 +124,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     const user = await signup({
       ...signupData,
       phone: cleanPhoneNumber(form.phone), // Clean phone number for API
-      countryCode: form.countryCode
+      country_code: form.countryCode  // Convert camelCase to snake_case for API
     });
     
     if (user && onContinue) {

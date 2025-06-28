@@ -2288,6 +2288,13 @@ async def push_notification_verify_impl(request: dict, authorization: str):
 async def user_signup(request: Request, user_data: UserSignup):
     """Create new user account with email/password"""
     try:
+        # Debug: Print incoming data
+        print(f"DEBUG: Signup request data: {user_data}")
+        print(f"DEBUG: Name: {user_data.name}")
+        print(f"DEBUG: Email: {user_data.email}")
+        print(f"DEBUG: Phone: {user_data.phone}")
+        print(f"DEBUG: Country code: {user_data.country_code}")
+        
         # Validate email format
         if not validate_email(user_data.email):
             raise HTTPException(status_code=400, detail="Invalid email format")

@@ -31,8 +31,15 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({
 }, ref) => {
   const [capsLockOn, setCapsLockOn] = useState(false);
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // Detect caps lock state
+    if (e.getModifierState) {
+      setCapsLockOn(e.getModifierState('CapsLock'));
+    }
+  };
+
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Detect caps lock state on key up as well
     if (e.getModifierState) {
       setCapsLockOn(e.getModifierState('CapsLock'));
     }

@@ -28,6 +28,30 @@ import ptAuth from '../locales/pt/auth.json';
 
 import zhCommon from '../locales/zh/common.json';
 
+import ruCommon from '../locales/ru/common.json';
+import ruAuth from '../locales/ru/auth.json';
+
+import jaCommon from '../locales/ja/common.json';
+import jaAuth from '../locales/ja/auth.json';
+
+import koCommon from '../locales/ko/common.json';
+import koAuth from '../locales/ko/auth.json';
+
+import arCommon from '../locales/ar/common.json';
+import arAuth from '../locales/ar/auth.json';
+
+import hiCommon from '../locales/hi/common.json';
+import hiAuth from '../locales/hi/auth.json';
+
+import trCommon from '../locales/tr/common.json';
+import trAuth from '../locales/tr/auth.json';
+
+import plCommon from '../locales/pl/common.json';
+import plAuth from '../locales/pl/auth.json';
+
+import nlCommon from '../locales/nl/common.json';
+import nlAuth from '../locales/nl/auth.json';
+
 // Define supported languages
 export const SUPPORTED_LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },

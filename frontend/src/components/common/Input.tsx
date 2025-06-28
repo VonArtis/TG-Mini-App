@@ -45,6 +45,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
         )}
         
         <input
+          ref={ref}
           type={type}
           value={value}
           onChange={onChange}
@@ -53,10 +54,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
           disabled={disabled}
           step={step}
           className={`
-            w-full p-3 bg-gray-900 border rounded-lg text-white placeholder-gray-400 
-            focus:border-purple-400 focus:outline-none transition-colors
-            ${prefix ? 'pl-8' : ''}
-            ${error ? 'border-red-500' : 'border-purple-500'}
+            w-full px-4 py-3
+            ${prefix ? 'pl-12' : ''}
+            bg-gray-800 border rounded-lg
+            text-white placeholder-gray-400
+            focus:ring-2 focus:ring-blue-500 focus:border-transparent
+            transition-all duration-200
+            ${error ? 'border-red-500' : 'border-gray-600'}
             ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
           `}
         />

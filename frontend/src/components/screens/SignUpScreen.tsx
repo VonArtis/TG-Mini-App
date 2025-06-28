@@ -359,6 +359,7 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
             {/* Phone input with auto-formatting */}
             <div className="flex-1">
               <Input
+                ref={phoneRef}
                 type="tel"
                 value={phoneFormatted}
                 onChange={handleChange('phone')}

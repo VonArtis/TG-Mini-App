@@ -255,33 +255,37 @@ export const detectCountryFromIP = async (): Promise<{
       });
       clearTimeout(timeoutId);
     
-    if (response.ok) {
-      const data = await response.json();
-      
-      // Map country codes to phone codes
-      const countryToPhoneMap: Record<string, string> = {
-        'US': '+1', 'CA': '+1', 'GB': '+44', 'FR': '+33', 'DE': '+49',
-        'ES': '+34', 'IT': '+39', 'BR': '+55', 'PT': '+351', 'RU': '+7',
-        'CN': '+86', 'JP': '+81', 'KR': '+82', 'IN': '+91', 'SA': '+966',
-        'TR': '+90', 'PL': '+48', 'NL': '+31', 'AR': '+54', 'MX': '+52',
-        'AU': '+61', 'BE': '+32', 'CH': '+41', 'AT': '+43', 'SE': '+46',
-        'NO': '+47', 'DK': '+45', 'FI': '+358', 'IE': '+353', 'EG': '+20',
-        'ZA': '+27', 'NG': '+234', 'TH': '+66', 'VN': '+84', 'MY': '+60',
-        'SG': '+65', 'PH': '+63', 'ID': '+62', 'HK': '+852', 'TW': '+886',
-        'CL': '+56', 'CO': '+57', 'PE': '+51', 'CZ': '+420', 'HU': '+36',
-        'GR': '+30', 'RO': '+40', 'UA': '+380', 'AE': '+971', 'NZ': '+64'
-      };
-      
-      const phoneCode = countryToPhoneMap[data.country_code];
-      
-      if (phoneCode) {
-        return {
-          countryCode: phoneCode,
-          countryName: data.country_name || 'Unknown',
-          detected: true,
-          method: 'ip'
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Map country codes to phone codes
+        const countryToPhoneMap: Record<string, string> = {
+          'US': '+1', 'CA': '+1', 'GB': '+44', 'FR': '+33', 'DE': '+49',
+          'ES': '+34', 'IT': '+39', 'BR': '+55', 'PT': '+351', 'RU': '+7',
+          'CN': '+86', 'JP': '+81', 'KR': '+82', 'IN': '+91', 'SA': '+966',
+          'TR': '+90', 'PL': '+48', 'NL': '+31', 'AR': '+54', 'MX': '+52',
+          'AU': '+61', 'BE': '+32', 'CH': '+41', 'AT': '+43', 'SE': '+46',
+          'NO': '+47', 'DK': '+45', 'FI': '+358', 'IE': '+353', 'EG': '+20',
+          'ZA': '+27', 'NG': '+234', 'TH': '+66', 'VN': '+84', 'MY': '+60',
+          'SG': '+65', 'PH': '+63', 'ID': '+62', 'HK': '+852', 'TW': '+886',
+          'CL': '+56', 'CO': '+57', 'PE': '+51', 'CZ': '+420', 'HU': '+36',
+          'GR': '+30', 'RO': '+40', 'UA': '+380', 'AE': '+971', 'NZ': '+64'
         };
+        
+        const phoneCode = countryToPhoneMap[data.country_code];
+        
+        if (phoneCode) {
+          return {
+            countryCode: phoneCode,
+            countryName: data.country_name || 'Unknown',
+            detected: true,
+            method: 'ip'
+          };
+        }
       }
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      throw fetchError;
     }
   } catch (error) {
     console.log('IP detection failed, falling back to language detection:', error);

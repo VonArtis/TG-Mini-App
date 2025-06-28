@@ -981,7 +981,7 @@ async def verify_email_code(email: str, code: str) -> dict:
             raise HTTPException(status_code=400, detail="Invalid email format")
         
         # Check verification code in database
-        verification = await db.verification_codes.find_one({
+        verification = db.verification_codes.find_one({
             "contact": email,
             "code": code,
             "type": "email",
@@ -992,7 +992,7 @@ async def verify_email_code(email: str, code: str) -> dict:
         
         if verification:
             # Mark as verified
-            await db.verification_codes.update_one(
+            db.verification_codes.update_one(
                 {"_id": verification["_id"]},
                 {"$set": {"verified": True, "verified_at": datetime.utcnow()}}
             )
@@ -1003,7 +1003,7 @@ async def verify_email_code(email: str, code: str) -> dict:
             }
         else:
             # Increment attempts
-            await db.verification_codes.update_one(
+            db.verification_codes.update_one(
                 {"contact": email, "verified": False, "type": "email"},
                 {"$inc": {"attempts": 1}}
             )

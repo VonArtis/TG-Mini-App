@@ -39,6 +39,19 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     stage: 'idle'
   });
 
+  // Country detection state
+  const [countryDetection, setCountryDetection] = useState<{
+    isDetecting: boolean;
+    detected: boolean;
+    method: 'ip' | 'language' | 'fallback';
+    countryName: string;
+  }>({
+    isDetecting: true,
+    detected: false,
+    method: 'fallback',
+    countryName: 'Unknown'
+  });
+
   // Field refs for auto-focus
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);

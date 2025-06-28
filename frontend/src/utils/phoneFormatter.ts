@@ -174,29 +174,65 @@ export const detectCountryCode = (number: string): string | null => {
 };
 
 /**
- * Get user's likely country code based on timezone/locale
+ * Get user's likely country code based on browser locale and language
  */
 export const getUserCountryCode = (): string => {
   try {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // Try to detect from browser language
+    const language = navigator.language || 'en-US';
+    const locale = language.toLowerCase();
     
-    // Simple timezone to country mapping
-    const timezoneMap: Record<string, string> = {
-      'America/New_York': '+1',
-      'America/Los_Angeles': '+1',
-      'America/Chicago': '+1',
-      'Europe/London': '+44',
-      'Europe/Paris': '+33',
-      'Europe/Berlin': '+49',
-      'Europe/Madrid': '+34',
-      'Europe/Rome': '+39',
-      'Asia/Kolkata': '+91',
-      'Asia/Shanghai': '+86',
-      'Asia/Tokyo': '+81'
+    // Language to country code mapping
+    const localeMap: Record<string, string> = {
+      'en-us': '+1',    // English (US)
+      'en-ca': '+1',    // English (Canada) 
+      'en-gb': '+44',   // English (UK)
+      'fr-fr': '+33',   // French (France)
+      'fr-ca': '+1',    // French (Canada)
+      'de-de': '+49',   // German (Germany)
+      'es-es': '+34',   // Spanish (Spain)
+      'es-mx': '+52',   // Spanish (Mexico)
+      'it-it': '+39',   // Italian (Italy)
+      'pt-br': '+55',   // Portuguese (Brazil)
+      'pt-pt': '+351',  // Portuguese (Portugal)
+      'ru-ru': '+7',    // Russian (Russia)
+      'zh-cn': '+86',   // Chinese (China)
+      'ja-jp': '+81',   // Japanese (Japan)
+      'ko-kr': '+82',   // Korean (South Korea)
+      'hi-in': '+91',   // Hindi (India)
+      'ar-sa': '+966',  // Arabic (Saudi Arabia)
+      'tr-tr': '+90',   // Turkish (Turkey)
+      'pl-pl': '+48',   // Polish (Poland)
+      'nl-nl': '+31'    // Dutch (Netherlands)
     };
     
-    return timezoneMap[timezone] || '+1'; // Default to US
+    // Check exact locale match first
+    if (localeMap[locale]) {
+      return localeMap[locale];
+    }
+    
+    // Check language prefix (e.g., 'fr' from 'fr-fr')
+    const languagePrefix = locale.split('-')[0];
+    const languageMap: Record<string, string> = {
+      'en': '+1',   // English -> US default
+      'fr': '+33',  // French -> France
+      'de': '+49',  // German -> Germany
+      'es': '+34',  // Spanish -> Spain
+      'it': '+39',  // Italian -> Italy
+      'pt': '+351', // Portuguese -> Portugal
+      'ru': '+7',   // Russian -> Russia
+      'zh': '+86',  // Chinese -> China
+      'ja': '+81',  // Japanese -> Japan
+      'ko': '+82',  // Korean -> South Korea
+      'hi': '+91',  // Hindi -> India
+      'ar': '+966', // Arabic -> Saudi Arabia
+      'tr': '+90',  // Turkish -> Turkey
+      'pl': '+48',  // Polish -> Poland
+      'nl': '+31'   // Dutch -> Netherlands
+    };
+    
+    return languageMap[languagePrefix] || '+1'; // Default to US
   } catch {
-    return '+1'; // Fallback
+    return '+1'; // Fallback to US
   }
 };

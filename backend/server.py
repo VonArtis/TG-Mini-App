@@ -30,8 +30,6 @@ from io import BytesIO
 import base64
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioException
-from twilio.rest import Client
-from twilio.base.exceptions import TwilioException
 import random
 from datetime import datetime, timedelta
 

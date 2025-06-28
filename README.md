@@ -282,6 +282,24 @@ VonVault achieved **progressive enterprise-grade security** that adapts to user 
 
 ---
 
+## ⚙️ **SMS Configuration**
+
+VonVault uses **Vonage SMS API** for secure SMS verification. To configure SMS in your deployment:
+
+1. **Get Vonage Credentials**:
+   - Sign up at [Vonage Developer Portal](https://developer.vonage.com/)
+   - Get your API Key and API Secret
+
+2. **Environment Variables**:
+   ```bash
+   VONAGE_API_KEY="your_vonage_api_key"
+   VONAGE_API_SECRET="your_vonage_api_secret"
+   ```
+
+3. **Production Ready**: SMS verification works internationally with high deliverability
+
+---
+
 <div align="center">
 
 ### 🎯 **Ready to Experience the Future of DeFi?**

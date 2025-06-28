@@ -454,16 +454,22 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
       </motion.div>
 
       <div className="space-y-5">
-        <Input
-          ref={nameRef}
-          label={t('auth:signup.nameLabel')}
-          value={form.name}
-          onChange={handleChange('name')}
-          placeholder={t('auth:signup.namePlaceholder')}
-          required
-          error={errors.name}
-          autoComplete="given-name"
-        />
+        {/* Name Field with Shake Animation */}
+        <motion.div
+          animate={shakeErrors.name ? { x: [0, -10, 10, -10, 10, 0] } : {}}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
+          <Input
+            ref={nameRef}
+            label={t('auth:signup.nameLabel')}
+            value={form.name}
+            onChange={handleChange('name')}
+            placeholder={t('auth:signup.namePlaceholder')}
+            required
+            error={errors.name}
+            autoComplete="given-name"
+          />
+        </motion.div>
         
         {/* Enhanced Email Input with Smart Validation */}
         <div>

@@ -456,6 +456,7 @@ test_plan:
     - "Profile Deletion Backend Endpoint"
     - "Profile Deletion UI Implementation"
     - "Multi-language functionality"
+    - "Add confirm password field to signup screen"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

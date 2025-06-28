@@ -67,6 +67,42 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     }
   }, []);
 
+  // Smart country detection
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const detection = await detectCountryFromIP();
+        
+        // Update form with detected country code
+        setForm(prev => ({
+          ...prev,
+          countryCode: detection.countryCode
+        }));
+        
+        // Update detection state
+        setCountryDetection({
+          isDetecting: false,
+          detected: detection.detected,
+          method: detection.method,
+          countryName: detection.countryName
+        });
+        
+      } catch (error) {
+        console.error('Country detection failed:', error);
+        
+        // Fallback to default
+        setCountryDetection({
+          isDetecting: false,
+          detected: false,
+          method: 'fallback',
+          countryName: 'United States'
+        });
+      }
+    };
+    
+    detectCountry();
+  }, []);
+
   // Auto-focus next field when current field is completed
   useEffect(() => {
     // Name is complete (at least 2 words, 3+ chars each)

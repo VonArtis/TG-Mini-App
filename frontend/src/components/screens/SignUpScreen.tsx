@@ -167,9 +167,8 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
         
         {/* Enhanced Email Input with Smart Validation */}
         <div>
-          <Input
+          <EmailInput
             label={t('auth:signup.emailLabel')}
-            type="email"
             value={form.email}
             onChange={handleChange('email')}
             placeholder={t('auth:signup.emailPlaceholder')}

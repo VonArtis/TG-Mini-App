@@ -66,6 +66,30 @@ const resources = {
     dashboard: enDashboard, // Fallback to English
     profile: frProfile,
     auth: frAuth
+  },
+  de: {
+    common: deCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: deAuth
+  },
+  it: {
+    common: itCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: itAuth
+  },
+  pt: {
+    common: ptCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: ptAuth
+  },
+  zh: {
+    common: zhCommon,
+    dashboard: enDashboard, // Fallback to English
+    profile: enProfile, // Fallback to English
+    auth: enAuth // Fallback to English
   }
   // Other languages will fallback to English for now
 };

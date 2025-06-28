@@ -19,6 +19,10 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     phone: '',
     countryCode: getUserCountryCode() // Auto-detect user's country
   });
+
+  // Password visibility toggles
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [emailValidation, setEmailValidation] = useState<EmailValidationResult>({ isValid: true, type: 'valid' });

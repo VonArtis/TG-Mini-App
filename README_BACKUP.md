@@ -817,7 +817,7 @@ VonVault achieved **progressive enterprise-grade security** that adapts to user 
 <td width="50%">
 
 ### 🔐 **Complete 2FA System - LIVE**
-- **📲 SMS 2FA**: Real-time codes via Twilio Verify API
+- **📲 SMS 2FA**: Real-time codes via Vonage SMS API
 - **📧 Email 2FA**: Backup verification system
 - **🔐 TOTP 2FA**: Google Authenticator, Authy support
 - **🔑 Recovery Codes**: Backup access system

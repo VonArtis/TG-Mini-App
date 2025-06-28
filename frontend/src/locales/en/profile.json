@@ -32,7 +32,7 @@
       "title": "Language & Region",
       "subtitle": "Choose your preferred language",
       "displayLanguage": "Display Language",
-      "comingSoon": "Coming Soon",
+      "comingSoon": "Multi-Language Support Available",
       "developmentNote": "Select your preferred language. Full translations are available for English, Spanish, and French. Other languages use English fallbacks and will be fully translated in future updates.",
       "changeSuccess": "Language changed successfully!",
       "changeError": "Failed to change language. Please try again."

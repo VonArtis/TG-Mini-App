@@ -52,6 +52,9 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
     countryName: 'Unknown'
   });
 
+  // Error shake animations state
+  const [shakeErrors, setShakeErrors] = useState<Record<string, boolean>>({});
+
   // Field refs for auto-focus
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);

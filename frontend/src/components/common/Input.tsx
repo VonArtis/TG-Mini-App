@@ -35,7 +35,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   return (
     <div className={`space-y-1 ${className}`}>
       {label && (
-        <label className="block text-sm font-medium text-white">
+        <label className="block text-sm font-medium text-white dark:text-white light:text-black">
           {label}
           {required && <span className="text-red-400 ml-1">*</span>}
         </label>

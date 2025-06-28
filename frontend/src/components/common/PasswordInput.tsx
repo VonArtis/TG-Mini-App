@@ -12,6 +12,7 @@ interface PasswordInputProps {
   className?: string;
   showPassword: boolean;
   onToggleVisibility: () => void;
+  preventCopyPaste?: boolean;
 }
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({

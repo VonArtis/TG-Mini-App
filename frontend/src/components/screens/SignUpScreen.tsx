@@ -8,6 +8,7 @@ import { LanguageSelector } from '../common/LanguageSelector';
 import { PasswordStrength } from '../common/PasswordStrength';
 import { PasswordInput } from '../common/PasswordInput';
 import { EmailInput } from '../common/EmailInput';
+import { ThemeToggle } from '../common/ThemeToggle';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { formatPhoneNumber, validatePhoneNumber, cleanPhoneNumber, getUserCountryCode, detectCountryFromIP } from '../../utils/phoneFormatter';

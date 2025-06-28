@@ -504,6 +504,81 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Tested the signup and profile workflow to debug the issue where user details aren't saved and membership status doesn't load when skipping verification. Found that the signup process works correctly and user data is properly saved in localStorage. The skip verification flow also works as expected, with the user being able to skip email verification, SMS verification, and 2FA setup. However, there are issues with accessing the profile screen. When trying to click on 'Profile & Settings' in the dashboard, the element was not found. When trying to log in with a created user, we were redirected to the email verification screen instead of the dashboard. The user data is correctly stored in localStorage, but there seems to be an issue with the navigation to the profile screen and possibly with the membership status loading."
+        
+  - task: "Auto-focus functionality in signup form"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/screens/SignUpScreen.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented auto-focus functionality to improve form UX: name field (6+ chars with space) → auto-focus to email field, valid email → auto-focus to password field, strong password (8+ chars) → auto-focus to confirm password field, matching confirm password → auto-focus to phone field"
+      - working: true
+        agent: "testing"
+        comment: "Auto-focus functionality is working correctly. When entering a name with 6+ characters and a space, focus automatically moves to the email field. After entering a valid email, focus moves to the password field. After entering a strong password (8+ chars), focus moves to the confirm password field. After entering a matching confirm password, focus moves to the phone field. The transitions are smooth and enhance the user experience."
+
+  - task: "Caps Lock detection in password fields"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/common/PasswordInput.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented Caps Lock detection in password fields to show yellow warning 'Caps Lock is on' when Caps Lock is enabled"
+      - working: false
+        agent: "testing"
+        comment: "Caps Lock detection is not working as expected. When turning on Caps Lock and typing in the password fields, the warning 'Caps Lock is on' does not appear. The feature is implemented in the code (PasswordInput.tsx lines 32-39 and 111-133) but is not functioning in the UI. No DOM elements containing 'Caps Lock' text were found during testing."
+
+  - task: "Mobile keyboard optimization"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/common/Input.tsx, /app/frontend/src/components/common/EmailInput.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added proper autoComplete and inputMode attributes to optimize mobile keyboard experience"
+      - working: true
+        agent: "testing"
+        comment: "Mobile keyboard optimization is working correctly. The name field has autoComplete='given-name', the email field has inputMode='email', and the phone field has inputMode='tel'. These attributes ensure that the appropriate keyboard types are shown on mobile devices. The form is also properly responsive on mobile with no overflowing or invisible elements."
+
+  - task: "Copy/paste prevention in confirm password field"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/common/PasswordInput.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added copy/paste prevention to confirm password field for security"
+      - working: true
+        agent: "testing"
+        comment: "Copy/paste prevention in the confirm password field is working correctly. When attempting to copy from the password field and paste into the confirm password field, the paste operation is blocked. The confirm password field remains empty after the paste attempt. This feature enhances security by ensuring users manually type their password confirmation."
+
+  - task: "Success animations (framer-motion)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/common/EmailInput.tsx, /app/frontend/src/components/screens/SignUpScreen.tsx"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added smooth animations for success states: green checkmark for valid email, animated 'Passwords match' indicator"
+      - working: true
+        agent: "testing"
+        comment: "Success animations are working correctly. When entering a valid email, a green checkmark animation appears. When passwords match, an animated 'Passwords match' indicator is displayed. The animations are smooth and provide good visual feedback to users. The framer-motion library is properly implemented and there are no performance issues with the animations."
 
 backend:
   - task: "Enhanced User Model with Multi-Wallet Support"

@@ -869,7 +869,7 @@ async def send_sms_verification(phone_number: str) -> dict:
             "verified": False,
             "attempts": 0
         }
-        await db.verification_codes.insert_one(verification_data)
+        db.verification_codes.insert_one(verification_data)
         
         if response["messages"][0]["status"] == "0":
             return {

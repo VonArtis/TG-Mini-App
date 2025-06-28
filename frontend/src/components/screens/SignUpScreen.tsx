@@ -402,19 +402,19 @@ export const SignUpScreen: React.FC<AuthScreenProps> = ({ onContinue, onGoToLogi
         </div>
         
         {/* Progress milestones */}
-        <div className="flex justify-between mt-1 text-xs text-gray-500">
-          <span className={progress >= 20 ? 'text-green-400' : ''}>Form</span>
-          <span className={progress >= 40 ? 'text-green-400' : ''}>Email ✓</span>
-          <span className={progress >= 60 ? 'text-green-400' : ''}>Phone ✓</span>
-          <span className={progress >= 80 ? 'text-green-400' : ''}>2FA ✓</span>
-          <span className={progress >= 100 ? 'text-green-400' : ''}>Complete</span>
+        <div className="flex justify-between mt-1 text-xs text-gray-500 dark:text-gray-500 light:text-gray-400">
+          <span className={progress >= 20 ? 'text-green-400 dark:text-green-400 light:text-green-600' : ''}>Form</span>
+          <span className={progress >= 40 ? 'text-green-400 dark:text-green-400 light:text-green-600' : ''}>Email ✓</span>
+          <span className={progress >= 60 ? 'text-green-400 dark:text-green-400 light:text-green-600' : ''}>Phone ✓</span>
+          <span className={progress >= 80 ? 'text-green-400 dark:text-green-400 light:text-green-600' : ''}>2FA ✓</span>
+          <span className={progress >= 100 ? 'text-green-400 dark:text-green-400 light:text-green-600' : ''}>Complete</span>
         </div>
         
         {/* Completion message */}
         {progress === 100 && (
           <AnimatePresence>
             <motion.div
-              className="mt-3 p-3 bg-green-900/20 border border-green-500/30 rounded-lg"
+              className="mt-3 p-3 bg-green-900/20 dark:bg-green-900/20 light:bg-green-100 border border-green-500/30 dark:border-green-500/30 light:border-green-300 rounded-lg transition-colors duration-300"
               initial={{ opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}

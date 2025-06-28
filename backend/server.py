@@ -1521,6 +1521,8 @@ async def push_notification_verify_v1(request: dict, authorization: str = Header
 
 async def user_signup_impl(request: Request, user_data: UserSignup):
     """Implementation for user signup - shared between versions"""
+    print(f"DEBUG V1: Raw request received at user_signup_impl")
+    print(f"DEBUG V1: Signup request data: {user_data}")
     try:
         # Validate email format
         if not validate_email(user_data.email):

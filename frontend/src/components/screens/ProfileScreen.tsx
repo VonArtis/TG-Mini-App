@@ -268,17 +268,16 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
               </select>
             </div>
             
-            {availableLanguages.length > 2 && (
-              <div className="bg-blue-900/20 rounded-lg p-3">
-                <div className="flex items-center space-x-2">
-                  <span className="text-blue-400">ℹ️</span>
-                  <div>
-                    <p className="text-sm text-blue-300 font-medium">{t('profile:sections.language.comingSoon')}</p>
-                    <p className="text-xs text-blue-400">{t('profile:sections.language.developmentNote')}</p>
-                  </div>
+            {/* Language Support Info */}
+            <div className="bg-green-900/20 rounded-lg p-3">
+              <div className="flex items-center space-x-2">
+                <span className="text-green-400">✅</span>
+                <div>
+                  <p className="text-sm text-green-300 font-medium">{t('profile:sections.language.comingSoon')}</p>
+                  <p className="text-xs text-green-400">{t('profile:sections.language.developmentNote')}</p>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </Card>
 

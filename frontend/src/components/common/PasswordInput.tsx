@@ -25,7 +25,8 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({
   error,
   className = '',
   showPassword,
-  onToggleVisibility
+  onToggleVisibility,
+  preventCopyPaste = false
 }, ref) => {
   const [capsLockOn, setCapsLockOn] = useState(false);
 

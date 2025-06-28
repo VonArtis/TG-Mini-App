@@ -246,9 +246,14 @@ export const detectCountryFromIP = async (): Promise<{
 }> => {
   try {
     // Try IP-based geolocation first
-    const response = await fetch('https://ipapi.co/json/', {
-      timeout: 3000 // 3 second timeout
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    
+    try {
+      const response = await fetch('https://ipapi.co/json/', {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
     
     if (response.ok) {
       const data = await response.json();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { AuthScreenProps } from '../../types';
 import { ScreenHeader } from '../layout/ScreenHeader';
 import { Input } from '../common/Input';

@@ -17,9 +17,9 @@ export const MobileLayoutWithTabs: React.FC<MobileLayoutWithTabsProps> = ({
   className = ''
 }) => {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen w-full bg-black text-white">
       {/* Main content area */}
-      <div className={`px-6 pb-8 pt-4 space-y-6 ${showTabs ? 'pb-20' : 'pb-8'} ${className}`}>
+      <div className={`w-full px-4 pb-8 pt-4 space-y-6 ${showTabs ? 'pb-20' : 'pb-8'} ${className}`}>
         {children}
       </div>
       

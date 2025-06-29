@@ -79,18 +79,24 @@ export const UiCatalogScreen: React.FC<ScreenProps> = ({ onBack }) => {
           <Input
             label="Email Input"
             type="email"
+            value=""
+            onChange={() => {}}
             placeholder="user@example.com"
           />
 
           <Input
             label="Number Input"
             type="number"
+            value=""
+            onChange={() => {}}
             placeholder="123.45"
           />
 
           <Input
             label="Input with Error"
             error="This field is required"
+            value=""
+            onChange={() => {}}
             placeholder="This has an error"
           />
 
@@ -99,6 +105,8 @@ export const UiCatalogScreen: React.FC<ScreenProps> = ({ onBack }) => {
             value={passwordValue}
             onChange={(e) => setPasswordValue(e.target.value)}
             placeholder="Enter password..."
+            showPassword={false}
+            onToggleVisibility={() => {}}
           />
 
           <div>

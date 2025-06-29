@@ -643,6 +643,22 @@ class ApiService {
     });
     return response.data;
   }
+
+  // === EMAIL VERIFICATION API METHODS ===
+  
+  async sendEmailVerification(email: string, token: string) {
+    const response = await axios.post(`${API_BASE}/auth/email/send-verification`, { email }, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async verifyEmail(code: string, token: string) {
+    const response = await axios.post(`${API_BASE}/auth/email/verify-code`, { code }, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
 }
 
 export const apiService = new ApiService();

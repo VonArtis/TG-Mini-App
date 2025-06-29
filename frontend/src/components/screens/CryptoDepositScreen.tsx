@@ -1,419 +1,350 @@
 import React, { useState, useEffect } from 'react';
-import QRCode from 'react-qr-code';
-import type { ScreenProps, ConnectedWallet } from '../../types';
-import { ScreenHeader } from '../layout/ScreenHeader';
+import type { ScreenProps } from '../../types';
+import { CleanHeader } from '../layout/CleanHeader';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
-import { FullScreenLoader } from '../common/LoadingSpinner';
+import { Input } from '../common/Input';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import { apiService } from '../../services/api';
 
-interface DepositAddress {
-  token: string;
+interface DepositMethod {
+  id: string;
+  name: string;
   network: string;
-  network_name: string;
-  chain_id: number;
+  token: string;
   address: string;
-  qr_code_data: string;
-  avg_fee_usd: number;
-  target_region: string;
-}
-
-interface DepositAddresses {
-  usdc: {
-    ethereum?: DepositAddress;
-    polygon?: DepositAddress;
-    bsc?: DepositAddress;
-  };
-  usdt: {
-    ethereum?: DepositAddress;
-    polygon?: DepositAddress;
-    bsc?: DepositAddress;
-  };
+  qrCode?: string;
+  fees: string;
+  time: string;
+  icon: string;
 }
 
 export const CryptoDepositScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
-  const [addresses, setAddresses] = useState<DepositAddresses | null>(null);
+  const [methods, setMethods] = useState<DepositMethod[]>([]);
+  const [selectedMethod, setSelectedMethod] = useState<DepositMethod | null>(null);
+  const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(true);
-  const [selectedNetwork, setSelectedNetwork] = useState<'ethereum' | 'polygon' | 'bsc'>('polygon');
-  const [selectedToken, setSelectedToken] = useState<'usdc' | 'usdt'>('usdc');
-  const [copied, setCopied] = useState<string>('');
-  
-  // === PHASE 2C: MULTI-WALLET INTEGRATION ===
-  const [selectedWallet, setSelectedWallet] = useState<ConnectedWallet | null>(null);
-  const [walletDepositAddresses, setWalletDepositAddresses] = useState<{ [walletId: string]: any }>({});
-  const { user, connected_wallets, primary_wallet, getWalletByNetwork } = useApp();
+  const [step, setStep] = useState<'select-method' | 'deposit-info' | 'confirm'>('select-method');
+  const { user } = useApp();
+  const { t } = useLanguage();
 
   useEffect(() => {
-    // Set default wallet based on selected network or primary wallet
-    const defaultWallet = getWalletByNetwork(selectedNetwork) || primary_wallet || connected_wallets[0];
-    setSelectedWallet(defaultWallet);
-    
-    fetchDepositAddresses();
-    if (connected_wallets.length > 0) {
-      fetchWalletDepositAddresses();
-    }
-  }, [selectedNetwork, connected_wallets, primary_wallet]);
-
-  const fetchWalletDepositAddresses = async () => {
-    if (!user?.token) return;
-    
-    try {
-      const walletAddresses: { [walletId: string]: any } = {};
-      
-      for (const wallet of connected_wallets) {
-        try {
-          const response = await apiService.getWalletDepositAddresses(user.token, wallet.id);
-          walletAddresses[wallet.id] = response;
-        } catch (error) {
-          console.error(`Failed to fetch deposit addresses for wallet ${wallet.id}:`, error);
-        }
-      }
-      
-      setWalletDepositAddresses(walletAddresses);
-    } catch (error) {
-      console.error('Error fetching wallet deposit addresses:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchDepositAddresses();
+    fetchDepositMethods();
   }, []);
 
-  const fetchDepositAddresses = async () => {
-    if (!user?.token) {
-      setLoading(false);
-      return;
-    }
-
+  const fetchDepositMethods = async () => {
     try {
-      setLoading(true);
-      
-      // Add timeout to prevent infinite loading
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), 10000)
-      );
-      
-      const apiPromise = apiService.getCryptoDepositAddresses(user.token);
-      
-      const response = await Promise.race([apiPromise, timeoutPromise]);
-      setAddresses(response.addresses);
-      
+      if (!user?.token) {
+        // Demo methods
+        setMethods([
+          {
+            id: 'usdc-eth',
+            name: 'USDC',
+            network: 'Ethereum',
+            token: 'USDC',
+            address: '0x742d35Cc6C5c3Aa3fcC3C6c6c6c6c6c6c6c6c6c6',
+            fees: 'Network fees apply',
+            time: '~10 minutes',
+            icon: '🔵'
+          },
+          {
+            id: 'usdt-eth',
+            name: 'USDT',
+            network: 'Ethereum',
+            token: 'USDT',
+            address: '0x742d35Cc6C5c3Aa3fcC3C6c6c6c6c6c6c6c6c6c6',
+            fees: 'Network fees apply',
+            time: '~10 minutes',
+            icon: '🟢'
+          },
+          {
+            id: 'usdc-polygon',
+            name: 'USDC',
+            network: 'Polygon',
+            token: 'USDC',
+            address: '0x742d35Cc6C5c3Aa3fcC3C6c6c6c6c6c6c6c6c6c6',
+            fees: 'Low fees',
+            time: '~2 minutes',
+            icon: '🟣'
+          },
+          {
+            id: 'usdt-bsc',
+            name: 'USDT',
+            network: 'BSC',
+            token: 'USDT',
+            address: '0x742d35Cc6C5c3Aa3fcC3C6c6c6c6c6c6c6c6c6c6',
+            fees: 'Very low fees',
+            time: '~3 minutes',
+            icon: '🟡'
+          }
+        ]);
+        setLoading(false);
+        return;
+      }
+
+      const response = await apiService.getDepositMethods(user.token);
+      setMethods(response.methods || []);
     } catch (error) {
-      console.error('Error fetching deposit addresses:', error);
-      
-      // Fallback to mock data if API fails
-      const mockAddresses = {
-        usdc: {
-          ethereum: {
-            token: 'USDC',
-            network: 'ethereum',
-            network_name: 'Ethereum Mainnet',
-            chain_id: 1,
-            address: '0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            qr_code_data: 'ethereum:0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            avg_fee_usd: 25,
-            target_region: 'Global'
-          },
-          polygon: {
-            token: 'USDC',
-            network: 'polygon', 
-            network_name: 'Polygon',
-            chain_id: 137,
-            address: '0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            qr_code_data: 'ethereum:0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            avg_fee_usd: 0.01,
-            target_region: 'Global'
-          },
-          bsc: {
-            token: 'USDC',
-            network: 'bsc',
-            network_name: 'BNB Smart Chain', 
-            chain_id: 56,
-            address: '0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            qr_code_data: 'ethereum:0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            avg_fee_usd: 0.20,
-            target_region: 'Asia'
-          }
-        },
-        usdt: {
-          ethereum: {
-            token: 'USDT',
-            network: 'ethereum',
-            network_name: 'Ethereum Mainnet',
-            chain_id: 1,
-            address: '0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            qr_code_data: 'ethereum:0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            avg_fee_usd: 25,
-            target_region: 'Global'
-          },
-          polygon: {
-            token: 'USDT',
-            network: 'polygon',
-            network_name: 'Polygon', 
-            chain_id: 137,
-            address: '0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            qr_code_data: 'ethereum:0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            avg_fee_usd: 0.01,
-            target_region: 'Global'
-          },
-          bsc: {
-            token: 'USDT',
-            network: 'bsc',
-            network_name: 'BNB Smart Chain',
-            chain_id: 56, 
-            address: '0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            qr_code_data: 'ethereum:0x1cB7111eBBF79Af5E941eB89B8eAFC67830be8a4',
-            avg_fee_usd: 0.20,
-            target_region: 'Asia'
-          }
-        }
-      };
-      
-      setAddresses(mockAddresses);
+      console.error('Error fetching deposit methods:', error);
+      setMethods([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const copyToClipboard = async (text: string, label: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(label);
-      setTimeout(() => setCopied(''), 2000);
-    } catch (error) {
-      console.error('Failed to copy:', error);
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Address copied to clipboard!');
+    }).catch(() => {
+      alert('Failed to copy address');
+    });
+  };
+
+  const getNetworkColor = (network: string) => {
+    switch (network.toLowerCase()) {
+      case 'ethereum': return 'text-blue-400';
+      case 'polygon': return 'text-purple-400';
+      case 'bsc': return 'text-yellow-400';
+      case 'arbitrum': return 'text-cyan-400';
+      default: return 'text-gray-400';
     }
   };
 
-  const getCurrentAddress = () => {
-    if (!addresses || !addresses[selectedToken]) return null;
-    return addresses[selectedToken][selectedNetwork];
-  };
-
-  const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  if (loading) {
-    return <FullScreenLoader text="Loading deposit addresses..." />;
-  }
-
-  const currentAddress = getCurrentAddress();
-
-  return (
-    <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8">
-      <ScreenHeader title="Deposit Crypto" onBack={onBack} />
-
-      {/* Important Notice */}
-      <Card className="mb-6 border-yellow-500/30 bg-yellow-900/20">
-        <div className="flex items-start gap-3">
-          <div className="text-yellow-400 text-xl">⚠️</div>
-          <div>
-            <h3 className="text-yellow-400 font-semibold mb-2">Important Notice</h3>
-            <ul className="text-sm text-gray-300 space-y-1">
-              <li>• Minimum deposit: {formatAmount(20000)} for investment eligibility</li>
-              <li>• Only send USDC/USDT on Polygon network</li>
-              <li>• Wrong network = permanent loss of funds</li>
-              <li>• Deposits are processed automatically</li>
-            </ul>
-          </div>
-        </div>
+  const renderSelectMethod = () => (
+    <div className="space-y-4">
+      <Card className="p-6 text-center">
+        <div className="text-6xl mb-4">💰</div>
+        <h2 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+          {t('deposit.title', 'Deposit Crypto')}
+        </h2>
+        <p className="text-gray-400">
+          {t('deposit.description', 'Choose your preferred cryptocurrency and network')}
+        </p>
       </Card>
 
-      {/* Network Selection */}
-      <Card className="mb-6">
-        <h3 className="text-lg font-semibold mb-4">Select Network</h3>
-        <div className="grid grid-cols-1 gap-3">
-          <Button
-            onClick={() => setSelectedNetwork('ethereum')}
-            variant={selectedNetwork === 'ethereum' ? 'primary' : 'secondary'}
-            className="h-20 flex flex-col items-center justify-center"
-          >
-            <span className="text-lg">🌐</span>
-            <span className="text-sm font-semibold">Ethereum</span>
-            <span className="text-xs text-gray-400">~$25 fees • Global</span>
-          </Button>
-          <Button
-            onClick={() => setSelectedNetwork('polygon')}
-            variant={selectedNetwork === 'polygon' ? 'primary' : 'secondary'}
-            className="h-20 flex flex-col items-center justify-center"
-          >
-            <span className="text-lg">⚡</span>
-            <span className="text-sm font-semibold">Polygon</span>
-            <span className="text-xs text-gray-400">~$0.01 fees • Low cost</span>
-          </Button>
-          <Button
-            onClick={() => setSelectedNetwork('bsc')}
-            variant={selectedNetwork === 'bsc' ? 'primary' : 'secondary'}
-            className="h-20 flex flex-col items-center justify-center"
-          >
-            <span className="text-lg">🇦🇸</span>
-            <span className="text-sm font-semibold">BSC</span>
-            <span className="text-xs text-gray-400">~$0.20 fees • Asia focus</span>
-          </Button>
-        </div>
-      </Card>
-
-      {/* Token Selection */}
-      <Card className="mb-6">
-        <h3 className="text-lg font-semibold mb-4">Select Token</h3>
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            onClick={() => setSelectedToken('usdc')}
-            variant={selectedToken === 'usdc' ? 'primary' : 'secondary'}
-            className="h-16 flex flex-col items-center justify-center"
-          >
-            <span className="text-lg">🔵</span>
-            <span className="text-sm font-semibold">USDC</span>
-            <span className="text-xs text-gray-400">USD Coin</span>
-          </Button>
-          <Button
-            onClick={() => setSelectedToken('usdt')}
-            variant={selectedToken === 'usdt' ? 'primary' : 'secondary'}
-            className="h-16 flex flex-col items-center justify-center"
-          >
-            <span className="text-lg">🟢</span>
-            <span className="text-sm font-semibold">USDT</span>
-            <span className="text-xs text-gray-400">Tether</span>
-          </Button>
-        </div>
-      </Card>
-
-      {/* Deposit Address & QR Code */}
-      {currentAddress ? (
-        <Card className="mb-6 bg-gradient-to-br from-green-900/30 to-blue-900/30 border-green-500/30">
-          <h3 className="text-lg font-semibold mb-4 text-center">
-            {selectedToken.toUpperCase()} Deposit Address
-          </h3>
-          
-          {/* QR Code */}
-          <div className="flex justify-center mb-6">
-            <div className="bg-white p-4 rounded-xl">
-              <QRCode
-                size={200}
-                value={currentAddress.address}
-                level="M"
-              />
-            </div>
-          </div>
-
-          {/* Address Display */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
-                Wallet Address (Polygon Network)
-              </label>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 bg-gray-800 rounded-lg p-3 font-mono text-sm break-all">
-                  {currentAddress.address}
-                </div>
-                <Button
-                  onClick={() => copyToClipboard(currentAddress.address, 'address')}
-                  variant="secondary"
-                  size="sm"
-                  className="whitespace-nowrap"
-                >
-                  {copied === 'address' ? '✓ Copied!' : '📋 Copy'}
-                </Button>
-              </div>
-            </div>
-
-            {/* Network Info */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="bg-gray-800/50 rounded-lg p-3">
-                <div className="text-gray-400">Network</div>
-                <div className="font-semibold text-purple-400">Polygon</div>
-              </div>
-              <div className="bg-gray-800/50 rounded-lg p-3">
-                <div className="text-gray-400">Token</div>
-                <div className="font-semibold text-green-400">{selectedToken.toUpperCase()}</div>
-              </div>
-            </div>
-          </div>
-        </Card>
-      ) : (
-        <Card className="mb-6 text-center py-8">
-          <div className="text-gray-400 mb-4">
-            <svg className="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-            <h3 className="text-lg font-medium text-white mb-2">Address Not Available</h3>
-            <p className="text-sm">
-              {selectedNetwork === 'bsc' 
-                ? 'BSC deposit address is ready for use'
-                : 'This network is available for deposits'
-              }
-            </p>
-          </div>
-        </Card>
-      )}
-
-      {/* Instructions */}
-      <Card className="mb-6">
-        <h3 className="text-lg font-semibold mb-4">How to Deposit</h3>
-        <div className="space-y-3 text-sm">
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-xs font-bold">1</div>
-            <div>
-              <div className="font-medium">Scan QR Code or Copy Address</div>
-              <div className="text-gray-400">Use the QR code with your wallet app or copy the address manually</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-xs font-bold">2</div>
-            <div>
-              <div className="font-medium">Verify Network is Polygon</div>
-              <div className="text-gray-400">Ensure your wallet is set to Polygon network (not Ethereum)</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-xs font-bold">3</div>
-            <div>
-              <div className="font-medium">Send {selectedToken.toUpperCase()} Tokens</div>
-              <div className="text-gray-400">Minimum {formatAmount(20000)} for investment eligibility</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center text-xs font-bold">4</div>
-            <div>
-              <div className="font-medium">Automatic Processing</div>
-              <div className="text-gray-400">Your deposit will appear in your balance within 2-5 minutes</div>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Action Buttons */}
       <div className="space-y-3">
+        <h3 className="text-lg font-semibold text-white">
+          {t('deposit.supportedTokens', 'Supported Tokens & Networks')}
+        </h3>
+        
+        {methods.map((method) => (
+          <Card 
+            key={method.id}
+            className="p-4 cursor-pointer hover:bg-gray-800/50 transition-colors"
+            onClick={() => {
+              setSelectedMethod(method);
+              setStep('deposit-info');
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="text-2xl">{method.icon}</div>
+                <div>
+                  <h4 className="font-semibold text-white flex items-center gap-2">
+                    {method.name}
+                    <span className={`text-sm px-2 py-1 rounded ${getNetworkColor(method.network)} bg-current bg-opacity-20`}>
+                      {method.network}
+                    </span>
+                  </h4>
+                  <div className="text-sm text-gray-400">{method.fees} • {method.time}</div>
+                </div>
+              </div>
+              
+              <div className="text-purple-400">→</div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Important Notes */}
+      <Card className="p-4 bg-yellow-900/20 border-yellow-500/30">
+        <h3 className="text-yellow-300 font-medium mb-2 flex items-center gap-2">
+          <span>⚠️</span>
+          {t('deposit.importantNotes', 'Important Notes')}
+        </h3>
+        <ul className="space-y-1 text-yellow-400 text-sm">
+          <li>• {t('deposit.note1', 'Only send supported tokens to avoid loss of funds')}</li>
+          <li>• {t('deposit.note2', 'Ensure you select the correct network')}</li>
+          <li>• {t('deposit.note3', 'Minimum deposit amounts may apply')}</li>
+          <li>• {t('deposit.note4', 'Deposits are processed automatically')}</li>
+        </ul>
+      </Card>
+    </div>
+  );
+
+  const renderDepositInfo = () => (
+    <div className="space-y-4">
+      <Card className="p-4 bg-purple-900/20 border-purple-500/30">
+        <div className="flex items-center gap-3">
+          <div className="text-xl">{selectedMethod?.icon}</div>
+          <div>
+            <div className="font-semibold text-white flex items-center gap-2">
+              {selectedMethod?.name}
+              <span className={`text-sm px-2 py-1 rounded ${getNetworkColor(selectedMethod?.network || '')} bg-current bg-opacity-20`}>
+                {selectedMethod?.network}
+              </span>
+            </div>
+            <div className="text-sm text-purple-400">{selectedMethod?.fees} • {selectedMethod?.time}</div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-6 text-center">
+        <h2 className="text-xl font-semibold mb-4">
+          {t('deposit.depositAddress', 'Deposit Address')}
+        </h2>
+        
+        {/* QR Code placeholder */}
+        <div className="bg-white p-4 rounded-lg mb-4 inline-block">
+          <div className="w-48 h-48 bg-gray-300 rounded flex items-center justify-center">
+            <div className="text-gray-600 text-center">
+              <div className="text-2xl mb-2">📱</div>
+              <div className="text-sm">QR Code</div>
+            </div>
+          </div>
+        </div>
+        
+        <p className="text-gray-400 text-sm mb-4">
+          {t('deposit.scanQR', 'Scan QR code or copy address below')}
+        </p>
+
+        {/* Address */}
+        <div className="bg-gray-800 p-4 rounded-lg mb-4">
+          <div className="text-xs text-gray-400 mb-2">
+            {selectedMethod?.network} {selectedMethod?.name} {t('deposit.address', 'Address')}
+          </div>
+          <div className="font-mono text-sm text-white break-all mb-3">
+            {selectedMethod?.address}
+          </div>
+          <Button
+            onClick={() => copyToClipboard(selectedMethod?.address || '')}
+            variant="outline"
+            size="sm"
+            className="w-full min-h-[44px]"
+          >
+            📋 {t('buttons.copyAddress', 'Copy Address')}
+          </Button>
+        </div>
+
+        {/* Amount Input */}
+        <div className="text-left mb-4">
+          <Input
+            label={t('deposit.amount', 'Amount (Optional)')}
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder={`Enter ${selectedMethod?.name} amount`}
+            className="min-h-[44px]"
+          />
+          <p className="text-xs text-gray-400 mt-2">
+            {t('deposit.amountNote', 'Enter the amount you plan to deposit for tracking purposes')}
+          </p>
+        </div>
+
+        <Button
+          onClick={() => setStep('confirm')}
+          className="w-full min-h-[44px] h-14 bg-purple-400 hover:bg-purple-500 text-white font-semibold text-lg"
+        >
+          {t('buttons.confirmDeposit', 'I Have Sent the Deposit')}
+        </Button>
+      </Card>
+
+      {/* Security Notice */}
+      <Card className="p-4 bg-red-900/20 border-red-500/30">
+        <h3 className="text-red-300 font-medium mb-2 flex items-center gap-2">
+          <span>🚨</span>
+          {t('deposit.securityWarning', 'Security Warning')}
+        </h3>
+        <ul className="space-y-1 text-red-400 text-sm">
+          <li>• {t('deposit.warning1', 'Only send')} {selectedMethod?.name} {t('deposit.warning1b', 'on')} {selectedMethod?.network} {t('deposit.warning1c', 'network')}</li>
+          <li>• {t('deposit.warning2', 'Sending other tokens or wrong network will result in permanent loss')}</li>
+          <li>• {t('deposit.warning3', 'Double-check the address before sending')}</li>
+          <li>• {t('deposit.warning4', 'VonVault is not responsible for incorrect deposits')}</li>
+        </ul>
+      </Card>
+    </div>
+  );
+
+  const renderConfirm = () => (
+    <div className="space-y-4">
+      <Card className="p-8 text-center bg-gradient-to-br from-green-900/30 to-green-800/30 border-green-500/30">
+        <div className="text-6xl mb-4">✅</div>
+        <h2 className="text-2xl font-semibold mb-2 text-green-400">
+          {t('deposit.confirmed', 'Deposit Confirmed!')}
+        </h2>
+        <p className="text-gray-300 mb-6">
+          {t('deposit.confirmMessage', 'Your deposit is being processed and will appear in your account shortly')}
+        </p>
+
+        {amount && (
+          <div className="bg-green-900/20 rounded-lg p-4 mb-6">
+            <div className="text-lg font-semibold text-white">
+              {amount} {selectedMethod?.name}
+            </div>
+            <div className="text-green-400 text-sm">
+              {selectedMethod?.network} Network
+            </div>
+          </div>
+        )}
+
         <Button
           onClick={() => onNavigate?.('crypto')}
-          className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
-          size="lg"
+          className="w-full min-h-[44px] h-14 bg-green-500 hover:bg-green-600 text-white font-semibold text-lg"
         >
-          Check My Crypto Balance
+          {t('buttons.viewWallet', 'View My Wallet')}
         </Button>
-        
-        <Button
-          onClick={onBack}
-          variant="secondary"
-          className="w-full"
-          size="lg"
-        >
-          Back to Dashboard
-        </Button>
-      </div>
+      </Card>
 
-      {/* Support Note */}
-      <div className="mt-6 text-center text-xs text-gray-500">
-        <p>Need help? Having issues with deposits?</p>
-        <p>Contact support with your transaction hash for assistance</p>
+      {/* Processing Info */}
+      <Card className="p-4 bg-blue-900/20 border-blue-500/30">
+        <h3 className="text-blue-300 font-medium mb-2">
+          {t('deposit.processingInfo', 'Processing Information')}
+        </h3>
+        <ul className="space-y-1 text-blue-400 text-sm">
+          <li>• {t('deposit.processing1', 'Deposits are processed automatically upon network confirmation')}</li>
+          <li>• {t('deposit.processing2', 'Processing time:')} {selectedMethod?.time}</li>
+          <li>• {t('deposit.processing3', 'You will receive an email confirmation when processed')}</li>
+          <li>• {t('deposit.processing4', 'Contact support if your deposit doesn\'t appear within the expected time')}</li>
+        </ul>
+      </Card>
+
+      {/* Next Steps */}
+      <Card className="p-4 bg-purple-900/20 border-purple-500/30">
+        <h3 className="text-purple-300 font-medium mb-2">
+          {t('deposit.nextSteps', 'What\'s Next?')}
+        </h3>
+        <ul className="space-y-1 text-purple-400 text-sm">
+          <li>• {t('deposit.step1', 'Your funds will appear in your crypto wallet')}</li>
+          <li>• {t('deposit.step2', 'Use them for DeFi investments and earning yield')}</li>
+          <li>• {t('deposit.step3', 'Monitor your portfolio performance')}</li>
+          <li>• {t('deposit.step4', 'Withdraw anytime to your connected wallets')}</li>
+        </ul>
+      </Card>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <div className="px-6 pb-8 pt-4 space-y-6">
+        <CleanHeader title="💰 Crypto Deposit" onBack={onBack} />
+        <div className="flex justify-center py-8">
+          <div className="animate-spin w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full"></div>
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="px-6 pb-8 pt-4 space-y-6">
+      <CleanHeader 
+        title="💰 Crypto Deposit" 
+        onBack={onBack}
+      />
+
+      {step === 'select-method' && renderSelectMethod()}
+      {step === 'deposit-info' && renderDepositInfo()}
+      {step === 'confirm' && renderConfirm()}
     </div>
   );
 };

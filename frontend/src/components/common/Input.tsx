@@ -13,6 +13,7 @@ interface InputProps {
   prefix?: string;
   className?: string;
   step?: string;
+  maxLength?: number;
   inputMode?: 'text' | 'email' | 'tel' | 'url' | 'numeric' | 'decimal' | 'search';
   autoComplete?: string;
 }

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import type { ScreenProps } from '../../types';
-import { CleanHeader } from '../layout/CleanHeader';
-import { Card } from '../common/Card';
+import React, { useState } from 'react';
+import type { AuthScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { PasswordInput } from '../common/PasswordInput';
+import { MobileLayout } from '../layout/MobileLayout';
+import { LanguageSelector } from '../common/LanguageSelector';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 
-interface LoginScreenProps extends ScreenProps {
+interface LoginScreenProps extends AuthScreenProps {
   onLogin: (user: any) => void;
-  onCreateAccount: () => void;
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ 

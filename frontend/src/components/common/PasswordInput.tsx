@@ -21,6 +21,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({
   label,
   value,
   onChange,
+  onKeyPress,
   placeholder,
   required = false,
   disabled = false,

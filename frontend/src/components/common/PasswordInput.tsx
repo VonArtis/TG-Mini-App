@@ -74,6 +74,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({
           type={showPassword ? 'text' : 'password'}
           value={value}
           onChange={onChange}
+          onKeyPress={onKeyPress}
           onKeyDown={handleKeyDown}
           onKeyUp={handleKeyUp}
           onPaste={handlePaste}

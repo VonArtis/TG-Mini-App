@@ -188,6 +188,8 @@ const AppRouter: React.FC = () => {
           <WelcomeScreen 
             onSignIn={() => setScreen('login')} 
             onCreateAccount={() => setScreen('signup')} 
+            onBack={() => {}}
+            onNavigate={(screen) => setScreen(screen)}
           />
         );
       case 'login':

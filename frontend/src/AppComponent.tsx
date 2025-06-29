@@ -201,7 +201,7 @@ const AppRouter: React.FC = () => {
       case 'signup':
         return (
           <SignUpScreen 
-            onContinue={handleSignup}
+            onSignUp={handleSignup}
             onGoToLogin={() => setScreen('login')}
           />
         );

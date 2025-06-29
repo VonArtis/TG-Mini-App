@@ -57,7 +57,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     
     setLoading(true);
     try {
-      const userData = await authenticateUser(form.email, form.password);
+      const userData = await login(form.email, form.password);
       
       if (userData) {
         onLogin(userData);

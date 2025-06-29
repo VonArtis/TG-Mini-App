@@ -477,8 +477,27 @@ def test_multi_wallet_management(token):
 def test_profile_deletion(token):
     """Test profile deletion endpoint"""
     if not token:
-        log_test("Profile Deletion - Setup", False, "No authentication token available")
-        return
+        # Create a new user specifically for deletion test
+        unique_id = uuid.uuid4().hex[:8]
+        phone_id = uuid.uuid4().hex[:8]
+        user_payload = {
+            "name": f"Deletion Test User {unique_id}",
+            "email": f"deletion.test.{unique_id}@example.com",
+            "password": "SecurePassword123!",
+            "phone": f"{phone_id[:10]}",
+            "country_code": "+1"
+        }
+        
+        signup_response = requests.post(f"{API_BASE}/auth/signup", json=user_payload)
+        
+        if signup_response.status_code == 200:
+            token = signup_response.json().get("token")
+            log_test("Profile Deletion - User Setup", True, "Created test user for deletion")
+        else:
+            log_test("Profile Deletion - User Setup", False, f"Failed to create test user: {signup_response.text}")
+            return
+    else:
+        log_test("Profile Deletion - User Setup", True, "Using existing token")
     
     headers = {"Authorization": f"Bearer {token}"}
     payload = {"password": "SecurePassword123!"}

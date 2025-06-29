@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import type { ScreenProps } from '../../types';
-import { CleanHeader } from '../layout/CleanHeader';
-import { Card } from '../common/Card';
+import React, { useState } from 'react';
+import type { AuthScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { PasswordInput } from '../common/PasswordInput';
-import { EnhancedProgressBar } from '../common/EnhancedProgressBar';
+import { MobileLayout } from '../layout/MobileLayout';
+import { LanguageSelector } from '../common/LanguageSelector';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { validatePhoneNumber } from '../../utils/phoneFormatter';
 
-interface SignUpScreenProps extends ScreenProps {
+interface SignUpScreenProps extends AuthScreenProps {
   onSignUp: (user: any) => void;
   onGoToLogin: () => void;
 }

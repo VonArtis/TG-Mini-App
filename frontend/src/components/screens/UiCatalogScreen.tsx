@@ -172,22 +172,22 @@ export const UiCatalogScreen: React.FC<ScreenProps> = ({ onBack }) => {
         <div className="space-y-4">
           <div>
             <h4 className="text-sm font-medium text-gray-400 mb-2">Basic Progress (25%)</h4>
-            <EnhancedProgressBar progress={25} />
+            <EnhancedProgressBar progress={25} level="club" />
           </div>
           
           <div>
             <h4 className="text-sm font-medium text-gray-400 mb-2">Success Progress (75%)</h4>
-            <EnhancedProgressBar progress={75} color="green" />
+            <EnhancedProgressBar progress={75} level="premium" />
           </div>
           
           <div>
             <h4 className="text-sm font-medium text-gray-400 mb-2">Warning Progress (50%)</h4>
-            <EnhancedProgressBar progress={50} color="yellow" />
+            <EnhancedProgressBar progress={50} level="vip" />
           </div>
           
           <div>
             <h4 className="text-sm font-medium text-gray-400 mb-2">Large Progress (90%)</h4>
-            <EnhancedProgressBar progress={90} height="h-4" />
+            <EnhancedProgressBar progress={90} level="elite" />
           </div>
         </div>
       </Card>

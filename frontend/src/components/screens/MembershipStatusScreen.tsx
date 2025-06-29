@@ -1,291 +1,149 @@
 import React, { useState, useEffect } from 'react';
 import type { ScreenProps } from '../../types';
-import { CleanHeader } from '../layout/CleanHeader';
-import { Card } from '../common/Card';
 import { Button } from '../common/Button';
-import { EnhancedProgressBar } from '../common/EnhancedProgressBar';
-import { useApp } from '../../context/AppContext';
+import { MobileLayout } from '../layout/MobileLayout';
+import { LanguageSelector } from '../common/LanguageSelector';
 import { useLanguage } from '../../hooks/useLanguage';
-import { apiService } from '../../services/api';
-
-interface MembershipLevel {
-  id: string;
-  name: string;
-  icon: string;
-  min_investment: number;
-  benefits: string[];
-  color: string;
-  description: string;
-}
-
-interface UserMembership {
-  current_level: string;
-  total_invested: number;
-  next_level?: string;
-  progress_to_next: number;
-  amount_needed: number;
-}
 
 export const MembershipStatusScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
-  const [membership, setMembership] = useState<UserMembership | null>(null);
-  const [levels, setLevels] = useState<MembershipLevel[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useApp();
+  const [membership, setMembership] = useState({
+    current_level: 'premium',
+    level_name: 'Premium',
+    total_invested: 15000,
+    next_level: 'vip',
+    next_level_name: 'VIP',
+    amount_needed: 10000,
+    progress_to_next: 60
+  });
   const { t } = useLanguage();
 
-  useEffect(() => {
-    fetchMembershipData();
-  }, []);
-
-  const fetchMembershipData = async () => {
-    try {
-      if (!user?.token) {
-        // Demo data
-        setLevels([
-          {
-            id: 'club',
-            name: 'Club',
-            min_investment: 0,
-            benefits: ['Basic portfolio tracking', 'Email support'],
-            color: '#d97706',
-            description: 'Start your investment journey'
-          },
-          {
-            id: 'premium',
-            name: 'Premium',
-            min_investment: 5000,
-            benefits: ['Advanced analytics', 'Priority support', 'Monthly reports'],
-            color: '#9ca3af',
-            description: 'Enhanced investment tools'
-          },
-          {
-            id: 'vip',
-            name: 'VIP',
-            min_investment: 25000,
-            benefits: ['Personal advisor', '24/7 support', 'Exclusive investments'],
-            color: '#eab308',
-            description: 'Premium investment experience'
-          },
-          {
-            id: 'elite',
-            name: 'Elite',
-            min_investment: 100000,
-            benefits: ['Dedicated manager', 'Custom strategies', 'Private events'],
-            color: '#dc2626',
-            description: 'Ultimate investment package'
-          }
-        ]);
-        setMembership({
-          current_level: 'club',
-          total_invested: 2500,
-          next_level: 'premium',
-          progress_to_next: 50,
-          amount_needed: 2500
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Fetch both membership status and tiers
-      const [statusResponse, tiersResponse] = await Promise.all([
-        apiService.getMembershipStatus(user.token),
-        apiService.getMembershipTiers()
-      ]);
-      
-      setMembership(statusResponse.membership);
-      setLevels(tiersResponse.tiers || []);
-    } catch (error) {
-      console.error('Error fetching membership data:', error);
-    } finally {
-      setLoading(false);
+  const levels = [
+    { 
+      id: 'club', 
+      name: 'Club', 
+      min_investment: 0, 
+      color: 'text-orange-400',
+      benefits: ['Basic portfolio tracking', 'Email support'] 
+    },
+    { 
+      id: 'premium', 
+      name: 'Premium', 
+      min_investment: 5000, 
+      color: 'text-gray-400',
+      benefits: ['Advanced analytics', 'Priority support', 'Monthly reports'] 
+    },
+    { 
+      id: 'vip', 
+      name: 'VIP', 
+      min_investment: 25000, 
+      color: 'text-yellow-400',
+      benefits: ['Personal advisor', '24/7 support', 'Exclusive investments'] 
+    },
+    { 
+      id: 'elite', 
+      name: 'Elite', 
+      min_investment: 100000, 
+      color: 'text-red-400',
+      benefits: ['Dedicated manager', 'Custom strategies', 'Private events'] 
     }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return `$${amount.toLocaleString()}`;
-  };
-
-  const getCurrentLevel = () => {
-    return levels.find(level => level.id === membership?.current_level);
-  };
-
-  const getNextLevel = () => {
-    return levels.find(level => level.id === membership?.next_level);
-  };
-
-  if (loading) {
-    return (
-      <div className="px-6 pb-8 pt-4 space-y-6">
-        <CleanHeader title="🏆 Membership Status" onBack={onBack} />
-        <div className="flex justify-center py-8">
-          <div className="animate-spin w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full"></div>
-        </div>
-      </div>
-    );
-  }
-
-  const currentLevel = getCurrentLevel();
-  const nextLevel = getNextLevel();
+  ];
 
   return (
-    <div className="px-6 pb-8 pt-4 space-y-6">
-      <CleanHeader 
-        title="🏆 Membership Status" 
-        onBack={onBack}
-      />
+    <MobileLayout centered maxWidth="xs">
+      <div className="absolute top-4 right-4">
+        <LanguageSelector variant="compact" />
+      </div>
 
-      {/* Current Status */}
-      <Card className="p-6 text-center bg-gradient-to-br from-purple-900/50 to-purple-800/50 border-purple-500/30">
-        <div className="text-6xl mb-4">{currentLevel?.icon}</div>
-        <h2 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-          {currentLevel?.name} Member
-        </h2>
-        <p className="text-gray-300 mb-4">{currentLevel?.description}</p>
-        
-        <div className="bg-purple-900/30 rounded-lg p-4">
-          <div className="text-sm text-purple-300 mb-1">Total Invested</div>
-          <div className="text-2xl font-bold text-white">
-            {formatCurrency(membership?.total_invested || 0)}
+      <div className="absolute top-4 left-4">
+        <button onClick={onBack} className="p-2 text-gray-400 hover:text-white">←</button>
+      </div>
+      
+      <div className="mb-6">
+        <div className="text-6xl mb-4 text-center">⭐</div>
+        <h1 className="text-2xl font-bold text-center mb-2">
+          {t('membership.title', 'Membership Status')}
+        </h1>
+        <p className="text-center text-sm text-gray-400">
+          {t('membership.subtitle', 'Your VonVault membership level')}
+        </p>
+      </div>
+
+      <div className="w-full space-y-6">
+        {/* Current Status */}
+        <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-6 text-center">
+          <div className="text-2xl font-bold text-purple-300 mb-2">
+            {membership.level_name}
+          </div>
+          <div className="text-gray-400 text-sm mb-4">
+            {t('membership.currentLevel', 'Current Level')}
+          </div>
+          <div className="text-lg font-semibold text-white">
+            ${membership.total_invested.toLocaleString()} {t('membership.invested', 'invested')}
           </div>
         </div>
-      </Card>
 
-      {/* Progress to Next Level */}
-      {nextLevel && (
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <span>🎯</span>
-            Progress to {nextLevel.name}
-          </h3>
-          
-          <div className="mb-4">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-400">Progress</span>
-              <span className="text-purple-400 font-medium">{membership?.progress_to_next}%</span>
+        {/* Progress to Next */}
+        {membership.next_level && (
+          <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+            <div className="flex justify-between text-sm text-gray-400 mb-2">
+              <span>{t('membership.progressTo', 'Progress to')} {membership.next_level_name}</span>
+              <span>{membership.progress_to_next}%</span>
             </div>
-            <EnhancedProgressBar 
-              progress={membership?.progress_to_next || 0}
-              color="purple"
-              height="h-3"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="bg-gray-800 p-3 rounded-lg text-center">
-              <div className="text-gray-400 mb-1">Amount Needed</div>
-              <div className="text-white font-semibold">
-                {formatCurrency(membership?.amount_needed || 0)}
-              </div>
+            <div className="w-full bg-gray-700 rounded-full h-3 mb-3">
+              <div
+                className="bg-purple-500 h-3 rounded-full transition-all"
+                style={{ width: `${membership.progress_to_next}%` }}
+              />
             </div>
-            <div className="bg-gray-800 p-3 rounded-lg text-center">
-              <div className="text-gray-400 mb-1">Next Level</div>
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-lg">{nextLevel.icon}</span>
-                <span className="text-white font-semibold">{nextLevel.name}</span>
-              </div>
+            <div className="text-center text-sm text-gray-400">
+              ${membership.amount_needed.toLocaleString()} {t('membership.moreNeeded', 'more needed')}
             </div>
           </div>
+        )}
 
-          <Button
-            onClick={() => onNavigate?.('new-investment')}
-            className="w-full mt-4 min-h-[44px] h-14 bg-purple-400 hover:bg-purple-500"
-          >
-            Invest More to Upgrade
-          </Button>
-        </Card>
-      )}
-
-      {/* Current Benefits */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4 text-green-400">
-          Your Current Benefits
-        </h3>
-        
+        {/* All Levels */}
         <div className="space-y-3">
-          {currentLevel?.benefits.map((benefit, index) => (
-            <div key={index} className="flex items-center gap-3">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <div className="text-white text-xs">✓</div>
+          <h2 className="text-lg font-semibold text-gray-300">
+            {t('membership.allLevels', 'Membership Levels')}
+          </h2>
+          
+          {levels.map((level) => (
+            <div
+              key={level.id}
+              className={`p-4 border rounded-lg ${
+                level.id === membership.current_level
+                  ? 'border-purple-500 bg-purple-900/20'
+                  : 'border-gray-700 bg-gray-900/30'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className={`font-semibold ${level.color}`}>
+                  {level.name}
+                  {level.id === membership.current_level && (
+                    <span className="ml-2 text-xs bg-purple-500 text-white px-2 py-1 rounded">
+                      {t('membership.current', 'Current')}
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm text-gray-400">
+                  ${level.min_investment.toLocaleString()}+
+                </div>
               </div>
-              <p className="text-gray-300">{benefit}</p>
+              <div className="text-xs text-gray-400">
+                {level.benefits.join(' • ')}
+              </div>
             </div>
           ))}
         </div>
-      </Card>
 
-      {/* All Membership Levels */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">All Membership Levels</h3>
-        
-        <div className="space-y-4">
-          {levels.map((level) => {
-            const isCurrentLevel = level.id === membership?.current_level;
-            const isCompleted = levels.findIndex(l => l.id === level.id) < levels.findIndex(l => l.id === membership?.current_level || '');
-            
-            return (
-              <div 
-                key={level.id}
-                className={`p-4 rounded-lg border ${
-                  isCurrentLevel 
-                    ? 'bg-purple-900/30 border-purple-500' 
-                    : isCompleted
-                      ? 'bg-green-900/20 border-green-500/30'
-                      : 'bg-gray-800/50 border-gray-600'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{level.icon}</span>
-                    <div>
-                      <h4 className={`font-semibold ${level.color}`}>
-                        {level.name}
-                        {isCurrentLevel && (
-                          <span className="ml-2 text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">
-                            CURRENT
-                          </span>
-                        )}
-                        {isCompleted && (
-                          <span className="ml-2 text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
-                            ACHIEVED
-                          </span>
-                        )}
-                      </h4>
-                      <p className="text-sm text-gray-400">{level.description}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="font-bold text-white">
-                      {formatCurrency(level.min_investment)}
-                    </div>
-                    <div className="text-sm text-gray-400">Minimum</div>
-                  </div>
-                </div>
-
-                <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-1 text-xs text-gray-400">
-                  {level.benefits.slice(0, 3).map((benefit, index) => (
-                    <div key={index}>• {benefit}</div>
-                  ))}
-                  {level.benefits.length > 3 && (
-                    <div className="text-purple-400">+{level.benefits.length - 3} more...</div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* Upgrade Action */}
-      <Card className="p-4 bg-blue-900/20 border-blue-500/30">
-        <h3 className="text-blue-300 font-medium mb-2">Membership Benefits</h3>
-        <ul className="space-y-1 text-blue-400 text-sm">
-          <li>• Higher membership levels unlock better investment plans</li>
-          <li>• Reduced fees and priority customer support</li>
-          <li>• Advanced analytics and reporting features</li>
-          <li>• Exclusive access to premium investment opportunities</li>
-        </ul>
-      </Card>
-    </div>
+        <Button 
+          onClick={() => onNavigate?.('new-investment')}
+          fullWidth
+          className="bg-purple-600 hover:bg-purple-700"
+        >
+          {t('membership.upgrade', 'Upgrade Membership')}
+        </Button>
+      </div>
+    </MobileLayout>
   );
 };

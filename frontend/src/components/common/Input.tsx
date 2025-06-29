@@ -24,6 +24,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   type = 'text',
   value,
   onChange,
+  onKeyPress,
   placeholder,
   required = false,
   disabled = false,

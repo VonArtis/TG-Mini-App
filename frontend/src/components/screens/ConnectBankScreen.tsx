@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { ScreenProps } from '../../types';
+import type { ConnectionScreenProps } from '../../types';
 import { CleanHeader } from '../layout/CleanHeader';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
@@ -8,7 +8,7 @@ import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useAuth } from '../../hooks/useAuth';
 
-export const ConnectBankScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
+export const ConnectBankScreen: React.FC<ConnectionScreenProps> = ({ onBack, onNavigate, onConnect }) => {
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [credentials, setCredentials] = useState({

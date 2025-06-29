@@ -565,9 +565,8 @@ def run_all_tests():
     
     # Profile Deletion Test
     print("\n----- Profile Deletion Test -----")
-    # Create a new token for deletion test to avoid affecting other tests
-    new_token, _ = test_auth_endpoints()
-    test_profile_deletion(new_token)
+    # Use a separate token for deletion test to avoid affecting other tests
+    test_profile_deletion(None)
     
     # Print summary
     print_summary()

@@ -50,6 +50,10 @@ export const ConnectBankScreen: React.FC<ConnectionScreenProps> = ({ onBack, onN
       
       if (bankData) {
         setStep('success');
+        // Call onConnect callback when bank is successfully connected
+        if (onConnect) {
+          await onConnect();
+        }
       } else {
         alert('Failed to connect bank account. Please try again.');
       }

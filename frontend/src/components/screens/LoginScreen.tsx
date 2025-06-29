@@ -25,7 +25,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [showPassword, setShowPassword] = useState(false);
-  const { authenticateUser } = useAuth();
+  const { authenticateUser: login } = useAuth();
   const { t } = useLanguage();
 
   // Clear errors when form changes

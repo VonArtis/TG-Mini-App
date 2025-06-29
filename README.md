@@ -24,7 +24,7 @@
 
 ### **The World's Most Secure DeFi Investment Platform Built for Telegram**
 
-**Experience the future of finance where 9.7/10 security rating meets DeFi innovation and global accessibility**
+**Experience the future of finance where 9.95/10 security rating meets DeFi innovation and global accessibility**
 
 </div>
 

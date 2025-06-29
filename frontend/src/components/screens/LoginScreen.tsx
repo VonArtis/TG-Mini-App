@@ -120,6 +120,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             onKeyPress={handleKeyPress}
             error={errors.password}
             placeholder={t('auth.passwordPlaceholder', 'Enter your password')}
+            showPassword={showPassword}
+            onToggleVisibility={() => setShowPassword(!showPassword)}
             className="min-h-[44px]"
           />
 

@@ -12,6 +12,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 export const UiCatalogScreen: React.FC<ScreenProps> = ({ onBack }) => {
   const [inputValue, setInputValue] = useState('');
   const [passwordValue, setPasswordValue] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'buttons' | 'inputs' | 'cards' | 'components'>('buttons');
   const { t } = useLanguage();
 

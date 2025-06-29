@@ -162,12 +162,14 @@ export const useMultiWallet = (user: User | null) => {
   return {
     connected_wallets,
     primary_wallet,
+    balances,
     loading,
     connectWallet,
     disconnectWallet,
     setPrimaryWallet,
     renameWallet,
     refreshWalletBalances,
+    refreshBalances: refreshWalletBalances, // Alias for backward compatibility
     getWalletByNetwork,
     fetchWallets
   };

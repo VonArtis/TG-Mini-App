@@ -5,7 +5,7 @@
 ![VonVault Logo](https://img.shields.io/badge/VonVault-World's%20Most%20Secure%20DeFi-9333ea?style=for-the-badge&logo=telegram)
 
 [![Live App](https://img.shields.io/badge/🚀%20Live%20App-www.vonartis.app-success?style=for-the-badge)](https://www.vonartis.app)
-[![Security Rating](https://img.shields.io/badge/🛡️%20Security%20Rating-9.7/10-green?style=for-the-badge)](https://www.vonartis.app)
+[![Security Rating](https://img.shields.io/badge/🛡️%20Security%20Rating-9.95/10-green?style=for-the-badge)](https://www.vonartis.app)
 [![Languages](https://img.shields.io/badge/🌍%20Languages-15+-blue?style=for-the-badge)](#-international-multi-language-support)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/HarryVonBot/TG-Mini-App?style=social)](https://github.com/HarryVonBot/TG-Mini-App)

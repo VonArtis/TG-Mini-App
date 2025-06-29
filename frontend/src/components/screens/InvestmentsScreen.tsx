@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import type { ScreenProps, Investment } from '../../types';
-import { CleanHeader } from '../layout/CleanHeader';
-import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { FullScreenLoader } from '../common/LoadingSpinner';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import { apiService } from '../../services/api';
 
 export const InvestmentsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useApp();
+  const { t } = useLanguage();
 
   useEffect(() => {
     fetchInvestments();

@@ -322,10 +322,16 @@ const AppRouter: React.FC = () => {
         );
       case 'crypto':
         return (
-          <CryptoWalletScreen 
-            onBack={() => setScreen('dashboard')}
-            onNavigate={setScreen}
-          />
+          <MobileLayoutWithTabs 
+            onNavigate={setScreen} 
+            currentScreen="crypto"
+            showTabs={true}
+          >
+            <CryptoWalletScreen 
+              onBack={() => setScreen('dashboard')}
+              onNavigate={setScreen}
+            />
+          </MobileLayoutWithTabs>
         );
       case 'crypto-deposit':
         return (

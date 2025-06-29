@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { ScreenProps } from '../../types';
+import type { ConnectionScreenProps } from '../../types';
 import { CleanHeader } from '../layout/CleanHeader';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
@@ -7,7 +7,7 @@ import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useAuth } from '../../hooks/useAuth';
 
-export const ConnectCryptoScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
+export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, onNavigate, onConnect }) => {
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

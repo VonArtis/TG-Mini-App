@@ -1,289 +1,115 @@
 import React, { useState, useEffect } from 'react';
-import type { ScreenProps, ConnectedWallet } from '../../types';
-import { CleanHeader } from '../layout/CleanHeader';
-import { Card } from '../common/Card';
+import type { ScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { FullScreenLoader } from '../common/LoadingSpinner';
 import { useApp } from '../../context/AppContext';
-import { useMultiWallet } from '../../hooks/useMultiWallet';
+import { useLanguage } from '../../hooks/useLanguage';
 
 export const CryptoWalletScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
-  const { user, connected_wallets, primary_wallet } = useApp();
-  const { balances, refreshBalances, loading: balancesLoading } = useMultiWallet();
   const [loading, setLoading] = useState(true);
+  const [cryptoData, setCryptoData] = useState({
+    balance: 2.5847,
+    usdValue: 4250.32,
+    walletAddress: '0x1234...5678'
+  });
+  const { user } = useApp();
+  const { t } = useLanguage();
 
   useEffect(() => {
-    const initializeWallets = async () => {
-      try {
-        if (connected_wallets.length > 0) {
-          await refreshBalances();
-        }
-      } catch (error) {
-        console.error('Error initializing wallets:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Simulate loading crypto data
+    setTimeout(() => setLoading(false), 1500);
+  }, []);
 
-    initializeWallets();
-  }, [connected_wallets, refreshBalances]);
-
-  const getWalletTypeIcon = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'metamask': return '🦊';
-      case 'trustwallet': return '🛡️';
-      case 'walletconnect': return '🔗';
-      case 'coinbase': return '🔵';
-      default: return '💼';
-    }
+  const formatCrypto = (amount: number) => {
+    return `${amount.toFixed(4)} ETH`;
   };
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
-
-  const formatCurrency = (amount: number) => {
+  const formatUsd = (amount: number) => {
     return `$${amount.toLocaleString()}`;
   };
 
-  const getTotalBalance = () => {
-    if (!balances) return 0;
-    
-    let total = 0;
-    Object.values(balances).forEach(walletBalances => {
-      Object.values(walletBalances).forEach(networkBalances => {
-        Object.values(networkBalances).forEach(tokenBalance => {
-          if (typeof tokenBalance === 'object' && tokenBalance.usd_value) {
-            total += tokenBalance.usd_value;
-          }
-        });
-      });
-    });
-    
-    return total;
-  };
-
-  const getWalletBalance = (walletAddress: string) => {
-    if (!balances || !balances[walletAddress]) return 0;
-    
-    let total = 0;
-    Object.values(balances[walletAddress]).forEach(networkBalances => {
-      Object.values(networkBalances).forEach(tokenBalance => {
-        if (typeof tokenBalance === 'object' && tokenBalance.usd_value) {
-          total += tokenBalance.usd_value;
-        }
-      });
-    });
-    
-    return total;
-  };
-
-  const getNetworkColor = (network: string) => {
-    switch (network.toLowerCase()) {
-      case 'ethereum': return 'text-blue-400';
-      case 'polygon': return 'text-purple-400';
-      case 'bsc': return 'text-yellow-400';
-      case 'arbitrum': return 'text-cyan-400';
-      default: return 'text-gray-400';
-    }
-  };
-
   if (loading) {
-    return <FullScreenLoader text="Loading crypto wallets..." />;
+    return <FullScreenLoader text="Loading crypto wallet..." />;
   }
 
   return (
-    <div className="px-6 pb-8 pt-4 space-y-6">
-      <CleanHeader 
-        title="🔗 Crypto Wallets" 
-        onBack={onBack}
-        action={
-          <Button 
-            onClick={() => onNavigate?.('connect-crypto')} 
-            size="sm" 
-            className="bg-purple-400 hover:bg-purple-500 min-h-[44px]"
-          >
-            + Connect
-          </Button>
-        }
-      />
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-2">
+          {t('crypto.title', 'Crypto Wallet')}
+        </h1>
+        <p className="text-gray-400 text-sm">
+          {t('crypto.subtitle', 'Manage your crypto assets')}
+        </p>
+      </div>
 
-      {/* Total Portfolio Value */}
-      <Card className="bg-gradient-to-br from-orange-900/50 to-orange-800/50 border-orange-500/30">
-        <div className="text-center">
-          <h3 className="text-lg font-semibold mb-3 text-orange-200">Total Portfolio Value</h3>
-          <div className="text-3xl font-bold text-white mb-2">
-            {formatCurrency(getTotalBalance())}
-          </div>
-          <div className="text-sm text-orange-300">
-            Across {connected_wallets.length} wallet{connected_wallets.length !== 1 ? 's' : ''}
-          </div>
-          {balancesLoading && (
-            <div className="text-xs text-orange-400 mt-2">
-              ↻ Refreshing balances...
-            </div>
-          )}
+      {/* Wallet Balance */}
+      <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-6 text-center">
+        <div className="text-3xl font-bold text-purple-300 mb-2">
+          {formatCrypto(cryptoData.balance)}
         </div>
-      </Card>
-
-      {/* Connected Wallets */}
-      <div className="space-y-4">
-        {connected_wallets.length > 0 ? (
-          connected_wallets.map((wallet: ConnectedWallet) => {
-            const walletBalance = getWalletBalance(wallet.address);
-            
-            return (
-              <Card key={wallet.id} className="hover:bg-gray-800/50 transition-colors">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">
-                      {getWalletTypeIcon(wallet.type)}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg flex items-center gap-2">
-                        {wallet.name || wallet.type}
-                        {wallet.is_primary && (
-                          <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
-                            PRIMARY
-                          </span>
-                        )}
-                      </h3>
-                      <p className="text-sm text-gray-400 font-mono">
-                        {formatAddress(wallet.address)}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="font-bold text-lg text-green-400">
-                      {formatCurrency(walletBalance)}
-                    </div>
-                    <div className="text-sm text-gray-400">
-                      Total Value
-                    </div>
-                  </div>
-                </div>
-
-                {/* Supported Networks */}
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-300 mb-2">Supported Networks:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {wallet.networks.map((network) => (
-                      <span 
-                        key={network}
-                        className={`text-xs px-2 py-1 rounded-full bg-gray-800 ${getNetworkColor(network)}`}
-                      >
-                        {network.toUpperCase()}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Wallet Balances by Network/Token */}
-                {balances && balances[wallet.address] && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-300 mb-2">Token Balances:</h4>
-                    <div className="space-y-2 max-h-32 overflow-y-auto">
-                      {Object.entries(balances[wallet.address]).map(([network, networkBalances]) => (
-                        <div key={network}>
-                          {Object.entries(networkBalances).map(([token, balance]) => {
-                            if (typeof balance === 'object' && balance.balance > 0) {
-                              return (
-                                <div key={`${network}-${token}`} className="flex justify-between text-sm bg-gray-800/50 p-2 rounded">
-                                  <span className={getNetworkColor(network)}>
-                                    {token.toUpperCase()} ({network})
-                                  </span>
-                                  <div className="text-right">
-                                    <div className="text-white">{balance.balance.toFixed(4)}</div>
-                                    <div className="text-gray-400 text-xs">
-                                      {formatCurrency(balance.usd_value || 0)}
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            }
-                            return null;
-                          })}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => onNavigate?.('crypto-deposit')}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 min-h-[44px]"
-                  >
-                    Deposit
-                  </Button>
-                  <Button
-                    onClick={() => onNavigate?.('wallet-manager')}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 min-h-[44px]"
-                  >
-                    Manage
-                  </Button>
-                  {!wallet.is_primary && (
-                    <Button
-                      onClick={() => {/* Set as primary */}}
-                      variant="outline"
-                      size="sm"
-                      className="min-h-[44px] border-green-500 text-green-400 hover:bg-green-500/10"
-                    >
-                      Set Primary
-                    </Button>
-                  )}
-                </div>
-              </Card>
-            );
-          })
-        ) : (
-          <Card className="text-center py-12">
-            <div className="text-6xl mb-4">🔗</div>
-            <h3 className="text-xl font-semibold mb-2">No Crypto Wallets Connected</h3>
-            <p className="text-gray-400 mb-6">
-              Connect your crypto wallet to start managing your digital assets and earn rewards
-            </p>
-            <Button
-              onClick={() => onNavigate?.('connect-crypto')}
-              className="bg-purple-400 hover:bg-purple-500 min-h-[44px]"
-            >
-              Connect Your First Wallet
-            </Button>
-          </Card>
-        )}
+        <div className="text-gray-400 text-sm mb-4">
+          {formatUsd(cryptoData.usdValue)}
+        </div>
+        <div className="text-xs text-gray-500 font-mono">
+          {cryptoData.walletAddress}
+        </div>
       </div>
 
       {/* Quick Actions */}
-      {connected_wallets.length > 0 && (
-        <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-gray-300">
+          {t('crypto.actions', 'Quick Actions')}
+        </h2>
+        
+        <div className="grid grid-cols-2 gap-3">
           <Button
-            onClick={() => refreshBalances()}
-            variant="secondary"
-            disabled={balancesLoading}
-            className="h-16 flex flex-col items-center justify-center space-y-1 min-h-[44px]"
+            onClick={() => onNavigate?.('crypto-deposit')}
+            className="h-16 bg-green-600 hover:bg-green-700 flex flex-col items-center justify-center"
           >
-            <span className="text-lg">↻</span>
-            <span className="text-sm">
-              {balancesLoading ? 'Refreshing...' : 'Refresh Balances'}
-            </span>
+            <span className="text-2xl mb-1">📥</span>
+            <span className="text-sm">{t('crypto.deposit', 'Deposit')}</span>
           </Button>
           
           <Button
-            onClick={() => onNavigate?.('wallet-manager')}
-            variant="secondary"
-            className="h-16 flex flex-col items-center justify-center space-y-1 min-h-[44px]"
+            onClick={() => onNavigate?.('withdrawal')}
+            variant="outline"
+            className="h-16 border-orange-500 text-orange-400 hover:bg-orange-500/10 flex flex-col items-center justify-center"
           >
-            <span className="text-lg">⚙️</span>
-            <span className="text-sm">Manage Wallets</span>
+            <span className="text-2xl mb-1">📤</span>
+            <span className="text-sm">{t('crypto.withdraw', 'Withdraw')}</span>
           </Button>
         </div>
-      )}
+
+        {!user?.crypto_connected && (
+          <Button
+            onClick={() => onNavigate?.('connect-crypto')}
+            fullWidth
+            className="h-12 border border-purple-500 text-purple-400 hover:bg-purple-500/10"
+            variant="outline"
+          >
+            🔗 {t('crypto.connect', 'Connect Wallet')}
+          </Button>
+        )}
+      </div>
+
+      {/* Recent Transactions */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-gray-300">
+          {t('crypto.transactions', 'Recent Transactions')}
+        </h2>
+        
+        <div className="text-center py-8">
+          <div className="text-4xl mb-4">₿</div>
+          <h3 className="text-lg font-semibold text-gray-300 mb-2">
+            {t('crypto.noTransactions', 'No transactions yet')}
+          </h3>
+          <p className="text-gray-400 text-sm">
+            {t('crypto.startTrading', 'Start trading to see your transaction history')}
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

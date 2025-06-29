@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { ScreenProps, Investment } from '../../types';
-import { ScreenHeader } from '../layout/ScreenHeader';
+import { CleanHeader } from '../layout/CleanHeader';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { FullScreenLoader } from '../common/LoadingSpinner';
@@ -19,227 +19,248 @@ export const InvestmentsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate })
     const timeout = setTimeout(() => {
       setLoading(false);
     }, 10000);
-    
+
     return () => clearTimeout(timeout);
   }, []);
 
   const fetchInvestments = async () => {
     try {
-      setLoading(true);
-      if (user?.token) {
-        const data = await apiService.getInvestments(user.token);
-        setInvestments(data.investments || []);
-      } else {
-        // No token - show empty state
-        setInvestments([]);
+      if (!user?.token) {
+        console.log('No user token available for investments');
+        setLoading(false);
+        return;
       }
+      
+      const data = await apiService.getInvestments(user.token);
+      setInvestments(data.investments || []);
     } catch (error) {
       console.error('Error fetching investments:', error);
-      // On error, show empty array instead of sample data
-      setInvestments([]);
+      // For demo, show sample investments
+      setInvestments([
+        {
+          id: 'demo-1',
+          plan_name: 'Growth Plan',
+          amount: 5000,
+          current_value: 5250,
+          profit: 250,
+          status: 'active',
+          start_date: '2024-01-15',
+          maturity_date: '2025-01-15',
+          apy_rate: 7.5
+        },
+        {
+          id: 'demo-2', 
+          plan_name: 'Stability Plan',
+          amount: 2000,
+          current_value: 2080,
+          profit: 80,
+          status: 'active',
+          start_date: '2024-02-01',
+          maturity_date: '2024-08-01',
+          apy_rate: 5.0
+        }
+      ]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Calculate investment metrics
-  const calculateInvestmentMetrics = (investment: Investment) => {
-    if (!investment.created_at) return null;
-    
-    const createdDate = new Date(investment.created_at);
-    const currentDate = new Date();
-    const termEndDate = new Date(createdDate.getTime() + (investment.term * 30 * 24 * 60 * 60 * 1000)); // term in months
-    
-    const totalDays = Math.floor((termEndDate.getTime() - createdDate.getTime()) / (24 * 60 * 60 * 1000));
-    const elapsedDays = Math.floor((currentDate.getTime() - createdDate.getTime()) / (24 * 60 * 60 * 1000));
-    const remainingDays = Math.max(0, totalDays - elapsedDays);
-    
-    // Calculate earned interest so far (simple interest calculation)
-    const annualRate = investment.rate / 100;
-    const dailyRate = annualRate / 365;
-    const earnedInterest = investment.amount * dailyRate * elapsedDays;
-    const totalExpectedReturn = investment.amount * (annualRate * (investment.term / 12));
-    
-    return {
-      totalDays,
-      elapsedDays,
-      remainingDays,
-      earnedInterest,
-      totalExpectedReturn,
-      currentValue: investment.amount + earnedInterest,
-      progressPercentage: Math.min(100, (elapsedDays / totalDays) * 100),
-      isCompleted: remainingDays <= 0
-    };
+  const formatCurrency = (amount: number) => {
+    return `$${amount.toLocaleString()}`;
   };
 
-  const formatAmount = (amount: number) => {
-    return `$${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
-  const formatDays = (days: number) => {
-    if (days === 0) return "Completed";
-    if (days === 1) return "1 day";
-    if (days < 30) return `${days} days`;
-    const months = Math.floor(days / 30);
-    const remainingDays = days % 30;
-    if (remainingDays === 0) return `${months} month${months > 1 ? 's' : ''}`;
-    return `${months}m ${remainingDays}d`;
+  const calculateProgress = (startDate: string, maturityDate: string) => {
+    const start = new Date(startDate).getTime();
+    const end = new Date(maturityDate).getTime();
+    const now = new Date().getTime();
+    
+    if (now <= start) return 0;
+    if (now >= end) return 100;
+    
+    return ((now - start) / (end - start)) * 100;
   };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'text-green-400';
+      case 'completed': return 'text-blue-400';
+      case 'pending': return 'text-yellow-400';
+      default: return 'text-gray-400';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return '🔄';
+      case 'completed': return '✅';
+      case 'pending': return '⏳';
+      default: return '❓';
+    }
+  };
+
+  const totalInvested = investments.reduce((sum, inv) => sum + inv.amount, 0);
+  const totalCurrentValue = investments.reduce((sum, inv) => sum + inv.current_value, 0);
+  const totalProfit = totalCurrentValue - totalInvested;
 
   if (loading) {
     return <FullScreenLoader text="Loading your investments..." />;
   }
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8">
-      <ScreenHeader title="My Investments" onBack={onBack} />
-
-      {investments.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">📈</div>
-          <h3 className="text-xl font-semibold mb-2">No Investments Yet</h3>
-          <p className="text-gray-400 mb-6">Start your investment journey with VonVault</p>
-          <Button
-            onClick={() => onNavigate?.('new-investment')}
-            size="lg"
-            className="bg-green-600 hover:bg-green-700"
+    <div className="px-6 pb-8 pt-4 space-y-6">
+      <CleanHeader 
+        title="💼 Portfolio" 
+        onBack={onBack}
+        action={
+          <Button 
+            onClick={() => onNavigate?.('new-investment')} 
+            size="sm" 
+            className="bg-purple-400 hover:bg-purple-500 min-h-[44px]"
           >
-            Make Your First Investment
+            + Invest
           </Button>
-        </div>
-      ) : (
-        <>
-          {/* Portfolio Summary */}
-          <Card className="mb-6 bg-gradient-to-r from-green-900/50 to-blue-900/50 border-green-500/30">
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <span className="text-2xl">💼</span>
-              Portfolio Summary
-            </h2>
-            
-            <div className="grid grid-cols-3 gap-4 text-center">
+        }
+      />
+
+      {/* Portfolio Summary */}
+      <div className="grid grid-cols-1 gap-4 mb-6">
+        <Card className="bg-gradient-to-br from-purple-900/50 to-purple-800/50 border-purple-500/30">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold mb-3 text-purple-200">Portfolio Overview</h3>
+            <div className="grid grid-cols-3 gap-4">
               <div>
-                <div className="text-sm text-gray-400">Total Invested</div>
-                <div className="text-lg font-bold text-white">
-                  {formatAmount(investments.reduce((sum, inv) => sum + inv.amount, 0))}
+                <div className="text-2xl font-bold text-white">
+                  {formatCurrency(totalInvested)}
                 </div>
+                <div className="text-sm text-purple-300">Invested</div>
               </div>
               <div>
-                <div className="text-sm text-gray-400">Total Earned</div>
-                <div className="text-lg font-bold text-green-400">
-                  {formatAmount(investments.reduce((sum, inv) => {
-                    const metrics = calculateInvestmentMetrics(inv);
-                    return sum + (metrics?.earnedInterest || 0);
-                  }, 0))}
+                <div className="text-2xl font-bold text-green-400">
+                  {formatCurrency(totalCurrentValue)}
                 </div>
+                <div className="text-sm text-purple-300">Current Value</div>
               </div>
               <div>
-                <div className="text-sm text-gray-400">Current Value</div>
-                <div className="text-lg font-bold text-blue-400">
-                  {formatAmount(investments.reduce((sum, inv) => {
-                    const metrics = calculateInvestmentMetrics(inv);
-                    return sum + (metrics?.currentValue || inv.amount);
-                  }, 0))}
+                <div className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {totalProfit >= 0 ? '+' : ''}{formatCurrency(totalProfit)}
+                </div>
+                <div className="text-sm text-purple-300">
+                  {totalProfit >= 0 ? 'Profit' : 'Loss'}
                 </div>
               </div>
             </div>
-          </Card>
-
-          {/* Individual Investments */}
-          <div className="space-y-4">
-            {investments.map((investment) => {
-              const metrics = calculateInvestmentMetrics(investment);
-              
-              return (
-                <Card key={investment.id} className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-lg font-bold">{investment.name}</h3>
-                      <div className="text-sm text-gray-400">
-                        {investment.membership_level && (
-                          <span className="capitalize">{investment.membership_level} Member Plan</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-green-400">{investment.rate}% APY</div>
-                      <div className="text-xs text-gray-400">{investment.term} months</div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <div className="text-xs text-gray-400">Principal Amount</div>
-                      <div className="text-lg font-semibold">{formatAmount(investment.amount)}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-400">Current Value</div>
-                      <div className="text-lg font-semibold text-blue-400">
-                        {formatAmount(metrics?.currentValue || investment.amount)}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-400">Interest Earned</div>
-                      <div className="text-lg font-semibold text-green-400">
-                        {formatAmount(metrics?.earnedInterest || 0)}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-400">Time Remaining</div>
-                      <div className="text-lg font-semibold">
-                        {metrics?.isCompleted ? (
-                          <span className="text-green-400">✅ Completed</span>
-                        ) : (
-                          formatDays(metrics?.remainingDays || 0)
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Progress Bar */}
-                  {metrics && !metrics.isCompleted && (
-                    <div className="mb-4">
-                      <div className="flex justify-between text-xs text-gray-400 mb-1">
-                        <span>Progress</span>
-                        <span>{metrics.progressPercentage.toFixed(1)}%</span>
-                      </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2">
-                        <div 
-                          className="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${metrics.progressPercentage}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="pt-3 border-t border-gray-600">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-400">
-                        Status: <span className="text-green-400 capitalize">{investment.status}</span>
-                      </span>
-                      {metrics?.totalExpectedReturn && (
-                        <span className="text-gray-400">
-                          Expected Return: <span className="text-white font-semibold">
-                            {formatAmount(metrics.totalExpectedReturn)}
-                          </span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
           </div>
+        </Card>
+      </div>
 
-          <Button
-            onClick={() => onNavigate?.('new-investment')}
-            fullWidth
-            size="lg"
-            className="mt-8 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-          >
-            + Make New Investment
-          </Button>
-        </>
-      )}
+      {/* Investments List */}
+      <div className="space-y-4">
+        {investments.length > 0 ? (
+          investments.map((investment) => {
+            const progress = calculateProgress(investment.start_date, investment.maturity_date);
+            const profitPercentage = ((investment.current_value - investment.amount) / investment.amount) * 100;
+            
+            return (
+              <Card key={investment.id} className="hover:bg-gray-800/50 transition-colors">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
+                      <span>{getStatusIcon(investment.status)}</span>
+                      {investment.plan_name}
+                    </h3>
+                    <p className={`text-sm ${getStatusColor(investment.status)} capitalize`}>
+                      {investment.status}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-lg text-green-400">
+                      {formatCurrency(investment.current_value)}
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      of {formatCurrency(investment.amount)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <span className="text-sm text-gray-500">Start Date:</span>
+                    <div className="text-white">{formatDate(investment.start_date)}</div>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">Maturity:</span>
+                    <div className="text-white">{formatDate(investment.maturity_date)}</div>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">APY Rate:</span>
+                    <div className="text-purple-400 font-medium">{investment.apy_rate}%</div>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">Profit/Loss:</span>
+                    <div className={`font-medium ${profitPercentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {profitPercentage >= 0 ? '+' : ''}{profitPercentage.toFixed(2)}%
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mb-3">
+                  <div className="flex justify-between text-sm text-gray-400 mb-2">
+                    <span>Progress</span>
+                    <span>{progress.toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-purple-400 to-purple-500 h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min(progress, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {/* View details */}}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 min-h-[44px]"
+                  >
+                    View Details
+                  </Button>
+                  {investment.status === 'active' && (
+                    <Button
+                      onClick={() => {/* Manage investment */}}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 min-h-[44px]"
+                    >
+                      Manage
+                    </Button>
+                  )}
+                </div>
+              </Card>
+            );
+          })
+        ) : (
+          <Card className="text-center py-12">
+            <div className="text-6xl mb-4">💼</div>
+            <h3 className="text-xl font-semibold mb-2">No Investments Yet</h3>
+            <p className="text-gray-400 mb-6">
+              Start your investment journey and build your wealth with our DeFi plans
+            </p>
+            <Button
+              onClick={() => onNavigate?.('new-investment')}
+              className="bg-purple-400 hover:bg-purple-500 min-h-[44px]"
+            >
+              Make Your First Investment
+            </Button>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };

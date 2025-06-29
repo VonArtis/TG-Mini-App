@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import type { ScreenProps } from '../../types';
-import { ScreenHeader } from '../layout/ScreenHeader';
+import { CleanHeader } from '../layout/CleanHeader';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { MembershipBadge } from '../common/MembershipBadge';
+import { LanguageSelector } from '../common/LanguageSelector';
 import { useApp } from '../../context/AppContext';
 import { useMembership } from '../../hooks/useMembership';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -130,8 +131,14 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
   };
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8">
-      <ScreenHeader title={t('profile:title')} onBack={onBack} />
+    <div className="px-6 pb-8 pt-4 space-y-6">
+      <CleanHeader 
+        title="👤 Profile" 
+        onBack={onBack}
+        action={
+          <LanguageSelector />
+        }
+      />
 
       <div className="space-y-4">
         {/* User Information */}

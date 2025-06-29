@@ -67,6 +67,10 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
         // Update user with crypto connection status
         setUser({ ...user, crypto_connected: true } as any);
         setStep('success');
+        // Call onConnect callback when crypto wallet is successfully connected
+        if (onConnect) {
+          await onConnect();
+        }
       } else {
         setError('Failed to connect wallet. Please try again.');
         setStep('select');
@@ -76,6 +80,10 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
       // For demo purposes, simulate success
       setUser({ ...user, crypto_connected: true } as any);
       setStep('success');
+      // Call onConnect callback for demo success
+      if (onConnect) {
+        await onConnect();
+      }
     } finally {
       setLoading(false);
     }

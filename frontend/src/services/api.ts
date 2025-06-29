@@ -558,6 +558,91 @@ class ApiService {
         : null
     };
   }
+
+  // === WALLET MANAGEMENT API METHODS ===
+  
+  async getConnectedWallets(token: string) {
+    const response = await axios.get(`${API_BASE}/wallets/connected`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async disconnectWallet(walletId: string, token: string) {
+    const response = await axios.delete(`${API_BASE}/wallets/${walletId}`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  // === WITHDRAWAL API METHODS ===
+  
+  async getWithdrawalSources(token: string) {
+    const response = await axios.get(`${API_BASE}/withdrawals/sources`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async createWithdrawal(withdrawalData: {
+    source_id: string;
+    amount: number;
+    method: string;
+  }, token: string) {
+    const response = await axios.post(`${API_BASE}/withdrawals`, withdrawalData, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async getAvailableFunds(token: string) {
+    const response = await axios.get(`${API_BASE}/funds/available`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async getDepositMethods(token: string) {
+    const response = await axios.get(`${API_BASE}/deposits/methods`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  // === USER PROFILE API METHODS ===
+  
+  async updateProfile(profileData: any, token: string) {
+    const response = await axios.put(`${API_BASE}/user/profile`, profileData, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async changePassword(passwordData: {
+    current_password: string;
+    new_password: string;
+  }, token: string) {
+    const response = await axios.put(`${API_BASE}/user/password`, passwordData, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  // === 2FA API METHODS ===
+  
+  async generate2FASecret(token: string) {
+    const response = await axios.post(`${API_BASE}/auth/2fa/generate`, {}, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async verify2FA(code: string, token: string) {
+    const response = await axios.post(`${API_BASE}/auth/2fa/verify`, { code }, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
 }
 
 export const apiService = new ApiService();

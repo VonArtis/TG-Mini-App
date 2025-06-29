@@ -282,9 +282,15 @@ const AppRouter: React.FC = () => {
         );
       case 'dashboard':
         return (
-          <DashboardScreen 
+          <MobileLayoutWithTabs 
             onNavigate={setScreen} 
-          />
+            currentScreen="dashboard"
+            showTabs={true}
+          >
+            <DashboardScreen 
+              onNavigate={setScreen} 
+            />
+          </MobileLayoutWithTabs>
         );
       // Add direct access to connect-crypto for testing
       case 'test-wallet-connections':

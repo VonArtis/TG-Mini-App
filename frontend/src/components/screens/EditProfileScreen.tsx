@@ -1,219 +1,311 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ScreenProps } from '../../types';
-import { ScreenHeader } from '../layout/ScreenHeader';
+import { CleanHeader } from '../layout/CleanHeader';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../hooks/useLanguage';
+import { apiService } from '../../services/api';
 
-export const EditProfileScreen: React.FC<ScreenProps> = ({ onBack }) => {
-  const { user, setUser } = useApp();
-  const [loading, setLoading] = useState(false);
+export const EditProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
   const [form, setForm] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone?.replace(/^\+\d+/, '') || '', // Remove country code
-    countryCode: user?.phone?.match(/^\+\d+/)?.[0] || '+1'
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
-  
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [activeTab, setActiveTab] = useState<'profile' | 'security'>('profile');
+  const { user, setUser } = useApp();
+  const { t } = useLanguage();
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [field]: e.target.value });
-    if (errors[field]) {
-      setErrors({ ...errors, [field]: '' });
+  useEffect(() => {
+    if (user) {
+      setForm({
+        firstName: user.first_name || '',
+        lastName: user.last_name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+    }
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    if (!validateProfileForm()) return;
+
+    setSaving(true);
+    try {
+      if (!user?.token) {
+        setErrors({ general: 'Please log in to update profile' });
+        return;
+      }
+
+      const response = await apiService.updateProfile({
+        first_name: form.firstName,
+        last_name: form.lastName,
+        phone: form.phone
+      }, user.token);
+
+      if (response.success) {
+        setUser({ ...user, first_name: form.firstName, last_name: form.lastName, phone: form.phone });
+        alert('Profile updated successfully!');
+      } else {
+        setErrors({ general: response.message || 'Failed to update profile' });
+      }
+    } catch (error: any) {
+      setErrors({ general: error.message || 'Failed to update profile' });
+    } finally {
+      setSaving(false);
     }
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const handleChangePassword = async () => {
+    if (!validatePasswordForm()) return;
 
-    if (!form.name.trim()) newErrors.name = 'Name is required';
-    if (!form.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = 'Please enter a valid email';
+    setSaving(true);
+    try {
+      if (!user?.token) {
+        setErrors({ general: 'Please log in to change password' });
+        return;
+      }
+
+      const response = await apiService.changePassword({
+        current_password: form.currentPassword,
+        new_password: form.newPassword
+      }, user.token);
+
+      if (response.success) {
+        setForm({ ...form, currentPassword: '', newPassword: '', confirmPassword: '' });
+        alert('Password changed successfully!');
+      } else {
+        setErrors({ general: response.message || 'Failed to change password' });
+      }
+    } catch (error: any) {
+      setErrors({ general: error.message || 'Failed to change password' });
+    } finally {
+      setSaving(false);
     }
-    if (!form.phone) {
+  };
+
+  const validateProfileForm = () => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (!form.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+    
+    if (!form.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+    
+    if (!form.phone.trim()) {
       newErrors.phone = 'Phone number is required';
-    } else if (!/^\d{10,15}$/.test(form.phone.replace(/\s+/g, ''))) {
-      newErrors.phone = 'Please enter a valid phone number';
     }
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = async () => {
-    if (!validateForm()) return;
-
-    setLoading(true);
-    try {
-      // Simulate API update
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Update user data
-      const updatedUser = {
-        ...user,
-        name: form.name,
-        email: form.email,
-        phone: form.countryCode + form.phone
-      };
-      
-      setUser(updatedUser);
-      alert('Profile updated successfully!');
-      onBack?.();
-    } catch (error) {
-      console.error('Profile update error:', error);
-      alert('Failed to update profile. Please try again.');
-    } finally {
-      setLoading(false);
+  const validatePasswordForm = () => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (!form.currentPassword) {
+      newErrors.currentPassword = 'Current password is required';
     }
+    
+    if (!form.newPassword) {
+      newErrors.newPassword = 'New password is required';
+    } else if (form.newPassword.length < 8) {
+      newErrors.newPassword = 'Password must be at least 8 characters';
+    }
+    
+    if (form.newPassword !== form.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  return (
-    <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8">
-      <ScreenHeader title="Edit Profile" onBack={onBack} />
-
-      <div className="space-y-6">
-        <Card>
-          <h3 className="text-lg font-semibold text-white mb-4">Personal Information</h3>
-          
-          <div className="space-y-4">
-            <Input
-              label="Full Name"
-              value={form.name}
-              onChange={handleChange('name')}
-              placeholder="Enter your full name"
-              required
-              error={errors.name}
-            />
-
-            <Input
-              label="Email Address"
-              type="email"
-              value={form.email}
-              onChange={handleChange('email')}
-              placeholder="Enter your email address"
-              required
-              error={errors.email}
-            />
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-white">
-                Phone Number <span className="text-red-400 ml-1">*</span>
-              </label>
-              <div className="flex gap-2">
-                <select
-                  value={form.countryCode}
-                  onChange={(e) => setForm({ ...form, countryCode: e.target.value })}
-                  className="p-3 bg-gray-900 border border-purple-500 rounded-lg text-white focus:border-purple-400 focus:outline-none w-48"
-                >
-                  <option value="+1">🇺🇸 United States (+1)</option>
-                  <option value="+1">🇨🇦 Canada (+1)</option>
-                  <option value="+44">🇬🇧 United Kingdom (+44)</option>
-                  <option value="+33">🇫🇷 France (+33)</option>
-                  <option value="+49">🇩🇪 Germany (+49)</option>
-                  <option value="+39">🇮🇹 Italy (+39)</option>
-                  <option value="+34">🇪🇸 Spain (+34)</option>
-                  <option value="+31">🇳🇱 Netherlands (+31)</option>
-                  <option value="+32">🇧🇪 Belgium (+32)</option>
-                  <option value="+41">🇨🇭 Switzerland (+41)</option>
-                  <option value="+43">🇦🇹 Austria (+43)</option>
-                  <option value="+45">🇩🇰 Denmark (+45)</option>
-                  <option value="+46">🇸🇪 Sweden (+46)</option>
-                  <option value="+47">🇳🇴 Norway (+47)</option>
-                  <option value="+358">🇫🇮 Finland (+358)</option>
-                  <option value="+86">🇨🇳 China (+86)</option>
-                  <option value="+81">🇯🇵 Japan (+81)</option>
-                  <option value="+82">🇰🇷 South Korea (+82)</option>
-                  <option value="+91">🇮🇳 India (+91)</option>
-                  <option value="+852">🇭🇰 Hong Kong (+852)</option>
-                  <option value="+65">🇸🇬 Singapore (+65)</option>
-                  <option value="+61">🇦🇺 Australia (+61)</option>
-                  <option value="+64">🇳🇿 New Zealand (+64)</option>
-                  <option value="+55">🇧🇷 Brazil (+55)</option>
-                  <option value="+52">🇲🇽 Mexico (+52)</option>
-                  <option value="+54">🇦🇷 Argentina (+54)</option>
-                  <option value="+56">🇨🇱 Chile (+56)</option>
-                  <option value="+57">🇨🇴 Colombia (+57)</option>
-                  <option value="+51">🇵🇪 Peru (+51)</option>
-                  <option value="+27">🇿🇦 South Africa (+27)</option>
-                  <option value="+234">🇳🇬 Nigeria (+234)</option>
-                  <option value="+20">🇪🇬 Egypt (+20)</option>
-                  <option value="+971">🇦🇪 UAE (+971)</option>
-                  <option value="+966">🇸🇦 Saudi Arabia (+966)</option>
-                  <option value="+90">🇹🇷 Turkey (+90)</option>
-                  <option value="+7">🇷🇺 Russia (+7)</option>
-                  <option value="+380">🇺🇦 Ukraine (+380)</option>
-                  <option value="+48">🇵🇱 Poland (+48)</option>
-                  <option value="+420">🇨🇿 Czech Republic (+420)</option>
-                  <option value="+36">🇭🇺 Hungary (+36)</option>
-                  <option value="+40">🇷🇴 Romania (+40)</option>
-                  <option value="+30">🇬🇷 Greece (+30)</option>
-                  <option value="+351">🇵🇹 Portugal (+351)</option>
-                  <option value="+353">🇮🇪 Ireland (+353)</option>
-                  <option value="+60">🇲🇾 Malaysia (+60)</option>
-                  <option value="+66">🇹🇭 Thailand (+66)</option>
-                  <option value="+84">🇻🇳 Vietnam (+84)</option>
-                  <option value="+63">🇵🇭 Philippines (+63)</option>
-                  <option value="+62">🇮🇩 Indonesia (+62)</option>
-                </select>
-                <Input
-                  type="tel"
-                  value={form.phone}
-                  onChange={handleChange('phone')}
-                  placeholder="123 456 7890"
-                  required
-                  error={errors.phone}
-                  className="flex-1"
-                />
-              </div>
-            </div>
+  const renderProfileTab = () => (
+    <div className="space-y-4">
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
+        
+        {errors.general && (
+          <div className="mb-4 p-3 bg-red-900/30 border border-red-500/50 rounded-lg">
+            <p className="text-red-400 text-sm">{errors.general}</p>
           </div>
-        </Card>
+        )}
 
-        <Card className="bg-gray-900/50">
-          <h3 className="text-lg font-semibold text-white mb-3">Account Information</h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-400">User ID:</span>
-              <span className="text-white font-mono">{user?.id}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Account Created:</span>
-              <span className="text-white">{user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Recently'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Authentication Method:</span>
-              <span className="text-white">{user?.auth_type || 'Email'}</span>
-            </div>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="First Name"
+              value={form.firstName}
+              onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+              error={errors.firstName}
+              className="min-h-[44px]"
+            />
+            
+            <Input
+              label="Last Name"
+              value={form.lastName}
+              onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+              error={errors.lastName}
+              className="min-h-[44px]"
+            />
           </div>
-        </Card>
 
-        <div className="flex gap-3">
+          <Input
+            label="Email Address"
+            value={form.email}
+            disabled
+            className="min-h-[44px] bg-gray-800 text-gray-400"
+          />
+
+          <Input
+            label="Phone Number"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            error={errors.phone}
+            className="min-h-[44px]"
+          />
+
           <Button
-            onClick={handleSave}
-            loading={loading}
-            disabled={loading}
-            fullWidth
-            size="lg"
-            className="bg-green-600 hover:bg-green-700"
+            onClick={handleSaveProfile}
+            disabled={saving}
+            className="w-full min-h-[44px] h-14 bg-purple-400 hover:bg-purple-500"
           >
-            Save Changes
-          </Button>
-          
-          <Button
-            onClick={onBack}
-            variant="secondary"
-            fullWidth
-            size="lg"
-            disabled={loading}
-          >
-            Cancel
+            {saving ? 'Saving...' : 'Save Profile'}
           </Button>
         </div>
-      </div>
+      </Card>
+    </div>
+  );
+
+  const renderSecurityTab = () => (
+    <div className="space-y-4">
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4">Change Password</h3>
+        
+        {errors.general && (
+          <div className="mb-4 p-3 bg-red-900/30 border border-red-500/50 rounded-lg">
+            <p className="text-red-400 text-sm">{errors.general}</p>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <Input
+            label="Current Password"
+            type="password"
+            value={form.currentPassword}
+            onChange={(e) => setForm({ ...form, currentPassword: e.target.value })}
+            error={errors.currentPassword}
+            className="min-h-[44px]"
+          />
+
+          <Input
+            label="New Password"
+            type="password"
+            value={form.newPassword}
+            onChange={(e) => setForm({ ...form, newPassword: e.target.value })}
+            error={errors.newPassword}
+            className="min-h-[44px]"
+          />
+
+          <Input
+            label="Confirm New Password"
+            type="password"
+            value={form.confirmPassword}
+            onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+            error={errors.confirmPassword}
+            className="min-h-[44px]"
+          />
+
+          <Button
+            onClick={handleChangePassword}
+            disabled={saving}
+            className="w-full min-h-[44px] h-14 bg-red-600 hover:bg-red-700"
+          >
+            {saving ? 'Changing...' : 'Change Password'}
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4">Security Actions</h3>
+        
+        <div className="space-y-3">
+          <Button
+            onClick={() => onNavigate?.('two-factor-setup')}
+            variant="outline"
+            className="w-full min-h-[44px] flex items-center justify-between"
+          >
+            <span>🔐 Two-Factor Authentication</span>
+            <span>→</span>
+          </Button>
+          
+          <Button
+            onClick={() => onNavigate?.('email-verification')}
+            variant="outline"
+            className="w-full min-h-[44px] flex items-center justify-between"
+          >
+            <span>📧 Verify Email</span>
+            <span>→</span>
+          </Button>
+          
+          <Button
+            onClick={() => onNavigate?.('sms-verification')}
+            variant="outline"
+            className="w-full min-h-[44px] flex items-center justify-between"
+          >
+            <span>📱 Verify Phone</span>
+            <span>→</span>
+          </Button>
+        </div>
+      </Card>
+    </div>
+  );
+
+  return (
+    <div className="px-6 pb-8 pt-4 space-y-6">
+      <CleanHeader 
+        title="✏️ Edit Profile" 
+        onBack={onBack}
+      />
+
+      {/* Tab Navigation */}
+      <Card className="p-4">
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setActiveTab('profile')}
+            variant={activeTab === 'profile' ? 'primary' : 'outline'}
+            className={`flex-1 min-h-[44px] ${activeTab === 'profile' ? 'bg-purple-400 hover:bg-purple-500' : ''}`}
+          >
+            👤 Profile
+          </Button>
+          <Button
+            onClick={() => setActiveTab('security')}
+            variant={activeTab === 'security' ? 'primary' : 'outline'}
+            className={`flex-1 min-h-[44px] ${activeTab === 'security' ? 'bg-purple-400 hover:bg-purple-500' : ''}`}
+          >
+            🔒 Security
+          </Button>
+        </div>
+      </Card>
+
+      {activeTab === 'profile' && renderProfileTab()}
+      {activeTab === 'security' && renderSecurityTab()}
     </div>
   );
 };

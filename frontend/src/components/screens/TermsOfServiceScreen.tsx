@@ -1,153 +1,198 @@
 import React from 'react';
 import type { ScreenProps } from '../../types';
-import { ScreenHeader } from '../layout/ScreenHeader';
+import { CleanHeader } from '../layout/CleanHeader';
+import { Card } from '../common/Card';
+import { useLanguage } from '../../hooks/useLanguage';
 
 export const TermsOfServiceScreen: React.FC<ScreenProps> = ({ onBack }) => {
+  const { t } = useLanguage();
+
   return (
-    <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8">
-      <ScreenHeader title="Terms of Service" onBack={onBack} />
-      
-      <div className="max-w-4xl mx-auto prose prose-invert prose-sm">
-        <div className="space-y-6 text-sm leading-relaxed">
-          
-          <div className="text-center mb-8">
-            <p className="text-gray-400">Last updated: June 20, 2025</p>
-          </div>
+    <div className="px-6 pb-8 pt-4 space-y-6">
+      <CleanHeader 
+        title="📋 Terms of Service" 
+        onBack={onBack}
+      />
 
-          <section>
-            <h2 className="text-xl font-semibold text-white mb-3">1. Acceptance of Terms</h2>
-            <p className="text-gray-300">
-              By accessing or using VonVault ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-white mb-3">2. Description of Service</h2>
-            <p className="text-gray-300 mb-3">VonVault is a decentralized finance (DeFi) investment platform offering:</p>
-            <ul className="text-gray-300 space-y-1 ml-4">
-              <li>• <strong>Tiered Membership System</strong>: Club, Premium, VIP, and Elite levels</li>
-              <li>• <strong>Investment Opportunities</strong>: Various DeFi investment plans with different returns</li>
-              <li>• <strong>Portfolio Management</strong>: Real-time tracking of investments and returns</li>
-              <li>• <strong>Multi-Asset Support</strong>: Bank account and cryptocurrency wallet integration</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-white mb-3">3. Investment Risks</h2>
-            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
-              <h3 className="text-lg font-medium text-red-400 mb-2">⚠️ Important Risk Disclosure</h3>
-              <ul className="text-gray-300 space-y-2">
-                <li>• <strong>No Guaranteed Returns</strong>: All investments involve risk of loss</li>
-                <li>• <strong>Market Volatility</strong>: Cryptocurrency and DeFi markets are highly volatile</li>
-                <li>• <strong>Regulatory Risk</strong>: Changes in regulations may affect investments</li>
-                <li>• <strong>Technology Risk</strong>: Smart contracts and blockchain technology carry inherent risks</li>
-              </ul>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-white mb-3">4. Membership Tiers</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-amber-900/30 rounded-lg p-4 border border-amber-500/30">
-                <h3 className="text-lg font-medium text-amber-400 mb-2">🥉 Club Tier</h3>
-                <p className="text-gray-300 text-sm">$0 - $50,000 total invested</p>
-                <p className="text-white font-semibold">6% APY</p>
-                <p className="text-gray-400 text-sm">$100 - $20,000 per investment</p>
-              </div>
-              
-              <div className="bg-gray-600/30 rounded-lg p-4 border border-gray-400/30">
-                <h3 className="text-lg font-medium text-gray-300 mb-2">🥈 Premium Tier</h3>
-                <p className="text-gray-300 text-sm">$50,001 - $150,000 total invested</p>
-                <p className="text-white font-semibold">8-10% APY</p>
-                <p className="text-gray-400 text-sm">$500 - $50,000 per investment</p>
-              </div>
-              
-              <div className="bg-yellow-600/30 rounded-lg p-4 border border-yellow-400/30">
-                <h3 className="text-lg font-medium text-yellow-400 mb-2">🥇 VIP Tier</h3>
-                <p className="text-gray-300 text-sm">$150,001 - $500,000 total invested</p>
-                <p className="text-white font-semibold">12-14% APY</p>
-                <p className="text-gray-400 text-sm">$1,000 - $100,000 per investment</p>
-              </div>
-              
-              <div className="bg-purple-600/30 rounded-lg p-4 border border-purple-400/30">
-                <h3 className="text-lg font-medium text-purple-400 mb-2">💎 Elite Tier</h3>
-                <p className="text-gray-300 text-sm">$500,001+ total invested</p>
-                <p className="text-white font-semibold">16-20% APY</p>
-                <p className="text-gray-400 text-sm">$5,000 - $250,000+ per investment</p>
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-white mb-3">5. Financial Connections</h2>
-            <div className="space-y-4">
-              <div className="bg-blue-900/30 rounded-lg p-4">
-                <h3 className="text-lg font-medium text-blue-400 mb-2">🏦 Bank Account Integration</h3>
-                <ul className="text-gray-300 space-y-1 text-sm">
-                  <li>• Third-party service (Teller API) used for bank connectivity</li>
-                  <li>• We do not store your banking credentials</li>
-                  <li>• You authorize read-only access to account balances</li>
-                </ul>
-              </div>
-              
-              <div className="bg-orange-900/30 rounded-lg p-4">
-                <h3 className="text-lg font-medium text-orange-400 mb-2">🔗 Cryptocurrency Wallets</h3>
-                <ul className="text-gray-300 space-y-1 text-sm">
-                  <li>• Connect compatible wallets (MetaMask, WalletConnect)</li>
-                  <li>• You maintain full control of your crypto assets</li>
-                  <li>• We do not have access to your private keys</li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-white mb-3">6. User Responsibilities</h2>
-            <div className="bg-gray-900/50 rounded-lg p-4">
-              <ul className="text-gray-300 space-y-2">
-                <li>• <strong>Compliance</strong>: Follow all applicable laws and regulations</li>
-                <li>• <strong>Security</strong>: Maintain strong passwords and secure devices</li>
-                <li>• <strong>Accuracy</strong>: Provide accurate information for all transactions</li>
-                <li>• <strong>Tax Compliance</strong>: Ensure proper tax reporting in your jurisdiction</li>
-              </ul>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-white mb-3">7. Disclaimers</h2>
-            <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4">
-              <h3 className="text-lg font-medium text-yellow-400 mb-2">⚠️ Important Disclaimers</h3>
-              <ul className="text-gray-300 space-y-1">
-                <li>• <strong>Not Financial Advice</strong>: Information provided is educational only</li>
-                <li>• <strong>Risk of Loss</strong>: You may lose some or all invested funds</li>
-                <li>• <strong>No FDIC Insurance</strong>: Investments are not insured by government agencies</li>
-                <li>• <strong>Service "As Is"</strong>: No warranties regarding performance or availability</li>
-              </ul>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-white mb-3">8. Contact Information</h2>
-            <div className="bg-gray-800/50 rounded-lg p-4">
-              <p className="text-gray-300 mb-2">For questions about these Terms:</p>
-              <ul className="text-gray-300 space-y-1">
-                <li><strong>Email</strong>: legal@vonartis.app</li>
-                <li><strong>Customer Support</strong>: support@vonartis.app</li>
-              </ul>
-            </div>
-          </section>
-
-          <div className="mt-8 pt-6 border-t border-gray-700">
-            <p className="text-center text-gray-400 text-sm">
-              By using VonVault, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
-            </p>
-            <p className="text-center text-gray-400 text-sm mt-2">
-              Last updated: June 20, 2025
-            </p>
-          </div>
-
+      <Card className="p-6">
+        <div className="text-center mb-6">
+          <div className="text-4xl mb-3">📋</div>
+          <h2 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+            VonVault Terms of Service
+          </h2>
+          <p className="text-gray-400 text-sm">
+            Last updated: {new Date().toLocaleDateString()}
+          </p>
         </div>
-      </div>
+
+        <div className="space-y-6 text-gray-300">
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">1. Acceptance of Terms</h3>
+            <div className="space-y-2 text-sm">
+              <p>By accessing and using VonVault ("the Platform"), you accept and agree to be bound by these Terms of Service.</p>
+              <p>If you do not agree to these terms, you may not access or use the Platform.</p>
+              <p>These terms apply to all users, including visitors, registered users, and premium subscribers.</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">2. Eligibility</h3>
+            <div className="space-y-2 text-sm">
+              <p>• You must be at least 18 years old to use VonVault</p>
+              <p>• You must have legal capacity to enter into binding agreements</p>
+              <p>• You must not be prohibited from using the service under applicable laws</p>
+              <p>• You must provide accurate and complete information during registration</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">3. Account Registration</h3>
+            <div className="space-y-2 text-sm">
+              <p><strong>Account Creation:</strong> You must create an account to access investment features.</p>
+              <p><strong>Information Accuracy:</strong> All information provided must be accurate and up-to-date.</p>
+              <p><strong>Account Security:</strong> You are responsible for maintaining account security.</p>
+              <p><strong>Verification:</strong> We may require identity verification for compliance purposes.</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">4. Investment Services</h3>
+            <div className="space-y-2 text-sm">
+              <p><strong>DeFi Platform:</strong> VonVault provides access to decentralized finance investment opportunities.</p>
+              <p><strong>Risk Disclosure:</strong> All investments carry risk, including potential loss of principal.</p>
+              <p><strong>No Guarantees:</strong> Past performance does not guarantee future results.</p>
+              <p><strong>Professional Advice:</strong> Platform does not provide personalized investment advice.</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">5. User Responsibilities</h3>
+            <div className="space-y-2 text-sm">
+              <p>• <strong>Compliance:</strong> Follow all applicable laws and regulations</p>
+              <p>• <strong>Accurate Information:</strong> Provide truthful and current information</p>
+              <p>• <strong>Security:</strong> Protect your account credentials and private keys</p>
+              <p>• <strong>Prohibited Activities:</strong> Do not engage in fraudulent or illegal activities</p>
+              <p>• <strong>System Integrity:</strong> Do not attempt to compromise platform security</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">6. Prohibited Activities</h3>
+            <div className="space-y-2 text-sm">
+              <p>Users may not:</p>
+              <p>• Use the platform for money laundering or terrorist financing</p>
+              <p>• Manipulate markets or engage in fraudulent trading</p>
+              <p>• Attempt to hack, reverse engineer, or compromise the platform</p>
+              <p>• Share accounts or allow unauthorized access</p>
+              <p>• Violate any applicable laws or regulations</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">7. Fees and Payments</h3>
+            <div className="space-y-2 text-sm">
+              <p><strong>Transaction Fees:</strong> Certain transactions may incur fees as disclosed.</p>
+              <p><strong>Network Fees:</strong> Blockchain network fees are separate and beyond our control.</p>
+              <p><strong>Fee Changes:</strong> Fees may change with reasonable notice.</p>
+              <p><strong>Payment Processing:</strong> Third-party payment processors may apply additional fees.</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">8. Intellectual Property</h3>
+            <div className="space-y-2 text-sm">
+              <p><strong>Platform Ownership:</strong> VonVault owns all platform intellectual property.</p>
+              <p><strong>License:</strong> We grant you limited, non-exclusive access to use the platform.</p>
+              <p><strong>Restrictions:</strong> You may not copy, modify, or redistribute platform content.</p>
+              <p><strong>User Content:</strong> You retain ownership of content you submit but grant us usage rights.</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">9. Disclaimers</h3>
+            <div className="space-y-2 text-sm">
+              <p><strong>Service Availability:</strong> Platform provided "as is" without warranties.</p>
+              <p><strong>Investment Risk:</strong> All investments are subject to market risk and volatility.</p>
+              <p><strong>Third-Party Services:</strong> We are not responsible for third-party service failures.</p>
+              <p><strong>Regulatory Changes:</strong> Service may be affected by regulatory changes.</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">10. Limitation of Liability</h3>
+            <div className="space-y-2 text-sm">
+              <p>VonVault's liability is limited to the maximum extent permitted by law.</p>
+              <p>We are not liable for:</p>
+              <p>• Investment losses or market volatility</p>
+              <p>• Third-party service interruptions</p>
+              <p>• User errors or security breaches</p>
+              <p>• Force majeure events or regulatory changes</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">11. Indemnification</h3>
+            <div className="space-y-2 text-sm">
+              <p>You agree to indemnify VonVault against claims arising from:</p>
+              <p>• Your violation of these terms</p>
+              <p>• Your use of the platform</p>
+              <p>• Your violation of applicable laws</p>
+              <p>• Infringement of third-party rights</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">12. Termination</h3>
+            <div className="space-y-2 text-sm">
+              <p><strong>User Termination:</strong> You may close your account at any time.</p>
+              <p><strong>Platform Termination:</strong> We may suspend or terminate accounts for violations.</p>
+              <p><strong>Effect of Termination:</strong> Access to services will cease upon termination.</p>
+              <p><strong>Data Retention:</strong> Some data may be retained per our Privacy Policy.</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">13. Dispute Resolution</h3>
+            <div className="space-y-2 text-sm">
+              <p><strong>Governing Law:</strong> These terms are governed by [Jurisdiction] law.</p>
+              <p><strong>Arbitration:</strong> Disputes may be subject to binding arbitration.</p>
+              <p><strong>Class Action Waiver:</strong> You waive rights to participate in class actions.</p>
+              <p><strong>Informal Resolution:</strong> Contact support first to resolve disputes.</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">14. Changes to Terms</h3>
+            <div className="space-y-2 text-sm">
+              <p>We may modify these terms with notice to users.</p>
+              <p>Material changes will be communicated via email or platform notification.</p>
+              <p>Continued use constitutes acceptance of modified terms.</p>
+              <p>You may terminate your account if you disagree with changes.</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-white mb-3">15. Contact Information</h3>
+            <div className="space-y-2 text-sm">
+              <p>For questions about these terms, contact us:</p>
+              <p>• <strong>Email:</strong> legal@vonvault.com</p>
+              <p>• <strong>Address:</strong> VonVault Legal Department, [Company Address]</p>
+              <p>• <strong>Support:</strong> Available through the platform help center</p>
+            </div>
+          </section>
+        </div>
+      </Card>
+
+      {/* Legal Notice */}
+      <Card className="p-4 bg-yellow-900/20 border-yellow-500/30">
+        <h3 className="text-yellow-300 font-medium mb-2">Important Legal Notice</h3>
+        <div className="space-y-1 text-yellow-400 text-sm">
+          <p>• These terms constitute a legally binding agreement</p>
+          <p>• Investment involves risk and potential loss of capital</p>
+          <p>• Consult professional advisors before making investment decisions</p>
+          <p>• Report any violations or concerns to our support team</p>
+        </div>
+      </Card>
     </div>
   );
 };

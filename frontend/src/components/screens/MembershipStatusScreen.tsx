@@ -43,52 +43,38 @@ export const MembershipStatusScreen: React.FC<ScreenProps> = ({ onBack, onNaviga
         // Demo data
         setLevels([
           {
-            id: 'basic',
-            name: 'Basic',
-            icon: '🌱',
-            min_investment: 0,
-            benefits: ['Basic investment plans', 'Email support', 'Monthly reports'],
-            color: 'text-green-400',
-            description: 'Start your investment journey'
-          },
-          {
             id: 'club',
             name: 'Club',
-            icon: '🥉',
-            min_investment: 1000,
-            benefits: ['Enhanced plans', 'Priority support', 'Weekly reports', 'Lower fees'],
-            color: 'text-amber-400',
-            description: 'Enhanced benefits for committed investors'
+            min_investment: 0,
+            benefits: ['Basic portfolio tracking', 'Email support'],
+            color: '#d97706',
+            description: 'Start your investment journey'
           },
           {
             id: 'premium',
             name: 'Premium',
-            icon: '🥈',
             min_investment: 5000,
-            benefits: ['Premium plans', 'Phone support', 'Daily reports', 'Reduced fees', 'Advanced analytics'],
-            color: 'text-gray-300',
-            description: 'Premium experience with advanced features'
+            benefits: ['Advanced analytics', 'Priority support', 'Monthly reports'],
+            color: '#9ca3af',
+            description: 'Enhanced investment tools'
           },
           {
             id: 'vip',
             name: 'VIP',
-            icon: '🥇',
             min_investment: 25000,
-            benefits: ['VIP plans', '24/7 support', 'Real-time reports', 'Lowest fees', 'Personal advisor'],
-            color: 'text-yellow-400',
-            description: 'Elite status with personal attention'
+            benefits: ['Personal advisor', '24/7 support', 'Exclusive investments'],
+            color: '#eab308',
+            description: 'Premium investment experience'
           },
           {
             id: 'elite',
             name: 'Elite',
-            icon: '💎',
             min_investment: 100000,
-            benefits: ['Exclusive plans', 'Dedicated advisor', 'Custom reports', 'No fees', 'Priority access'],
-            color: 'text-purple-400',
-            description: 'Ultimate VIP experience'
+            benefits: ['Dedicated manager', 'Custom strategies', 'Private events'],
+            color: '#dc2626',
+            description: 'Ultimate investment package'
           }
         ]);
-
         setMembership({
           current_level: 'club',
           total_invested: 2500,
@@ -96,14 +82,18 @@ export const MembershipStatusScreen: React.FC<ScreenProps> = ({ onBack, onNaviga
           progress_to_next: 50,
           amount_needed: 2500
         });
-        
         setLoading(false);
         return;
       }
 
-      const response = await apiService.getMembershipStatus(user.token);
-      setMembership(response.membership);
-      setLevels(response.levels);
+      // Fetch both membership status and tiers
+      const [statusResponse, tiersResponse] = await Promise.all([
+        apiService.getMembershipStatus(user.token),
+        apiService.getMembershipTiers()
+      ]);
+      
+      setMembership(statusResponse.membership);
+      setLevels(tiersResponse.tiers || []);
     } catch (error) {
       console.error('Error fetching membership data:', error);
     } finally {

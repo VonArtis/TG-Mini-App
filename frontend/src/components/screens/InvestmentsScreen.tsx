@@ -111,154 +111,138 @@ export const InvestmentsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate })
   }
 
   return (
-    <div className="px-6 pb-8 pt-4 space-y-6">
-      <CleanHeader 
-        title="💼 Portfolio" 
-        onBack={onBack}
-        action={
-          <Button 
-            onClick={() => onNavigate?.('new-investment')} 
-            size="sm" 
-            className="bg-purple-400 hover:bg-purple-500 min-h-[44px]"
-          >
-            + Invest
-          </Button>
-        }
-      />
-
-      {/* Portfolio Summary */}
-      <div className="grid grid-cols-1 gap-4 mb-6">
-        <Card className="bg-gradient-to-br from-purple-900/50 to-purple-800/50 border-purple-500/30">
-          <div className="text-center">
-            <h3 className="text-lg font-semibold mb-3 text-purple-200">Portfolio Overview</h3>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <div className="text-2xl font-bold text-white">
-                  {formatCurrency(totalInvested)}
-                </div>
-                <div className="text-sm text-purple-300">Invested</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-green-400">
-                  {formatCurrency(totalCurrentValue)}
-                </div>
-                <div className="text-sm text-purple-300">Current Value</div>
-              </div>
-              <div>
-                <div className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {totalProfit >= 0 ? '+' : ''}{formatCurrency(totalProfit)}
-                </div>
-                <div className="text-sm text-purple-300">
-                  {totalProfit >= 0 ? 'Profit' : 'Loss'}
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-2">
+          {t('investments.title', 'Investment Portfolio')}
+        </h1>
+        <p className="text-gray-400 text-sm">
+          {t('investments.subtitle', 'Track your DeFi investments')}
+        </p>
       </div>
 
+      {/* Portfolio Summary */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4 text-center">
+          <div className="text-lg font-bold text-purple-300">
+            {formatCurrency(totalInvested)}
+          </div>
+          <div className="text-xs text-gray-400">
+            {t('investments.invested', 'Invested')}
+          </div>
+        </div>
+        
+        <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 text-center">
+          <div className="text-lg font-bold text-green-300">
+            {formatCurrency(totalCurrentValue)}
+          </div>
+          <div className="text-xs text-gray-400">
+            {t('investments.current', 'Current')}
+          </div>
+        </div>
+        
+        <div className={`border rounded-lg p-4 text-center ${
+          totalProfit >= 0 
+            ? 'bg-blue-900/20 border-blue-500/30' 
+            : 'bg-red-900/20 border-red-500/30'
+        }`}>
+          <div className={`text-lg font-bold ${
+            totalProfit >= 0 ? 'text-blue-300' : 'text-red-300'
+          }`}>
+            {totalProfit >= 0 ? '+' : ''}{formatCurrency(totalProfit)}
+          </div>
+          <div className="text-xs text-gray-400">
+            {t('investments.profit', 'Profit')}
+          </div>
+        </div>
+      </div>
+
+      {/* New Investment Button */}
+      <Button
+        onClick={() => onNavigate?.('new-investment')}
+        fullWidth
+        className="h-12 bg-purple-600 hover:bg-purple-700"
+      >
+        + {t('investments.newInvestment', 'New Investment')}
+      </Button>
+
       {/* Investments List */}
-      <div className="space-y-4">
-        {investments.length > 0 ? (
-          investments.map((investment) => {
-            const progress = calculateProgress(investment.start_date, investment.maturity_date);
-            const profitPercentage = ((investment.current_value - investment.amount) / investment.amount) * 100;
-            
-            return (
-              <Card key={investment.id} className="hover:bg-gray-800/50 transition-colors">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="font-semibold text-lg flex items-center gap-2">
-                      <span>{getStatusIcon(investment.status)}</span>
-                      {investment.plan_name}
-                    </h3>
-                    <p className={`text-sm ${getStatusColor(investment.status)} capitalize`}>
-                      {investment.status}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-lg text-green-400">
-                      {formatCurrency(investment.current_value)}
-                    </div>
-                    <div className="text-sm text-gray-400">
-                      of {formatCurrency(investment.amount)}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <span className="text-sm text-gray-500">Start Date:</span>
-                    <div className="text-white">{formatDate(investment.start_date)}</div>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-500">Maturity:</span>
-                    <div className="text-white">{formatDate(investment.maturity_date)}</div>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-500">APY Rate:</span>
-                    <div className="text-purple-400 font-medium">{investment.apy_rate}%</div>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-500">Profit/Loss:</span>
-                    <div className={`font-medium ${profitPercentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {profitPercentage >= 0 ? '+' : ''}{profitPercentage.toFixed(2)}%
-                    </div>
-                  </div>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mb-3">
-                  <div className="flex justify-between text-sm text-gray-400 mb-2">
-                    <span>Progress</span>
-                    <span>{progress.toFixed(1)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-purple-400 to-purple-500 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(progress, 100)}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => {/* View details */}}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 min-h-[44px]"
-                  >
-                    View Details
-                  </Button>
-                  {investment.status === 'active' && (
-                    <Button
-                      onClick={() => {/* Manage investment */}}
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 min-h-[44px]"
-                    >
-                      Manage
-                    </Button>
-                  )}
-                </div>
-              </Card>
-            );
-          })
-        ) : (
-          <Card className="text-center py-12">
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-gray-300">
+          {t('investments.active', 'Active Investments')}
+        </h2>
+        
+        {investments.length === 0 ? (
+          <div className="text-center py-12">
             <div className="text-6xl mb-4">💼</div>
-            <h3 className="text-xl font-semibold mb-2">No Investments Yet</h3>
-            <p className="text-gray-400 mb-6">
-              Start your investment journey and build your wealth with our DeFi plans
+            <h3 className="text-lg font-semibold text-gray-300 mb-2">
+              {t('investments.noInvestments', 'No investments yet')}
+            </h3>
+            <p className="text-gray-400 text-sm mb-6">
+              {t('investments.startInvesting', 'Start your DeFi journey today')}
             </p>
             <Button
               onClick={() => onNavigate?.('new-investment')}
-              className="bg-purple-400 hover:bg-purple-500 min-h-[44px]"
+              className="bg-purple-600 hover:bg-purple-700"
             >
-              Make Your First Investment
+              {t('investments.makeFirst', 'Make Your First Investment')}
             </Button>
-          </Card>
+          </div>
+        ) : (
+          investments.map((investment) => (
+            <div
+              key={investment.id}
+              className="bg-gray-900/50 border border-gray-700 rounded-lg p-4"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{getStatusIcon(investment.status)}</span>
+                  <div>
+                    <div className="font-semibold text-white">
+                      {investment.plan_name}
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      {formatDate(investment.start_date)} - {formatDate(investment.maturity_date)}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold text-purple-300">
+                    {formatCurrency(investment.current_value)}
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {investment.apy_rate}% APY
+                  </div>
+                </div>
+              </div>
+              
+              {/* Progress Bar */}
+              <div className="mb-3">
+                <div className="flex justify-between text-xs text-gray-400 mb-1">
+                  <span>{t('investments.progress', 'Progress')}</span>
+                  <span>{Math.round(calculateProgress(investment.start_date, investment.maturity_date))}%</span>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div
+                    className="bg-purple-500 h-2 rounded-full transition-all"
+                    style={{
+                      width: `${calculateProgress(investment.start_date, investment.maturity_date)}%`
+                    }}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className={`text-xs px-2 py-1 rounded ${getStatusColor(investment.status)} bg-gray-800`}>
+                  {investment.status.toUpperCase()}
+                </span>
+                <div className="text-xs text-gray-400">
+                  +{formatCurrency(investment.current_value - investment.amount)}
+                </div>
+              </div>
+            </div>
+          ))
         )}
       </div>
     </div>

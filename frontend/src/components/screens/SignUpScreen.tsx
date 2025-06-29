@@ -31,6 +31,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [showProgress, setShowProgress] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { registerUser } = useAuth();
   const { t } = useLanguage();
 

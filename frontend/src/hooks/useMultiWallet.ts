@@ -6,6 +6,7 @@ import { apiService } from '../services/api';
 export const useMultiWallet = (user: User | null) => {
   const [connected_wallets, setConnectedWallets] = useState<ConnectedWallet[]>([]);
   const [primary_wallet, setPrimaryWalletState] = useState<ConnectedWallet | null>(null);
+  const [balances, setBalances] = useState<{[walletId: string]: any}>({});
   const [loading, setLoading] = useState(false);
 
   // === PHASE 2: MULTI-WALLET STATE MANAGEMENT (EXACT SPECIFICATION) ===

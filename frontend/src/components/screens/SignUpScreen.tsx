@@ -132,138 +132,128 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   };
 
   return (
-    <div className="px-6 pb-8 pt-4 space-y-6">
-      <CleanHeader 
-        title="📝 Create Account" 
-        onBack={onBack}
-      />
+    <MobileLayout centered maxWidth="xs">
+      {/* Language Selector */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector variant="compact" />
+      </div>
 
-      {/* Progress Indicator */}
-      {showProgress && (
-        <Card className="p-4 bg-purple-900/20 border-purple-500/30">
-          <div className="mb-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-purple-300">{t('auth.progress', 'Account Setup Progress')}</span>
-              <span className="text-purple-400 font-medium">{Math.round(calculateCompletion())}%</span>
-            </div>
-          </div>
-          <EnhancedProgressBar 
-            progress={calculateCompletion()} 
-            color="purple"
-            height="h-2"
-          />
-        </Card>
+      {/* Back Button */}
+      <div className="absolute top-4 left-4">
+        <button
+          onClick={onBack}
+          className="p-2 text-gray-400 hover:text-white transition-colors"
+        >
+          ←
+        </button>
+      </div>
+      
+      <div className="mb-6">
+        <svg className="h-10 w-10 text-purple-500 mx-auto mb-4" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="10,80 40,20 50,35 60,20 90,80 70,80 50,45 30,80" fill="#9333ea" />
+          <circle cx="50" cy="50" r="15" fill="none" stroke="#9333ea" strokeWidth="4" />
+        </svg>
+        <h1 className="text-2xl font-bold text-center mb-2">
+          {t('auth.joinVonVault', 'Join VonVault')}
+        </h1>
+        <p className="text-center text-sm text-gray-400">
+          {t('auth.signUpSubtitle', 'Create your account to start investing')}
+        </p>
+      </div>
+
+      {errors.general && (
+        <div className="mb-4 p-3 bg-red-900/30 border border-red-500/50 rounded-lg">
+          <p className="text-red-400 text-sm text-center">{errors.general}</p>
+        </div>
       )}
 
-      <Card className="p-6">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-            {t('auth.joinVonVault', 'Join VonVault')}
-          </h2>
-          <p className="text-gray-400">
-            {t('auth.signUpSubtitle', 'Create your account to start investing')}
-          </p>
-        </div>
-
-        {errors.general && (
-          <div className="mb-4 p-3 bg-red-900/30 border border-red-500/50 rounded-lg">
-            <p className="text-red-400 text-sm">{errors.general}</p>
-          </div>
-        )}
-
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              label={t('auth.firstName', 'First Name')}
-              value={form.firstName}
-              onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-              error={errors.firstName}
-              placeholder={t('auth.firstNamePlaceholder', 'John')}
-              className="min-h-[44px]"
-            />
-            
-            <Input
-              label={t('auth.lastName', 'Last Name')}
-              value={form.lastName}
-              onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-              error={errors.lastName}
-              placeholder={t('auth.lastNamePlaceholder', 'Doe')}
-              className="min-h-[44px]"
-            />
-          </div>
-
+      <div className="w-full space-y-4">
+        <div className="grid grid-cols-2 gap-3">
           <Input
-            label={t('auth.email', 'Email Address')}
-            type="email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            error={errors.email}
-            placeholder={t('auth.emailPlaceholder', 'john@example.com')}
-            className="min-h-[44px]"
+            label={t('auth.firstName', 'First Name')}
+            value={form.firstName}
+            onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+            error={errors.firstName}
+            placeholder={t('auth.firstNamePlaceholder', 'First name')}
           />
-
+          
           <Input
-            label={t('auth.phone', 'Phone Number')}
-            type="tel"
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            error={errors.phone}
-            placeholder={t('auth.phonePlaceholder', '+1 (555) 123-4567')}
-            className="min-h-[44px]"
+            label={t('auth.lastName', 'Last Name')}
+            value={form.lastName}
+            onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+            error={errors.lastName}
+            placeholder={t('auth.lastNamePlaceholder', 'Last name')}
           />
-
-          <PasswordInput
-            label={t('auth.password', 'Password')}
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            error={errors.password}
-            placeholder={t('auth.passwordPlaceholder', 'Create a secure password')}
-            showPassword={showPassword}
-            onToggleVisibility={() => setShowPassword(!showPassword)}
-            className="min-h-[44px]"
-          />
-
-          <PasswordInput
-            label={t('auth.confirmPassword', 'Confirm Password')}
-            value={form.confirmPassword}
-            onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-            error={errors.confirmPassword}
-            placeholder={t('auth.confirmPasswordPlaceholder', 'Re-enter your password')}
-            showPassword={showConfirmPassword}
-            onToggleVisibility={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="min-h-[44px]"
-          />
-
-          <Button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full min-h-[44px] h-14 bg-purple-400 hover:bg-purple-500 text-white font-semibold text-lg"
-          >
-            {loading ? t('buttons.creating', 'Creating Account...') : t('buttons.createAccount', 'Create Account')}
-          </Button>
         </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-400 text-sm">
-            {t('auth.hasAccount', 'Already have an account?')}{' '}
-            <button
-              onClick={onGoToLogin}
-              className="text-purple-400 hover:text-purple-300 font-medium min-h-[44px] px-2 py-1"
-            >
-              {t('buttons.signIn', 'Sign In')}
-            </button>
-          </p>
-        </div>
-      </Card>
+        <Input
+          label={t('auth.email', 'Email Address')}
+          type="email"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          error={errors.email}
+          placeholder={t('auth.emailPlaceholder', 'Enter your email address')}
+        />
 
-      {/* Terms Notice */}
-      <Card className="p-4 bg-blue-900/20 border-blue-500/30">
-        <div className="text-center">
-          <p className="text-blue-400 text-sm">
-            {t('auth.termsNotice', 'By creating an account, you agree to our Terms of Service and Privacy Policy')}
-          </p>
-        </div>
-      </Card>
-    </div>
+        <Input
+          label={t('auth.phone', 'Phone Number')}
+          type="tel"
+          value={form.phone}
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          error={errors.phone}
+          placeholder={t('auth.phonePlaceholder', '+1 (555) 123-4567')}
+        />
+
+        <PasswordInput
+          label={t('auth.password', 'Password')}
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          error={errors.password}
+          placeholder={t('auth.passwordPlaceholder', 'Create a secure password')}
+          showPassword={showPassword}
+          onToggleVisibility={() => setShowPassword(!showPassword)}
+        />
+
+        <PasswordInput
+          label={t('auth.confirmPassword', 'Confirm Password')}
+          value={form.confirmPassword}
+          onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+          error={errors.confirmPassword}
+          placeholder={t('auth.confirmPasswordPlaceholder', 'Re-enter your password')}
+          showPassword={showConfirmPassword}
+          onToggleVisibility={() => setShowConfirmPassword(!showConfirmPassword)}
+        />
+
+        <Button 
+          onClick={handleSubmit} 
+          disabled={loading || !isFormValid}
+          loading={loading}
+          fullWidth
+        >
+          {t('auth.createAccount', 'Create Account')}
+        </Button>
+      </div>
+
+      <p className="mt-6 text-xs text-center text-gray-500">
+        {t('auth.haveAccount', 'Already have an account?')}{' '}
+        <span 
+          className="text-purple-400 cursor-pointer hover:text-purple-300 transition-colors underline"
+          onClick={onGoToLogin}
+        >
+          {t('auth.signIn', 'Sign In')}
+        </span>
+      </p>
+
+      <p className="mt-4 text-xs text-center text-gray-500">
+        {t('auth.termsNotice', 'By creating an account, you agree to our')}{' '}
+        <span className="text-purple-400 cursor-pointer hover:text-purple-300 transition-colors underline">
+          {t('auth.termsOfService', 'Terms of Service')}
+        </span>{' '}
+        {t('auth.and', 'and')}{' '}
+        <span className="text-purple-400 cursor-pointer hover:text-purple-300 transition-colors underline">
+          {t('auth.privacyPolicy', 'Privacy Policy')}
+        </span>
+      </p>
+    </MobileLayout>
   );
 };

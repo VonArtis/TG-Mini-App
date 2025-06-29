@@ -57,6 +57,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
           type={type}
           value={value}
           onChange={onChange}
+          onKeyPress={onKeyPress}
           placeholder={placeholder}
           required={required}
           disabled={disabled}

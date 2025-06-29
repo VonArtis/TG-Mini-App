@@ -218,8 +218,27 @@ def test_membership_system():
 # API Security Tests
 def test_api_security():
     """Test API security features"""
-    # Test JWT token validation
-    valid_token = generate_test_jwt()
+    # Create a test user first to ensure a valid user ID
+    unique_id = uuid.uuid4().hex[:8]
+    phone_id = uuid.uuid4().hex[:8]
+    user_payload = {
+        "name": f"Security Test User {unique_id}",
+        "email": f"security.test.{unique_id}@example.com",
+        "password": "SecurePassword123!",
+        "phone": f"{phone_id[:10]}",
+        "country_code": "+1"
+    }
+    
+    signup_response = requests.post(f"{API_BASE}/auth/signup", json=user_payload)
+    
+    if signup_response.status_code == 200:
+        user_id = signup_response.json().get("user", {}).get("user_id")
+        valid_token = signup_response.json().get("token")
+    else:
+        # Fall back to generated token if signup fails
+        user_id = f"test_user_{unique_id}"
+        valid_token = generate_test_jwt(user_id)
+    
     valid_headers = {"Authorization": f"Bearer {valid_token}"}
     
     valid_response = requests.get(f"{API_BASE}/auth/me", headers=valid_headers)

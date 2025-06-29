@@ -442,7 +442,7 @@ VonVault achieved **industry-leading enterprise-grade security** with the **firs
 | **Multi-Language Guide** | Complete implementation details | [MULTI_LANGUAGE_IMPLEMENTATION.md](MULTI_LANGUAGE_IMPLEMENTATION.md) |
 | **Features Guide** | Complete feature showcase | [FEATURES.md](docs/FEATURES.md) |
 | **Security Guide** | Progressive Enhanced 2FA details | [SECURITY.md](SECURITY.md) |
-||| **CI/CD Pipeline Guide** | Development workflow & security | [DEVELOPMENT_WORKFLOW.md](docs/DEVELOPMENT_WORKFLOW.md) |
+|| **CI/CD Pipeline Guide** | Development workflow & security | [DEVELOPMENT_WORKFLOW.md](docs/DEVELOPMENT_WORKFLOW.md) |
 | **Architecture Docs** | Technical deep dive | [ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | **API Reference** | Complete API documentation | [API.md](docs/API.md) |
 | **Deployment Guide** | Production deployment | [DEPLOYMENT.md](docs/DEPLOYMENT.md) |

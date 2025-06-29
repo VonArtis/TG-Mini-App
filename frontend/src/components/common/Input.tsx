@@ -30,6 +30,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   prefix,
   className = '',
   step,
+  maxLength,
   inputMode,
   autoComplete
 }, ref) => {

@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { ScreenProps, Portfolio } from '../../types';
-import { CleanHeader } from '../layout/CleanHeader';
-import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { FullScreenLoader } from '../common/LoadingSpinner';
-import { MembershipBadge } from '../common/MembershipBadge';
-import { EnhancedProgressBar } from '../common/EnhancedProgressBar';
-import { LanguageSelector } from '../common/LanguageSelector';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../hooks/useLanguage';
 
@@ -14,7 +9,6 @@ export const DashboardScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
   const [loading, setLoading] = useState(true);
   const { t } = useLanguage();
   
-  // === PHASE 2C: MULTI-WALLET DASHBOARD INTEGRATION ===
   const { 
     portfolio, 
     fetchPortfolio, 

@@ -59,6 +59,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
           required={required}
           disabled={disabled}
           step={step}
+          maxLength={maxLength}
           inputMode={inputMode}
           autoComplete={autoComplete}
           className={`

@@ -368,10 +368,16 @@ const AppRouter: React.FC = () => {
         );
       case 'profile':
         return (
-          <ProfileScreen 
-            onBack={() => setScreen('dashboard')} 
-            onNavigate={setScreen}
-          />
+          <MobileLayoutWithTabs 
+            onNavigate={setScreen} 
+            currentScreen="profile"
+            showTabs={true}
+          >
+            <ProfileScreen 
+              onBack={() => setScreen('dashboard')}
+              onNavigate={setScreen}
+            />
+          </MobileLayoutWithTabs>
         );
       case 'ui-catalog':
         return (

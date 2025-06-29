@@ -602,6 +602,25 @@ class ApiService {
     return response.data;
   }
 
+  async getFundSources(token: string) {
+    const response = await axios.get(`${API_BASE}/funds/sources`, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
+  async transferFunds(transferData: {
+    from_source: string;
+    to_source: string;
+    amount: number;
+    memo?: string;
+  }, token: string) {
+    const response = await axios.post(`${API_BASE}/funds/transfer`, transferData, {
+      headers: this.getAuthHeaders(token)
+    });
+    return response.data;
+  }
+
   async getDepositMethods(token: string) {
     const response = await axios.get(`${API_BASE}/deposits/methods`, {
       headers: this.getAuthHeaders(token)

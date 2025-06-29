@@ -510,7 +510,7 @@ VonVault uses **Vonage SMS API** for secure SMS verification. To configure SMS i
 
 [**🚀 Launch VonVault Now →**](https://www.vonartis.app)
 
-*🛡️ 9.7/10 Security • 🌍 15+ Languages • 📱 Zero Downloads • ⚡ 60-Second Setup*
+*🛡️ 9.95/10 Security • 🌍 15+ Languages • 📱 Zero Downloads • ⚡ 60-Second Setup*
 
 ---
 

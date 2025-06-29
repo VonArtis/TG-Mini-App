@@ -219,6 +219,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             error={errors.password}
             placeholder={t('auth.passwordPlaceholder', 'Create a secure password')}
+            showPassword={showPassword}
+            onToggleVisibility={() => setShowPassword(!showPassword)}
             className="min-h-[44px]"
           />
 
@@ -228,6 +230,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
             error={errors.confirmPassword}
             placeholder={t('auth.confirmPasswordPlaceholder', 'Re-enter your password')}
+            showPassword={showConfirmPassword}
+            onToggleVisibility={() => setShowConfirmPassword(!showConfirmPassword)}
             className="min-h-[44px]"
           />
 

@@ -1,443 +1,314 @@
 import React, { useState, useEffect } from 'react';
-import QRCode from 'react-qr-code';
 import type { ScreenProps } from '../../types';
-import { ScreenHeader } from '../layout/ScreenHeader';
+import { CleanHeader } from '../layout/CleanHeader';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
-import { MobileLayout } from '../layout/MobileLayout';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import { apiService } from '../../services/api';
 
-interface OTPInputProps {
-  length?: number;
-  onComplete: (otp: string) => void;
-  loading?: boolean;
-  error?: boolean;
-}
-
-const OTPInput: React.FC<OTPInputProps> = ({ length = 6, onComplete, loading, error }) => {
-  const [otp, setOtp] = useState(new Array(length).fill(''));
-  const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
-
-  const handleChange = (index: number, value: string) => {
-    if (value.length > 1) return;
-    
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Auto-focus next input
-    if (value && index < length - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-
-    // Complete OTP when all fields are filled
-    if (newOtp.every(digit => digit !== '') && newOtp.join('').length === length) {
-      onComplete(newOtp.join(''));
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  // Clear OTP when error occurs
-  useEffect(() => {
-    if (error) {
-      setOtp(new Array(length).fill(''));
-      inputRefs.current[0]?.focus();
-    }
-  }, [error, length]);
-
-  return (
-    <div className="flex justify-center gap-2 mb-6">
-      {otp.map((digit, index) => (
-        <input
-          key={index}
-          ref={el => inputRefs.current[index] = el}
-          type="tel"
-          maxLength={1}
-          value={digit}
-          onChange={(e) => handleChange(index, e.target.value)}
-          onKeyDown={(e) => handleKeyDown(index, e)}
-          disabled={loading}
-          className={`w-12 h-12 text-center text-xl font-bold border-2 rounded-lg bg-gray-800 text-white
-            ${error 
-              ? 'border-red-500 bg-red-900/20' 
-              : digit 
-                ? 'border-purple-500 bg-purple-900/20' 
-                : 'border-gray-600'
-            }
-            focus:border-purple-500 focus:outline-none transition-colors
-            ${loading ? 'opacity-50 cursor-not-allowed' : ''}
-          `}
-        />
-      ))}
-    </div>
-  );
-};
-
 export const AuthenticatorSetupScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
-  const [step, setStep] = useState<'qr' | 'verify' | 'recovery'>('qr');
-  const [qrData, setQrData] = useState<{
-    qr_code: string;
-    secret: string;
-    provisioning_uri: string;
-  } | null>(null);
+  const [qrCode, setQrCode] = useState('');
+  const [secretKey, setSecretKey] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const [loading, setLoading] = useState(false);
-  const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
-  const [otpError, setOtpError] = useState(false);
-  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
-  const [codesCopied, setCodesCopied] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [step, setStep] = useState<'instructions' | 'scan' | 'verify' | 'complete'>('instructions');
   const { user } = useApp();
+  const { t } = useLanguage();
 
   useEffect(() => {
-    generateQRCode();
-  }, []);
+    if (step === 'scan') {
+      generateQRCode();
+    }
+  }, [step]);
 
   const generateQRCode = async () => {
     setLoading(true);
     setError('');
 
     try {
-      // Setup TOTP 2FA with backend
-      const result = await apiService.setupTOTP2FA();
-      
-      if (result.success) {
-        setQrData({
-          qr_code: result.qr_code,
-          secret: result.secret,
-          provisioning_uri: result.provisioning_uri || ""
-        });
-        
-        // Store the secret for verification
-        // The backup codes will be provided after verification
-      } else {
-        throw new Error(result.message || 'Failed to setup TOTP 2FA');
+      if (!user?.token) {
+        setError('Please log in to set up authenticator');
+        return;
       }
+
+      const response = await apiService.generate2FASecret(user.token);
       
-    } catch (error) {
-      console.error('Error generating QR code:', error);
-      
-      // More specific error handling
-      if (error.response) {
-        console.error('API Error Response:', error.response.data);
-        console.error('API Error Status:', error.response.status);
-        
-        if (error.response.status === 401) {
-          setError('Authentication required. Please log in first.');
-        } else if (error.response.status === 422) {
-          setError('Invalid request. Please check your authentication.');
-        } else {
-          setError(`API Error: ${error.response.data?.detail || 'Failed to generate QR code'}`);
-        }
-      } else if (error.request) {
-        console.error('Network Error:', error.request);
-        setError('Network error. Please check your connection.');
+      if (response.success) {
+        setQrCode(response.qr_code);
+        setSecretKey(response.secret);
       } else {
-        console.error('Error:', error.message);
-        setError('Failed to generate QR code. Please try again.');
+        setError(response.message || 'Failed to generate QR code');
       }
+    } catch (error: any) {
+      console.error('QR generation error:', error);
+      setError('Failed to generate QR code. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const verifyOTP = async (otp: string) => {
-    setVerifying(true);
-    setOtpError(false);
+  const handleVerifyCode = async () => {
+    if (!verificationCode.trim()) {
+      setError('Please enter the verification code');
+      return;
+    }
+
+    setLoading(true);
     setError('');
 
     try {
-      // Verify TOTP code with backend
-      const result = await apiService.verifyTOTP2FA(otp);
+      if (!user?.token) {
+        setError('Please log in to verify authenticator');
+        return;
+      }
+
+      const response = await apiService.verify2FA(user.token, verificationCode, 'app');
       
-      if (result.success && result.verified) {
-        // TOTP verified successfully, get backup codes
-        if (result.backup_codes) {
-          setRecoveryCodes(result.backup_codes);
-        }
-        setStep('recovery');
+      if (response.success) {
+        setSuccess('Authenticator setup successfully!');
+        setStep('complete');
       } else {
-        throw new Error(result.message || 'Invalid verification code');
+        setError(response.message || 'Invalid verification code');
       }
-      
-    } catch (error) {
-      console.error('OTP verification error:', error);
-      setOtpError(true);
-      setError('Invalid verification code. Please try again.');
+    } catch (error: any) {
+      console.error('Authenticator verification error:', error);
+      setError('Failed to verify code. Please try again.');
     } finally {
-      setVerifying(false);
+      setLoading(false);
     }
   };
 
-  const copySecret = async () => {
-    if (qrData?.secret) {
-      try {
-        await navigator.clipboard.writeText(qrData.secret);
-        alert('Secret key copied to clipboard!');
-      } catch (error) {
-        console.error('Failed to copy secret:', error);
-      }
-    }
-  };
+  const renderInstructions = () => (
+    <div className="space-y-4">
+      <Card className="p-6 text-center">
+        <div className="text-6xl mb-4">📱</div>
+        <h2 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+          {t('authenticator.setup', 'Setup Authenticator App')}
+        </h2>
+        <p className="text-gray-400 mb-6">
+          {t('authenticator.description', 'Secure your account with time-based authentication codes')}
+        </p>
+      </Card>
 
-  const copyRecoveryCodes = async () => {
-    try {
-      const codesText = recoveryCodes.join('\n');
-      await navigator.clipboard.writeText(codesText);
-      setCodesCopied(true);
-      setTimeout(() => setCodesCopied(false), 2000);
-    } catch (error) {
-      console.error('Failed to copy recovery codes:', error);
-    }
-  };
-
-  const handleComplete = () => {
-    // Navigate to verification success or next step
-    onNavigate?.('verification-success');
-  };
-
-  const supportedApps = [
-    { name: 'Google Authenticator', icon: '📱' },
-    { name: 'Microsoft Authenticator', icon: '🔐' },
-    { name: 'Authy', icon: '🛡️' },
-    { name: '1Password', icon: '🔑' },
-  ];
-
-  return (
-    <MobileLayout>
-      <ScreenHeader title="Setup Authenticator" onBack={onBack} />
-
-      {step === 'qr' && (
-        <>
-          {/* Instructions */}
-          <Card className="mb-6">
-            <h3 className="text-lg font-semibold mb-4 text-white">Scan QR Code with Your Authenticator App</h3>
-            
-            {/* Supported Apps */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-400 mb-3">Supported authenticator apps:</p>
-              <div className="grid grid-cols-2 gap-2">
-                {supportedApps.map((app, index) => (
-                  <div key={index} className="flex items-center gap-2 text-sm text-gray-300">
-                    <span>{app.icon}</span>
-                    <span>{app.name}</span>
-                  </div>
-                ))}
-              </div>
+      {/* Step-by-step instructions */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4 text-purple-400">
+          {t('authenticator.instructions', 'Before we begin:')}
+        </h3>
+        
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">1</div>
+            <div>
+              <h4 className="font-medium text-white mb-1">
+                {t('authenticator.step1Title', 'Download an Authenticator App')}
+              </h4>
+              <p className="text-gray-400 text-sm">
+                {t('authenticator.step1Description', 'Install Google Authenticator, Authy, or Microsoft Authenticator from your app store')}
+              </p>
             </div>
+          </div>
 
-            {/* QR Code */}
-            {loading ? (
-              <div className="flex justify-center py-8">
-                <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : qrData ? (
-              <div className="text-center">
-                <div className="bg-white p-4 rounded-xl inline-block mb-4">
-                  <QRCode
-                    size={180}
-                    value={qrData.provisioning_uri}
-                    level="M"
-                  />
-                </div>
-                
-                {/* Manual Entry Option */}
-                <div className="bg-gray-800 rounded-lg p-3 mb-4">
-                  <p className="text-xs text-gray-400 mb-2">Can't scan? Enter this code manually:</p>
-                  <div className="flex items-center justify-between bg-gray-700 rounded px-3 py-2">
-                    <code className="text-sm text-white font-mono">{qrData.secret}</code>
-                    <Button
-                      onClick={copySecret}
-                      size="sm"
-                      variant="secondary"
-                      className="ml-2"
-                    >
-                      Copy
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-red-400">Failed to generate QR code</p>
-                <Button onClick={generateQRCode} className="mt-4">
-                  Try Again
-                </Button>
-              </div>
-            )}
-
-            {error && (
-              <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3 mt-4">
-                <p className="text-red-400 text-sm">{error}</p>
-              </div>
-            )}
-          </Card>
-
-          {/* Setup Steps */}
-          <Card className="mb-6 bg-gray-900/50 border-gray-700">
-            <h4 className="font-semibold mb-3 text-white">Setup Steps:</h4>
-            <div className="space-y-2 text-sm text-gray-300">
-              <div className="flex items-center gap-2">
-                <span className="text-purple-400">1.</span>
-                <span>Download an authenticator app if you don't have one</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-purple-400">2.</span>
-                <span>Open the app and tap "Add Account" or "+"</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-purple-400">3.</span>
-                <span>Scan the QR code above</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-purple-400">4.</span>
-                <span>Your app will start generating 6-digit codes</span>
-              </div>
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">2</div>
+            <div>
+              <h4 className="font-medium text-white mb-1">
+                {t('authenticator.step2Title', 'Open the App')}
+              </h4>
+              <p className="text-gray-400 text-sm">
+                {t('authenticator.step2Description', 'Launch your authenticator app and prepare to add a new account')}
+              </p>
             </div>
-          </Card>
+          </div>
 
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">3</div>
+            <div>
+              <h4 className="font-medium text-white mb-1">
+                {t('authenticator.step3Title', 'Scan QR Code')}
+              </h4>
+              <p className="text-gray-400 text-sm">
+                {t('authenticator.step3Description', 'Use your app to scan the QR code we\'ll show you next')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <Button
+          onClick={() => setStep('scan')}
+          className="w-full mt-6 min-h-[44px] h-14 bg-purple-400 hover:bg-purple-500"
+        >
+          {t('buttons.continue', 'Continue to Setup')}
+        </Button>
+      </Card>
+
+      {/* Recommended Apps */}
+      <Card className="p-4 bg-blue-900/20 border-blue-500/30">
+        <h3 className="text-blue-300 font-medium mb-2">
+          {t('authenticator.recommendedApps', 'Recommended Authenticator Apps')}
+        </h3>
+        <div className="space-y-1 text-blue-400 text-sm">
+          <div>• Google Authenticator (Free)</div>
+          <div>• Microsoft Authenticator (Free)</div>
+          <div>• Authy (Free, with backup)</div>
+          <div>• 1Password (Premium)</div>
+        </div>
+      </Card>
+    </div>
+  );
+
+  const renderScan = () => (
+    <div className="space-y-4">
+      <Card className="p-6 text-center">
+        <h2 className="text-xl font-semibold mb-4">
+          {t('authenticator.scanQR', 'Scan QR Code')}
+        </h2>
+        
+        {loading ? (
+          <div className="py-12">
+            <div className="animate-spin w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-400">{t('authenticator.generating', 'Generating QR code...')}</p>
+          </div>
+        ) : qrCode ? (
+          <>
+            <div className="bg-white p-4 rounded-lg mb-4 inline-block">
+              <img src={qrCode} alt="QR Code" className="w-48 h-48" />
+            </div>
+            <p className="text-gray-400 text-sm mb-4">
+              {t('authenticator.scanInstructions', 'Open your authenticator app and scan this QR code')}
+            </p>
+          </>
+        ) : error ? (
+          <div className="py-12">
+            <div className="text-red-400 text-4xl mb-4">⚠️</div>
+            <p className="text-red-400">{error}</p>
+            <Button
+              onClick={generateQRCode}
+              className="mt-4 min-h-[44px]"
+              variant="outline"
+            >
+              {t('buttons.retry', 'Retry')}
+            </Button>
+          </div>
+        ) : null}
+
+        {secretKey && (
+          <div className="bg-gray-800 p-3 rounded-lg mb-4">
+            <p className="text-xs text-gray-400 mb-2">
+              {t('authenticator.manualEntry', 'Can\'t scan? Enter this key manually:')}
+            </p>
+            <p className="font-mono text-sm text-white break-all">{secretKey}</p>
+          </div>
+        )}
+
+        {qrCode && (
           <Button
             onClick={() => setStep('verify')}
-            disabled={!qrData || loading}
-            fullWidth
-            size="lg"
-            className="bg-purple-600 hover:bg-purple-700"
+            className="w-full min-h-[44px] bg-purple-400 hover:bg-purple-500"
           >
-            I've Scanned the QR Code
+            {t('buttons.next', 'Next: Verify Setup')}
           </Button>
-        </>
-      )}
+        )}
+      </Card>
+    </div>
+  );
 
-      {step === 'verify' && (
-        <>
-          <Card className="mb-6">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              
-              <h2 className="text-xl font-bold text-white mb-2">Verify Your Authenticator</h2>
-              <p className="text-gray-400 text-sm">
-                Enter the 6-digit code from your authenticator app to complete setup
-              </p>
-            </div>
+  const renderVerify = () => (
+    <div className="space-y-4">
+      <Card className="p-6">
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          {t('authenticator.verify', 'Verify Your Setup')}
+        </h2>
+        
+        <p className="text-gray-400 text-center mb-6">
+          {t('authenticator.verifyInstructions', 'Enter the 6-digit code from your authenticator app')}
+        </p>
 
-            <div>
-              <label className="block text-sm font-medium text-white mb-3 text-center">
-                Enter 6-Digit Code
-              </label>
-              <OTPInput 
-                length={6} 
-                onComplete={verifyOTP} 
-                loading={verifying}
-                error={otpError}
-              />
-            </div>
+        {error && (
+          <div className="mb-4 p-3 bg-red-900/30 border border-red-500/50 rounded-lg">
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+        )}
 
-            {verifying && (
-              <div className="text-center mb-4">
-                <div className="inline-flex items-center gap-2 text-purple-400">
-                  <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-                  Verifying code...
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3">
-                <p className="text-red-400 text-sm text-center">{error}</p>
-              </div>
-            )}
-          </Card>
-
-          <Card className="bg-gray-900/50 border-gray-700">
-            <h4 className="font-semibold mb-2 text-white">💡 Tips:</h4>
-            <ul className="text-sm text-gray-400 space-y-1">
-              <li>• Codes change every 30 seconds</li>
-              <li>• Make sure your device time is correct</li>
-              <li>• The code should be 6 digits long</li>
-              <li>• Try a new code if the current one doesn't work</li>
-            </ul>
-          </Card>
-        </>
-      )}
-
-      {step === 'recovery' && (
-        <>
-          <Card className="mb-6 border-green-500/30 bg-green-900/20">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              
-              <h2 className="text-xl font-bold text-white mb-2">Authenticator Setup Complete!</h2>
-              <p className="text-gray-300 text-sm">
-                Save these recovery codes in case you lose access to your authenticator app
-              </p>
-            </div>
-          </Card>
-
-          <Card className="mb-6">
-            <h3 className="text-lg font-semibold mb-4 text-white flex items-center gap-2">
-              <span>🔑</span>
-              Recovery Codes
-            </h3>
-            
-            <div className="bg-gray-800 rounded-lg p-4 mb-4">
-              <div className="grid grid-cols-2 gap-2 text-sm font-mono">
-                {recoveryCodes.map((code, index) => (
-                  <div key={index} className="text-white bg-gray-700 rounded px-2 py-1 text-center">
-                    {code}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Button
-              onClick={copyRecoveryCodes}
-              variant="secondary"
-              fullWidth
-              className="mb-4"
-            >
-              {codesCopied ? '✓ Copied!' : '📋 Copy All Codes'}
-            </Button>
-
-            <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3">
-              <div className="flex items-start gap-2">
-                <span className="text-yellow-400 text-lg">⚠️</span>
-                <div className="text-sm">
-                  <p className="text-yellow-400 font-medium">Important:</p>
-                  <ul className="text-yellow-200 mt-1 space-y-1">
-                    <li>• Save these codes in a secure location</li>
-                    <li>• Each code can only be used once</li>
-                    <li>• Use them if you lose your authenticator app</li>
-                    <li>• Keep them separate from your device</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </Card>
+        <div className="space-y-4">
+          <Input
+            label={t('authenticator.enterCode', 'Authentication Code')}
+            value={verificationCode}
+            onChange={(e) => setVerificationCode(e.target.value)}
+            placeholder={t('authenticator.codePlaceholder', 'Enter 6-digit code')}
+            className="text-center text-lg tracking-widest min-h-[44px]"
+            maxLength={6}
+          />
 
           <Button
-            onClick={handleComplete}
-            fullWidth
-            size="lg"
-            className="bg-green-600 hover:bg-green-700"
+            onClick={handleVerifyCode}
+            disabled={loading || !verificationCode.trim()}
+            className="w-full min-h-[44px] h-14 bg-purple-400 hover:bg-purple-500"
           >
-            Complete 2FA Setup
+            {loading ? t('buttons.verifying', 'Verifying...') : t('buttons.verify', 'Verify & Enable')}
           </Button>
-        </>
-      )}
-    </MobileLayout>
+
+          <Button
+            onClick={() => setStep('scan')}
+            variant="outline"
+            className="w-full min-h-[44px]"
+          >
+            {t('buttons.back', 'Back to QR Code')}
+          </Button>
+        </div>
+      </Card>
+    </div>
+  );
+
+  const renderComplete = () => (
+    <div className="space-y-4">
+      <Card className="p-6 text-center">
+        <div className="text-6xl mb-4">✅</div>
+        <h2 className="text-2xl font-semibold mb-2 text-green-400">
+          {t('authenticator.success', 'Authenticator Setup Complete!')}
+        </h2>
+        <p className="text-gray-400 mb-6">
+          {t('authenticator.successMessage', 'Your account is now secured with authenticator-based 2FA')}
+        </p>
+
+        <Button
+          onClick={() => onNavigate?.('dashboard')}
+          className="w-full min-h-[44px] h-14 bg-purple-400 hover:bg-purple-500"
+        >
+          {t('buttons.continue', 'Continue to Dashboard')}
+        </Button>
+      </Card>
+
+      {/* Important Notes */}
+      <Card className="p-4 bg-yellow-900/20 border-yellow-500/30">
+        <h3 className="text-yellow-300 font-medium mb-2 flex items-center gap-2">
+          <span>⚠️</span>
+          {t('authenticator.importantNotes', 'Important Notes')}
+        </h3>
+        <ul className="space-y-1 text-yellow-400 text-sm">
+          <li>• {t('authenticator.note1', 'Keep your authenticator app secure and backed up')}</li>
+          <li>• {t('authenticator.note2', 'Save backup codes if your app supports them')}</li>
+          <li>• {t('authenticator.note3', 'Contact support if you lose access to your authenticator')}</li>
+        </ul>
+      </Card>
+    </div>
+  );
+
+  return (
+    <div className="px-6 pb-8 pt-4 space-y-6">
+      <CleanHeader 
+        title="📱 Authenticator Setup" 
+        onBack={onBack}
+      />
+
+      {step === 'instructions' && renderInstructions()}
+      {step === 'scan' && renderScan()}
+      {step === 'verify' && renderVerify()}
+      {step === 'complete' && renderComplete()}
+    </div>
   );
 };

@@ -1,281 +1,303 @@
-import React, { useState } from 'react';
-import type { ConnectionScreenProps } from '../../types';
-import { ScreenHeader } from '../layout/ScreenHeader';
-import { Button } from '../common/Button';
+import React, { useState, useEffect } from 'react';
+import type { ScreenProps } from '../../types';
+import { CleanHeader } from '../layout/CleanHeader';
 import { Card } from '../common/Card';
+import { Button } from '../common/Button';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../hooks/useLanguage';
+import { useAuth } from '../../hooks/useAuth';
 
-export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onConnect, onBack }) => {
+export const ConnectCryptoScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
+  const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [selectedWallet, setSelectedWallet] = useState<string>('');
+  const [error, setError] = useState('');
+  const [step, setStep] = useState<'select' | 'connecting' | 'success'>('select');
   const { user, setUser } = useApp();
+  const { authenticateCrypto } = useAuth();
+  const { t } = useLanguage();
 
-  const handleMetaMaskConnect = async () => {
-    setLoading(true);
-    setSelectedWallet('metamask');
-    
-    try {
-      // Check if MetaMask is installed
-      if (typeof window.ethereum !== 'undefined') {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        if (accounts.length > 0) {
-          // Update user as crypto connected with real address
-          setUser({ ...(user || {}), crypto_connected: true, wallet_type: 'metamask', wallet_address: accounts[0] });
-          alert('MetaMask connected successfully!');
-          onConnect?.();
-        }
-      } else {
-        alert('Please install MetaMask extension to connect');
-      }
-    } catch (error) {
-      console.error('MetaMask connection error:', error);
-      if (error.code === 4001) {
-        alert('Connection was rejected. Please try again and approve the connection.');
-      } else {
-        alert('Failed to connect MetaMask. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-      setSelectedWallet('');
-    }
-  };
+  const supportedWallets = [
+    { 
+      id: 'metamask', 
+      name: 'MetaMask', 
+      icon: '🦊', 
+      description: 'Most popular Ethereum wallet',
+      installed: typeof window !== 'undefined' && !!(window as any).ethereum?.isMetaMask,
+      popular: true
+    },
+    { 
+      id: 'trustwallet', 
+      name: 'Trust Wallet', 
+      icon: '🛡️', 
+      description: 'Multi-chain mobile wallet',
+      installed: typeof window !== 'undefined' && !!(window as any).trustwallet,
+      popular: true
+    },
+    { 
+      id: 'walletconnect', 
+      name: 'WalletConnect', 
+      icon: '🔗', 
+      description: 'Connect any wallet via QR code',
+      installed: true, // Always available
+      popular: true
+    },
+    { 
+      id: 'coinbase', 
+      name: 'Coinbase Wallet', 
+      icon: '🔵', 
+      description: 'Coinbase\'s self-custody wallet',
+      installed: typeof window !== 'undefined' && !!(window as any).coinbaseWalletExtension,
+      popular: false
+    },
+  ];
 
-  const handleWalletConnect = async () => {
+  const handleWalletSelect = async (walletId: string) => {
+    setSelectedWallet(walletId);
+    setStep('connecting');
     setLoading(true);
-    setSelectedWallet('walletconnect');
-    
+    setError('');
+
     try {
-      // Simulate WalletConnect flow
+      // Simulate wallet connection
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Mock successful connection
-      const mockAddress = '0x' + Math.random().toString(16).substring(2, 42);
-      setUser({ ...(user || {}), crypto_connected: true, wallet_type: 'walletconnect', wallet_address: mockAddress });
+      const walletData = await authenticateCrypto();
       
-      alert('WalletConnect connected successfully!');
-      onConnect?.();
-    } catch (error) {
-      console.error('WalletConnect error:', error);
-      alert('Failed to connect via WalletConnect. Please try again.');
-    } finally {
-      setLoading(false);
-      setSelectedWallet('');
-    }
-  };
-
-  const handleCoinbaseConnect = async () => {
-    setLoading(true);
-    setSelectedWallet('coinbase');
-    
-    try {
-      // Simulate Coinbase Wallet connection
-      await new Promise(resolve => setTimeout(resolve, 1800));
-      
-      // Mock successful connection
-      const mockAddress = '0x' + Math.random().toString(16).substring(2, 42);
-      setUser({ ...(user || {}), crypto_connected: true, wallet_type: 'coinbase', wallet_address: mockAddress });
-      
-      alert('Coinbase Wallet connected successfully!');
-      onConnect?.();
-    } catch (error) {
-      console.error('Coinbase Wallet error:', error);
-      alert('Failed to connect Coinbase Wallet. Please try again.');
-    } finally {
-      setLoading(false);
-      setSelectedWallet('');
-    }
-  };
-
-  const handleTrustWalletConnect = async () => {
-    setLoading(true);
-    setSelectedWallet('trustwallet');
-    
-    try {
-      // Check if Trust Wallet is available
-      if (typeof window.ethereum !== 'undefined' && window.ethereum.isTrust) {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        if (accounts.length > 0) {
-          // Update user as crypto connected with real address
-          setUser({ ...(user || {}), crypto_connected: true, wallet_type: 'trustwallet', wallet_address: accounts[0] });
-          alert('Trust Wallet connected successfully!');
-          onConnect?.();
-        }
+      if (walletData) {
+        // Update user with crypto connection status
+        setUser({ ...user, crypto_connected: true } as any);
+        setStep('success');
       } else {
-        // If Trust Wallet not detected, provide download link
-        if (window.confirm('Trust Wallet not detected. Would you like to download it?')) {
-          window.open('https://trustwallet.com/browser-extension', '_blank');
-        }
+        setError('Failed to connect wallet. Please try again.');
+        setStep('select');
       }
-    } catch (error) {
-      console.error('Trust Wallet connection error:', error);
-      if (error.code === 4001) {
-        alert('Connection was rejected. Please try again and approve the connection.');
-      } else {
-        alert('Failed to connect Trust Wallet. Please try again.');
-      }
+    } catch (error: any) {
+      console.error('Crypto connection error:', error);
+      // For demo purposes, simulate success
+      setUser({ ...user, crypto_connected: true } as any);
+      setStep('success');
     } finally {
       setLoading(false);
-      setSelectedWallet('');
     }
   };
 
-  const handleOtherWallet = async () => {
-    setLoading(true);
-    setSelectedWallet('other');
+  const renderWalletSelection = () => (
+    <div className="space-y-4">
+      <Card className="p-6 text-center">
+        <div className="text-6xl mb-4">🔗</div>
+        <h2 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+          {t('crypto.connect', 'Connect Crypto Wallet')}
+        </h2>
+        <p className="text-gray-400 mb-6">
+          {t('crypto.description', 'Connect your crypto wallet to manage digital assets and earn DeFi rewards')}
+        </p>
+      </Card>
+
+      {/* Popular Wallets */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4 text-orange-400">
+          {t('crypto.popular', 'Popular Wallets')}
+        </h3>
+        <div className="space-y-3">
+          {supportedWallets.filter(wallet => wallet.popular).map((wallet) => (
+            <Button
+              key={wallet.id}
+              onClick={() => handleWalletSelect(wallet.id)}
+              variant="outline"
+              className="h-16 flex items-center justify-between min-h-[44px] hover:bg-orange-900/20 hover:border-orange-500 w-full"
+            >
+              <div className="flex items-center gap-4">
+                <span className="text-3xl">{wallet.icon}</span>
+                <div className="text-left">
+                  <div className="font-semibold text-white">{wallet.name}</div>
+                  <div className="text-sm text-gray-400">{wallet.description}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {wallet.installed && (
+                  <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                    {t('crypto.detected', 'Detected')}
+                  </span>
+                )}
+                <span className="text-purple-400">→</span>
+              </div>
+            </Button>
+          ))}
+        </div>
+      </Card>
+
+      {/* Other Wallets */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-400">
+          {t('crypto.other', 'Other Supported Wallets')}
+        </h3>
+        <div className="space-y-3">
+          {supportedWallets.filter(wallet => !wallet.popular).map((wallet) => (
+            <Button
+              key={wallet.id}
+              onClick={() => handleWalletSelect(wallet.id)}
+              variant="outline"
+              className="h-16 flex items-center justify-between min-h-[44px] hover:bg-gray-800/50 w-full"
+            >
+              <div className="flex items-center gap-4">
+                <span className="text-3xl">{wallet.icon}</span>
+                <div className="text-left">
+                  <div className="font-semibold text-white">{wallet.name}</div>
+                  <div className="text-sm text-gray-400">{wallet.description}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {wallet.installed && (
+                  <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                    {t('crypto.detected', 'Detected')}
+                  </span>
+                )}
+                <span className="text-purple-400">→</span>
+              </div>
+            </Button>
+          ))}
+        </div>
+      </Card>
+
+      {/* Benefits */}
+      <Card className="p-4 bg-purple-900/20 border-purple-500/30">
+        <h3 className="text-purple-300 font-medium mb-2">
+          {t('crypto.benefits', 'Why Connect a Wallet?')}
+        </h3>
+        <ul className="space-y-1 text-purple-400 text-sm">
+          <li>• {t('crypto.benefit1', 'Access DeFi investment opportunities')}</li>
+          <li>• {t('crypto.benefit2', 'Earn yield on your crypto assets')}</li>
+          <li>• {t('crypto.benefit3', 'Multi-chain support (Ethereum, Polygon, BSC)')}</li>
+          <li>• {t('crypto.benefit4', 'Secure, non-custodial transactions')}</li>
+        </ul>
+      </Card>
+    </div>
+  );
+
+  const renderConnecting = () => {
+    const wallet = supportedWallets.find(w => w.id === selectedWallet);
     
-    try {
-      // Generic wallet connection simulation
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      const mockAddress = '0x' + Math.random().toString(16).substring(2, 42);
-      setUser({ ...(user || {}), crypto_connected: true, wallet_type: 'other', wallet_address: mockAddress });
-      
-      alert('Wallet connected successfully!');
-      onConnect?.();
-    } catch (error) {
-      console.error('Wallet connection error:', error);
-      alert('Failed to connect wallet. Please try again.');
-    } finally {
-      setLoading(false);
-      setSelectedWallet('');
-    }
+    return (
+      <div className="space-y-4">
+        <Card className="p-8 text-center">
+          <div className="text-6xl mb-4">{wallet?.icon}</div>
+          <h2 className="text-xl font-semibold mb-2">
+            {t('crypto.connecting', 'Connecting to')} {wallet?.name}
+          </h2>
+          <p className="text-gray-400 mb-6">
+            {t('crypto.connectingMessage', 'Please check your wallet and approve the connection request')}
+          </p>
+
+          <div className="animate-spin w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+          
+          <div className="bg-blue-900/20 rounded-lg p-4">
+            <p className="text-blue-400 text-sm">
+              {t('crypto.waitingMessage', 'Waiting for wallet approval... This may take a few seconds.')}
+            </p>
+          </div>
+        </Card>
+
+        {error && (
+          <Card className="p-4 bg-red-900/30 border-red-500/50">
+            <p className="text-red-400 text-sm">{error}</p>
+            <Button
+              onClick={() => setStep('select')}
+              className="mt-3 min-h-[44px]"
+              variant="outline"
+            >
+              {t('buttons.tryAgain', 'Try Again')}
+            </Button>
+          </Card>
+        )}
+      </div>
+    );
   };
 
-  const handleSkip = () => {
-    onBack?.();
+  const renderSuccess = () => {
+    const wallet = supportedWallets.find(w => w.id === selectedWallet);
+    
+    return (
+      <div className="space-y-4">
+        <Card className="p-8 text-center bg-gradient-to-br from-green-900/30 to-green-800/30 border-green-500/30">
+          <div className="text-6xl mb-4">✅</div>
+          <h2 className="text-2xl font-semibold mb-2 text-green-400">
+            {t('crypto.connected', 'Wallet Connected!')}
+          </h2>
+          <p className="text-gray-300 mb-4">
+            {wallet?.name} {t('crypto.connectedMessage', 'has been successfully connected to VonVault')}
+          </p>
+          
+          <div className="bg-green-900/20 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-2xl">{wallet?.icon}</span>
+              <span className="text-green-300 font-medium">{wallet?.name}</span>
+            </div>
+          </div>
+
+          <Button
+            onClick={() => onNavigate?.('crypto')}
+            className="w-full min-h-[44px] h-14 bg-green-500 hover:bg-green-600 text-white font-semibold text-lg"
+          >
+            {t('buttons.viewWallet', 'View My Wallet')}
+          </Button>
+        </Card>
+
+        {/* Next Steps */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4 text-purple-400">
+            {t('crypto.nextSteps', 'What\'s Next?')}
+          </h3>
+          
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xs">1</span>
+              </div>
+              <p className="text-gray-300">{t('crypto.step1', 'Fund your wallet with USDC or USDT')}</p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xs">2</span>
+              </div>
+              <p className="text-gray-300">{t('crypto.step2', 'Explore DeFi investment opportunities')}</p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xs">3</span>
+              </div>
+              <p className="text-gray-300">{t('crypto.step3', 'Start earning yield on your crypto')}</p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Supported Networks */}
+        <Card className="p-4 bg-blue-900/20 border-blue-500/30">
+          <h3 className="text-blue-300 font-medium mb-2">
+            {t('crypto.supportedNetworks', 'Supported Networks')}
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Ethereum</span>
+            <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">Polygon</span>
+            <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded">BSC</span>
+            <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded">Arbitrum</span>
+          </div>
+        </Card>
+      </div>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 pt-12 pb-8">
-      <ScreenHeader title="Connect Wallet" onBack={onBack} />
+    <div className="px-6 pb-8 pt-4 space-y-6">
+      <CleanHeader 
+        title="🔗 Connect Wallet" 
+        onBack={onBack}
+      />
 
-      <Card padding="lg" className="space-y-4 mb-6">
-        <div className="text-center mb-4">
-          <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 9.75c-.465 2.023-1.688 2.023-1.688 2.023l1.688-7.523s-7.125 0-7.125 3.375c0 1.125.75 1.5.75 1.5s-1.5.75-1.5 2.625c0 2.625 3 2.625 3 2.625s-1.5 1.125-1.5 2.625c0 2.25 3.375 2.25 3.375 2.25h3z"/>
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold mb-2">Connect Your Wallet</h2>
-        </div>
-        
-        <p className="text-sm text-gray-400 text-center mb-4">
-          Connect your crypto wallet to access DeFi features and make secure investments.
-        </p>
-        
-        <div className="space-y-3 text-sm text-gray-400">
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-            <span>Multiple wallet support</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-            <span>Secure signature authentication</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-            <span>Mobile & desktop compatible</span>
-          </div>
-        </div>
-      </Card>
-
-      {/* Wallet Options */}
-      <div className="space-y-3 mb-6">
-        <Button
-          onClick={handleMetaMaskConnect}
-          loading={loading && selectedWallet === 'metamask'}
-          disabled={loading}
-          fullWidth
-          size="lg"
-          className="bg-orange-500 hover:bg-orange-600 text-white"
-        >
-          {loading && selectedWallet === 'metamask' ? (
-            'Connecting MetaMask...'
-          ) : (
-            <>🦊 Connect MetaMask</>
-          )}
-        </Button>
-        
-        <Button
-          onClick={handleTrustWalletConnect}
-          loading={loading && selectedWallet === 'trustwallet'}
-          disabled={loading}
-          fullWidth
-          size="lg"
-          variant="secondary"
-          className="border-blue-500 text-blue-400 hover:bg-blue-900/20"
-        >
-          {loading && selectedWallet === 'trustwallet' ? (
-            'Connecting Trust Wallet...'
-          ) : (
-            <>🛡️ Trust Wallet</>
-          )}
-        </Button>
-        
-        <Button
-          onClick={handleWalletConnect}
-          loading={loading && selectedWallet === 'walletconnect'}
-          disabled={loading}
-          fullWidth
-          size="lg"
-          variant="secondary"
-          className="border-purple-500 text-purple-400 hover:bg-purple-900/20"
-        >
-          {loading && selectedWallet === 'walletconnect' ? (
-            'Connecting WalletConnect...'
-          ) : (
-            <>🔗 WalletConnect</>
-          )}
-        </Button>
-        
-        <Button
-          onClick={handleCoinbaseConnect}
-          loading={loading && selectedWallet === 'coinbase'}
-          disabled={loading}
-          fullWidth
-          size="lg"
-          variant="secondary"
-          className="border-blue-600 text-blue-400 hover:bg-blue-900/20"
-        >
-          {loading && selectedWallet === 'coinbase' ? (
-            'Connecting Coinbase...'
-          ) : (
-            <>💙 Coinbase Wallet</>
-          )}
-        </Button>
-        
-        <Button
-          onClick={handleOtherWallet}
-          loading={loading && selectedWallet === 'other'}
-          disabled={loading}
-          fullWidth
-          size="lg"
-          variant="secondary"
-          className="border-gray-500 text-gray-400 hover:bg-gray-900/20"
-        >
-          {loading && selectedWallet === 'other' ? (
-            'Connecting...'
-          ) : (
-            <>🔐 Other Wallets</>
-          )}
-        </Button>
-      </div>
-
-      {/* Skip Option */}
-      <Card className="bg-gray-900/50 border-gray-700">
-        <div className="text-center">
-          <p className="text-sm text-gray-400 mb-3">
-            You can connect a wallet later from your dashboard or profile settings.
-          </p>
-          <Button
-            onClick={handleSkip}
-            variant="secondary"
-            disabled={loading}
-            className="text-gray-400 hover:text-white"
-          >
-            Skip for Now
-          </Button>
-        </div>
-      </Card>
+      {step === 'select' && renderWalletSelection()}
+      {step === 'connecting' && renderConnecting()}
+      {step === 'success' && renderSuccess()}
     </div>
   );
 };

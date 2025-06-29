@@ -1,263 +1,259 @@
 import React, { useState } from 'react';
 import type { ScreenProps } from '../../types';
-import { ScreenHeader } from '../layout/ScreenHeader';
+import { CleanHeader } from '../layout/CleanHeader';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
-import { MobileLayout } from '../layout/MobileLayout';
+import { Input } from '../common/Input';
+import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../hooks/useLanguage';
+import { apiService } from '../../services/api';
 
 export const TwoFactorSetupScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
-  const [selectedMethod, setSelectedMethod] = useState<'sms' | 'authenticator' | null>(null);
-  const [backupMethod, setBackupMethod] = useState<'sms' | 'authenticator' | null>(null);
-  const [showBackupOptions, setShowBackupOptions] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState<'sms' | 'app' | null>(null);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [qrCode, setQrCode] = useState('');
+  const [secretKey, setSecretKey] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [step, setStep] = useState<'choose' | 'setup' | 'verify' | 'complete'>('choose');
+  const { user } = useApp();
+  const { t } = useLanguage();
 
-  const handleMethodSelect = (method: 'sms' | 'authenticator') => {
+  const handleMethodSelect = async (method: 'sms' | 'app') => {
     setSelectedMethod(method);
-    // Reset backup if same as primary
-    if (backupMethod === method) {
-      setBackupMethod(null);
+    setLoading(true);
+    setError('');
+
+    try {
+      if (method === 'app') {
+        // Generate QR code for authenticator app
+        const response = await apiService.generate2FASecret(user?.token || '');
+        if (response.success) {
+          setQrCode(response.qr_code);
+          setSecretKey(response.secret);
+          setStep('setup');
+        } else {
+          setError(response.message || 'Failed to generate 2FA secret');
+        }
+      } else {
+        // SMS setup
+        setStep('verify');
+      }
+    } catch (error: any) {
+      setError('Failed to set up 2FA. Please try again.');
+      console.error('2FA setup error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleContinue = () => {
-    if (!selectedMethod) return;
-    
-    // Navigate to specific setup screen based on selected method
-    if (selectedMethod === 'sms') {
-      onNavigate?.('2fa-sms-setup');
-    } else {
-      onNavigate?.('2fa-authenticator-setup');
+  const handleVerifyCode = async () => {
+    if (!verificationCode.trim()) {
+      setError('Please enter the verification code');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await apiService.verify2FA(
+        user?.token || '', 
+        verificationCode,
+        selectedMethod || 'sms'
+      );
+
+      if (response.success) {
+        setSuccess('2FA enabled successfully!');
+        setStep('complete');
+      } else {
+        setError(response.message || 'Invalid verification code');
+      }
+    } catch (error: any) {
+      setError('Failed to verify code. Please try again.');
+      console.error('2FA verification error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const toggleBackupOptions = () => {
-    setShowBackupOptions(!showBackupOptions);
-  };
+  const renderChooseMethod = () => (
+    <div className="space-y-4">
+      <Card className="p-6 text-center">
+        <div className="text-6xl mb-4">🔐</div>
+        <h2 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+          {t('2fa.setup', 'Enable Two-Factor Authentication')}
+        </h2>
+        <p className="text-gray-400 mb-6">
+          {t('2fa.description', 'Add an extra layer of security to your account')}
+        </p>
+      </Card>
 
-  const getBackupOptions = () => {
-    if (!selectedMethod) return [];
-    return selectedMethod === 'sms' ? ['authenticator'] : ['sms'];
-  };
-
-  return (
-    <MobileLayout>
-      <ScreenHeader title="Setup 2-Factor Authentication" onBack={onBack} />
-
-      {/* Security Notice */}
-      <Card className="mb-6 border-blue-500/30 bg-blue-900/20">
-        <div className="flex items-start gap-3">
-          <div className="text-blue-400 text-xl">🛡️</div>
-          <div>
-            <h3 className="text-blue-400 font-semibold mb-2">Enhanced Security Required</h3>
-            <p className="text-sm text-gray-300">
-              Two-factor authentication (2FA) is required for all VonVault accounts to protect your investments and personal information.
-            </p>
+      {/* SMS Option */}
+      <Card className="p-6 hover:bg-gray-800/50 transition-colors cursor-pointer" onClick={() => handleMethodSelect('sms')}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="text-3xl">📱</div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                {t('2fa.sms', 'SMS Authentication')}
+              </h3>
+              <p className="text-sm text-gray-400">
+                {t('2fa.smsDescription', 'Receive codes via text message')}
+              </p>
+            </div>
           </div>
+          <div className="text-purple-400">→</div>
         </div>
       </Card>
 
-      {/* Method Selection */}
-      <Card className="mb-6">
-        <h3 className="text-lg font-semibold mb-4 text-white">Choose Your Primary 2FA Method</h3>
-        <p className="text-sm text-gray-400 mb-6">
-          Select your preferred method for verifying your identity when logging in and making transactions.
+      {/* Authenticator App Option */}
+      <Card className="p-6 hover:bg-gray-800/50 transition-colors cursor-pointer" onClick={() => handleMethodSelect('app')}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="text-3xl">📲</div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                {t('2fa.app', 'Authenticator App')}
+              </h3>
+              <p className="text-sm text-gray-400">
+                {t('2fa.appDescription', 'Use Google Authenticator or similar')}
+              </p>
+              <div className="text-xs text-green-400 mt-1">
+                {t('2fa.recommended', 'Recommended')}
+              </div>
+            </div>
+          </div>
+          <div className="text-purple-400">→</div>
+        </div>
+      </Card>
+    </div>
+  );
+
+  const renderSetupApp = () => (
+    <div className="space-y-4">
+      <Card className="p-6 text-center">
+        <h2 className="text-xl font-semibold mb-4">
+          {t('2fa.scanQR', 'Scan QR Code')}
+        </h2>
+        
+        {qrCode && (
+          <div className="bg-white p-4 rounded-lg mb-4 inline-block">
+            <img src={qrCode} alt="QR Code" className="w-48 h-48" />
+          </div>
+        )}
+
+        <p className="text-gray-400 text-sm mb-4">
+          {t('2fa.scanInstructions', 'Scan this QR code with your authenticator app')}
         </p>
+
+        {secretKey && (
+          <div className="bg-gray-800 p-3 rounded-lg mb-4">
+            <p className="text-xs text-gray-400 mb-1">
+              {t('2fa.manualEntry', 'Or enter this key manually:')}
+            </p>
+            <p className="font-mono text-sm text-white break-all">{secretKey}</p>
+          </div>
+        )}
+
+        <Button
+          onClick={() => setStep('verify')}
+          className="w-full min-h-[44px] bg-purple-400 hover:bg-purple-500"
+        >
+          {t('buttons.continue', 'Continue')}
+        </Button>
+      </Card>
+    </div>
+  );
+
+  const renderVerify = () => (
+    <div className="space-y-4">
+      <Card className="p-6">
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          {t('2fa.enterCode', 'Enter Verification Code')}
+        </h2>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-900/30 border border-red-500/50 rounded-lg">
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+        )}
 
         <div className="space-y-4">
-          {/* SMS Option */}
-          <div
-            onClick={() => handleMethodSelect('sms')}
-            className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
-              selectedMethod === 'sms'
-                ? 'border-green-500 bg-green-900/20'
-                : 'border-gray-600 hover:border-gray-500'
-            }`}
-          >
-            <div className="flex items-start gap-3">
-              <div className="text-2xl">📱</div>
-              <div className="flex-1">
-                <h4 className="text-white font-semibold">SMS Text Messages</h4>
-                <p className="text-sm text-gray-400 mt-1">
-                  Receive 6-digit codes via text message to your verified phone number
-                </p>
-                <div className="mt-2 text-xs">
-                  <span className="text-green-400">✓ Easy to use</span>
-                  <span className="text-gray-400 ml-4">• Works on any phone</span>
-                  <span className="text-yellow-400 ml-4">⚠ Requires cellular signal</span>
-                </div>
-              </div>
-              {selectedMethod === 'sms' && (
-                <div className="text-green-400">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          </div>
+          <Input
+            label={selectedMethod === 'app' ? t('2fa.appCode', 'Code from Authenticator App') : t('2fa.smsCode', 'SMS Code')}
+            value={verificationCode}
+            onChange={(e) => setVerificationCode(e.target.value)}
+            placeholder={t('2fa.codePlaceholder', 'Enter 6-digit code')}
+            className="text-center text-lg tracking-widest min-h-[44px]"
+            maxLength={6}
+          />
 
-          {/* Authenticator Option */}
-          <div
-            onClick={() => handleMethodSelect('authenticator')}
-            className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
-              selectedMethod === 'authenticator'
-                ? 'border-purple-500 bg-purple-900/20'
-                : 'border-gray-600 hover:border-gray-500'
-            }`}
+          <Button
+            onClick={handleVerifyCode}
+            disabled={loading || !verificationCode.trim()}
+            className="w-full min-h-[44px] h-14 bg-purple-400 hover:bg-purple-500"
           >
-            <div className="flex items-start gap-3">
-              <div className="text-2xl">🔐</div>
-              <div className="flex-1">
-                <h4 className="text-white font-semibold">Authenticator App</h4>
-                <p className="text-sm text-gray-400 mt-1">
-                  Use Google Authenticator, Authy, or Microsoft Authenticator for secure codes
-                </p>
-                <div className="mt-2 text-xs">
-                  <span className="text-green-400">✓ Most secure</span>
-                  <span className="text-green-400 ml-4">✓ Works offline</span>
-                  <span className="text-gray-400 ml-4">• No SIM swapping risk</span>
-                </div>
-              </div>
-              {selectedMethod === 'authenticator' && (
-                <div className="text-purple-400">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          </div>
+            {loading ? t('buttons.verifying', 'Verifying...') : t('buttons.enable2FA', 'Enable 2FA')}
+          </Button>
+
+          <Button
+            onClick={() => setStep('choose')}
+            variant="outline"
+            className="w-full min-h-[44px]"
+          >
+            {t('buttons.back', 'Back')}
+          </Button>
         </div>
       </Card>
+    </div>
+  );
 
-      {/* Backup Method Section */}
-      <Card className="mb-6 border-gray-700">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-white">Backup Method</h3>
-          <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">Recommended</span>
-        </div>
-        
-        <p className="text-sm text-gray-400 mb-4">
-          Add a backup method in case you lose access to your primary 2FA method.
+  const renderComplete = () => (
+    <div className="space-y-4">
+      <Card className="p-6 text-center">
+        <div className="text-6xl mb-4">✅</div>
+        <h2 className="text-2xl font-semibold mb-2 text-green-400">
+          {t('2fa.enabled', '2FA Enabled Successfully!')}
+        </h2>
+        <p className="text-gray-400 mb-6">
+          {t('2fa.enabledDescription', 'Your account is now protected with two-factor authentication')}
         </p>
 
         <Button
-          onClick={toggleBackupOptions}
-          variant="secondary"
-          size="sm"
-          className="mb-4"
+          onClick={() => onNavigate?.('dashboard')}
+          className="w-full min-h-[44px] h-14 bg-purple-400 hover:bg-purple-500"
         >
-          {showBackupOptions ? 'Hide Backup Options' : 'Add Backup Method (Optional)'}
+          {t('buttons.continue', 'Continue to Dashboard')}
         </Button>
-
-        {showBackupOptions && selectedMethod && (
-          <div className="space-y-3">
-            {getBackupOptions().map((method) => (
-              <div
-                key={method}
-                onClick={() => setBackupMethod(method === backupMethod ? null : method as 'sms' | 'authenticator')}
-                className={`border rounded-lg p-3 cursor-pointer transition-colors ${
-                  backupMethod === method
-                    ? 'border-orange-500 bg-orange-900/20'
-                    : 'border-gray-600 hover:border-gray-500'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{method === 'sms' ? '📱' : '🔐'}</span>
-                    <span className="text-white font-medium">
-                      {method === 'sms' ? 'SMS Backup' : 'Authenticator Backup'}
-                    </span>
-                  </div>
-                  {backupMethod === method && (
-                    <div className="text-orange-400">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </Card>
 
-      {/* Security Benefits */}
-      <Card className="mb-6 bg-gray-900/50 border-gray-700">
-        <h4 className="font-semibold mb-3 text-white flex items-center gap-2">
-          <span>🔒</span>
-          Why 2FA is Important
-        </h4>
-        <div className="text-sm text-gray-300 space-y-2">
-          <div className="flex items-start gap-2">
-            <span className="text-green-400 mt-0.5">✓</span>
-            <span>Protects your investments even if your password is compromised</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-green-400 mt-0.5">✓</span>
-            <span>Required for all transactions and account changes</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-green-400 mt-0.5">✓</span>
-            <span>Industry standard security for financial platforms</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-green-400 mt-0.5">✓</span>
-            <span>Backup methods ensure you never lose access to your account</span>
-          </div>
-        </div>
+      {/* Security Tips */}
+      <Card className="p-4 bg-blue-900/20 border-blue-500/30">
+        <h3 className="text-blue-300 font-medium mb-2">
+          {t('2fa.securityTips', 'Security Tips')}
+        </h3>
+        <ul className="space-y-1 text-blue-400 text-sm">
+          <li>• {t('2fa.tip1', 'Keep your authenticator app secure')}</li>
+          <li>• {t('2fa.tip2', 'Save backup codes in a safe place')}</li>
+          <li>• {t('2fa.tip3', 'Never share your 2FA codes')}</li>
+        </ul>
       </Card>
+    </div>
+  );
 
-      {/* Continue Button */}
-      <div className="space-y-3">
-        <Button
-          onClick={handleContinue}
-          disabled={!selectedMethod}
-          fullWidth
-          size="lg"
-          className={`${
-            selectedMethod
-              ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800'
-              : 'bg-gray-600 cursor-not-allowed'
-          }`}
-        >
-          {selectedMethod
-            ? `Setup ${selectedMethod === 'sms' ? 'SMS' : 'Authenticator'} 2FA`
-            : 'Select a 2FA Method to Continue'
-          }
-        </Button>
+  return (
+    <div className="px-6 pb-8 pt-4 space-y-6">
+      <CleanHeader 
+        title="🔐 Two-Factor Authentication" 
+        onBack={onBack}
+      />
 
-        {/* Skip Button for Admin/Testing */}
-        <Button
-          onClick={() => {
-            console.log('2FA setup skipped - proceeding to dashboard');
-            
-            // Mark verification as completed so user doesn't see this flow again
-            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            if (currentUser.email) {
-              localStorage.setItem(`verification_${currentUser.email}`, 'completed');
-              console.log(`Verification marked as completed for ${currentUser.email}`);
-            }
-            
-            onNavigate?.('dashboard');
-          }}
-          variant="secondary"
-          fullWidth
-          size="lg"
-          className="mt-3 border-yellow-500 text-yellow-400 hover:bg-yellow-500/10"
-        >
-          Skip 2FA Setup - Access Dashboard
-        </Button>
-
-        {selectedMethod && (
-          <p className="text-center text-xs text-gray-500">
-            {backupMethod
-              ? `Primary: ${selectedMethod === 'sms' ? 'SMS' : 'Authenticator'} • Backup: ${backupMethod === 'sms' ? 'SMS' : 'Authenticator'}`
-              : 'You can add a backup method later in security settings'
-            }
-          </p>
-        )}
-      </div>
-    </MobileLayout>
+      {step === 'choose' && renderChooseMethod()}
+      {step === 'setup' && renderSetupApp()}
+      {step === 'verify' && renderVerify()}
+      {step === 'complete' && renderComplete()}
+    </div>
   );
 };

@@ -1,193 +1,192 @@
 import React, { useEffect, useState } from 'react';
 import type { ScreenProps } from '../../types';
+import { CleanHeader } from '../layout/CleanHeader';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
-import { MobileLayout } from '../layout/MobileLayout';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../hooks/useLanguage';
 
-export const VerificationSuccessScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
-  const [showCelebration, setShowCelebration] = useState(false);
+interface VerificationSuccessScreenProps extends ScreenProps {
+  verificationType?: 'email' | 'sms' | '2fa' | 'all';
+  onContinue?: () => void;
+}
+
+export const VerificationSuccessScreen: React.FC<VerificationSuccessScreenProps> = ({ 
+  onBack, 
+  onNavigate,
+  verificationType = 'all',
+  onContinue
+}) => {
+  const [countdown, setCountdown] = useState(5);
   const { user } = useApp();
+  const { t } = useLanguage();
 
-  // Trigger celebration animation
+  // Auto-redirect countdown
   useEffect(() => {
-    setTimeout(() => setShowCelebration(true), 500);
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleContinue();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   const handleContinue = () => {
-    // Navigate to dashboard since verification is complete
-    onNavigate?.('dashboard');
+    if (onContinue) {
+      onContinue();
+    } else {
+      onNavigate?.('dashboard');
+    }
   };
 
-  const formatTime = () => {
-    return new Date().toLocaleString();
+  const getVerificationInfo = () => {
+    switch (verificationType) {
+      case 'email':
+        return {
+          icon: '📧',
+          title: t('verification.emailSuccess', 'Email Verified!'),
+          description: t('verification.emailSuccessMessage', 'Your email address has been successfully verified'),
+          benefits: [
+            t('verification.emailBenefit1', 'Secure account recovery'),
+            t('verification.emailBenefit2', 'Important notifications'),
+            t('verification.emailBenefit3', 'Transaction confirmations')
+          ]
+        };
+      case 'sms':
+        return {
+          icon: '📱',
+          title: t('verification.smsSuccess', 'Phone Verified!'),
+          description: t('verification.smsSuccessMessage', 'Your phone number has been successfully verified'),
+          benefits: [
+            t('verification.smsBenefit1', 'Two-factor authentication'),
+            t('verification.smsBenefit2', 'Security alerts'),
+            t('verification.smsBenefit3', 'Account recovery')
+          ]
+        };
+      case '2fa':
+        return {
+          icon: '🔐',
+          title: t('verification.2faSuccess', '2FA Enabled!'),
+          description: t('verification.2faSuccessMessage', 'Two-factor authentication is now active on your account'),
+          benefits: [
+            t('verification.2faBenefit1', 'Enhanced account security'),
+            t('verification.2faBenefit2', 'Protection against unauthorized access'),
+            t('verification.2faBenefit3', 'Peace of mind')
+          ]
+        };
+      default:
+        return {
+          icon: '✅',
+          title: t('verification.allSuccess', 'Verification Complete!'),
+          description: t('verification.allSuccessMessage', 'All verifications have been completed successfully'),
+          benefits: [
+            t('verification.allBenefit1', 'Full account access'),
+            t('verification.allBenefit2', 'Maximum security'),
+            t('verification.allBenefit3', 'All features unlocked')
+          ]
+        };
+    }
   };
+
+  const verificationInfo = getVerificationInfo();
 
   return (
-    <MobileLayout>
-      <div className="min-h-screen flex flex-col justify-center">
-        {/* Celebration Animation */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          {showCelebration && (
-            <>
-              {[...Array(20)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute animate-bounce"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    animationDelay: `${Math.random() * 2}s`,
-                    animationDuration: `${2 + Math.random() * 2}s`
-                  }}
-                >
-                  {['🎉', '✨', '🎊', '⭐'][Math.floor(Math.random() * 4)]}
-                </div>
-              ))}
-            </>
-          )}
+    <div className="px-6 pb-8 pt-4 space-y-6">
+      <CleanHeader 
+        title="✅ Verification" 
+        showBackButton={false}
+      />
+
+      {/* Success Card */}
+      <Card className="p-8 text-center bg-gradient-to-br from-green-900/30 to-green-800/30 border-green-500/30">
+        <div className="text-8xl mb-4">{verificationInfo.icon}</div>
+        <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-green-400 to-green-300 bg-clip-text text-transparent">
+          {verificationInfo.title}
+        </h2>
+        <p className="text-gray-300 text-lg mb-6">
+          {verificationInfo.description}
+        </p>
+
+        {/* Success Animation */}
+        <div className="mb-6">
+          <div className="w-16 h-16 bg-green-500 rounded-full mx-auto flex items-center justify-center animate-pulse">
+            <div className="text-white text-2xl">✓</div>
+          </div>
         </div>
 
-        <Card className="text-center relative z-10 bg-gradient-to-br from-green-900/50 to-blue-900/50 border-green-500/30">
-          <div className="space-y-6">
-            {/* Success Icon */}
-            <div className="relative">
-              <div className="w-24 h-24 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
-                <div className={`absolute inset-0 bg-green-400 rounded-full transform ${showCelebration ? 'animate-ping' : ''}`}></div>
-                <svg className="w-12 h-12 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              
-              {/* Verified Badge */}
-              <div className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-bold">
-                VERIFIED
-              </div>
-            </div>
-
-            {/* Success Message */}
-            <div>
-              <h1 className="text-2xl font-bold text-white mb-2">
-                🎉 Verification Complete!
-              </h1>
-              <p className="text-gray-300 text-lg">
-                Your account has been successfully verified
-              </p>
-            </div>
-
-            {/* Verification Details */}
-            <Card className="bg-gray-800/50 border-gray-600">
-              <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
-                <span className="text-green-400">✓</span>
-                Verification Status
-              </h3>
-              
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Email:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-white">{user?.email || 'user@example.com'}</span>
-                    <span className="text-green-400">✓</span>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Phone:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-white">{user?.phone || '+1xxxxxxxxxx'}</span>
-                    <span className="text-green-400">✓</span>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Verified:</span>
-                  <span className="text-white">{formatTime()}</span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Next Steps */}
-            <Card className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border-purple-500/30">
-              <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
-                <span className="text-purple-400">🚀</span>
-                You're Ready to Invest!
-              </h3>
-              
-              <div className="text-sm text-gray-300 text-left space-y-2">
-                <div className="flex items-start gap-2">
-                  <span className="text-green-400 mt-0.5">✓</span>
-                  <span>Access to all investment plans and crypto deposits</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-green-400 mt-0.5">✓</span>
-                  <span>Multi-network crypto support (Ethereum, Polygon, BSC)</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-green-400 mt-0.5">✓</span>
-                  <span>Membership tier progression (6% - 20% APY)</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-0.5">⏳</span>
-                  <span>KYC verification required for investments over $20,000</span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="space-y-3">
-              <Button
-                onClick={handleContinue}
-                fullWidth
-                size="lg"
-                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-lg"
-              >
-                <span className="flex items-center justify-center gap-2">
-                  <span>🎯</span>
-                  Go to Dashboard
-                </span>
-              </Button>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  onClick={() => onNavigate?.('new-investment')}
-                  variant="secondary"
-                  className="bg-purple-800/50 hover:bg-purple-700/50 border-purple-500/50"
-                >
-                  Start Investing
-                </Button>
-                
-                <Button
-                  onClick={() => onNavigate?.('crypto-deposit')}
-                  variant="secondary"
-                  className="bg-orange-800/50 hover:bg-orange-700/50 border-orange-500/50"
-                >
-                  Deposit Crypto
-                </Button>
-              </div>
-            </div>
-
-            {/* Security Notice */}
-            <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3">
-              <div className="flex items-start gap-2">
-                <span className="text-blue-400 text-lg">🔒</span>
-                <div className="text-left">
-                  <p className="text-blue-300 font-medium text-sm">Account Secured</p>
-                  <p className="text-blue-200 text-xs">
-                    Your verified contact information helps protect your account and ensures you receive important updates about your investments.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Additional Info */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-500 text-xs">
-            Need help? Contact support at support@vonartis.app
+        {/* Auto-redirect notice */}
+        <div className="bg-green-900/20 rounded-lg p-4 mb-6">
+          <p className="text-green-300 text-sm">
+            {t('verification.autoRedirect', 'Redirecting to dashboard in')} <span className="font-bold">{countdown}</span> {t('verification.seconds', 'seconds')}
           </p>
         </div>
-      </div>
-    </MobileLayout>
+
+        <Button
+          onClick={handleContinue}
+          className="w-full min-h-[44px] h-14 bg-green-500 hover:bg-green-600 text-white font-semibold text-lg"
+        >
+          {t('buttons.continueToDashboard', 'Continue to Dashboard')}
+        </Button>
+      </Card>
+
+      {/* Benefits */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4 text-green-400 flex items-center gap-2">
+          <span>🎉</span>
+          {t('verification.benefitsTitle', 'What you\'ve unlocked:')}
+        </h3>
+        
+        <div className="space-y-3">
+          {verificationInfo.benefits.map((benefit, index) => (
+            <div key={index} className="flex items-center gap-3">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="text-white text-xs">✓</div>
+              </div>
+              <p className="text-gray-300">{benefit}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* User Status */}
+      <Card className="p-6 bg-purple-900/20 border-purple-500/30">
+        <h3 className="text-lg font-semibold mb-4 text-purple-400">
+          {t('verification.accountStatus', 'Account Status')}
+        </h3>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center">
+            <div className="text-2xl mb-1">👤</div>
+            <div className="text-sm text-gray-400">{t('verification.accountHolder', 'Account Holder')}</div>
+            <div className="text-white font-medium">{user?.name || user?.email}</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-2xl mb-1">🔒</div>
+            <div className="text-sm text-gray-400">{t('verification.securityLevel', 'Security Level')}</div>
+            <div className="text-green-400 font-medium">{t('verification.verified', 'Verified')}</div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Next Steps */}
+      <Card className="p-4 bg-blue-900/20 border-blue-500/30">
+        <h3 className="text-blue-300 font-medium mb-2">
+          {t('verification.nextSteps', 'Next Steps')}
+        </h3>
+        <ul className="space-y-1 text-blue-400 text-sm">
+          <li>• {t('verification.nextStep1', 'Explore investment opportunities')}</li>
+          <li>• {t('verification.nextStep2', 'Connect your crypto wallet')}</li>
+          <li>• {t('verification.nextStep3', 'Set up additional security features')}</li>
+          <li>• {t('verification.nextStep4', 'Start your DeFi journey')}</li>
+        </ul>
+      </Card>
+    </div>
   );
 };

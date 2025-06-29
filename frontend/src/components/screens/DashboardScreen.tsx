@@ -37,39 +37,21 @@ export const DashboardScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
     }
   };
 
-  const getWalletTypeIcon = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'metamask': return '🦊';
-      case 'trustwallet': return '🛡️';
-      case 'walletconnect': return '🔗';
-      case 'coinbase': return '🔵';
-      default: return '💼';
-    }
-  };
-
-  const formatAmount = (amount: number) => {
-    return `$${amount.toLocaleString()}`;
-  };
-
-  const getProgressToNext = () => {
-    if (!membershipStatus?.amount_to_next) return 100;
-    const current = membershipStatus.total_invested;
-    const target = current + membershipStatus.amount_to_next;
-    return (current / target) * 100;
-  };
-
-  const showConnectionBanner = !user?.bank_connected && !user?.crypto_connected;
-
   if (loading) {
     return <FullScreenLoader text="Loading dashboard..." />;
   }
 
   return (
-    <div className="px-6 pb-8 pt-4 space-y-6">
-      <CleanHeader 
-        title="🏠 Dashboard"
-        showBackButton={false}
-      />
+    <div className="space-y-6">
+      {/* Welcome Header */}
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-2">
+          {t('dashboard.welcome', 'Welcome back')}{user?.firstName ? `, ${user.firstName}` : ''}
+        </h1>
+        <p className="text-gray-400 text-sm">
+          {t('dashboard.subtitle', 'Manage your DeFi portfolio')}
+        </p>
+      </div>
       {/* Enhanced Connection Status Banner */}
       {showConnectionBanner && (
         <Card className="mb-4 border-yellow-500/30 bg-yellow-900/20">

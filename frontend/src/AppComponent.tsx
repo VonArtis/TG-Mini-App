@@ -302,10 +302,16 @@ const AppRouter: React.FC = () => {
         );
       case 'investments':
         return (
-          <InvestmentsScreen 
-            onBack={() => setScreen('dashboard')} 
-            onNavigate={setScreen}
-          />
+          <MobileLayoutWithTabs 
+            onNavigate={setScreen} 
+            currentScreen="investments"
+            showTabs={true}
+          >
+            <InvestmentsScreen 
+              onBack={() => setScreen('dashboard')} 
+              onNavigate={setScreen}
+            />
+          </MobileLayoutWithTabs>
         );
       case 'new-investment':
         return (

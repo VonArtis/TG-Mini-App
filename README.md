@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/HarryVonBot/TG-Mini-App?style=social)](https://github.com/HarryVonBot/TG-Mini-App)
 
-**🏆 Production-Ready • 🛡️ 9.7/10 Security • 🌍 15+ Languages • 💎 28 Screens • ⚡ Real-time Data**
+**🏆 Production-Ready • 🛡️ 9.95/10 Security • 🌍 15+ Languages • 💎 28 Screens • ⚡ Real-time Data**
 
 [**🚀 Start Your DeFi Journey →**](https://www.vonartis.app)
 

@@ -9,6 +9,7 @@ export type ScreenType =
   | '2fa-setup'
   | 'two-factor-setup'
   | '2fa-authenticator-setup'
+  | 'authenticator-setup'
   | 'enhanced-2fa-setup'
   | '2fa-sms-setup'
   | 'verification-success'
@@ -87,6 +88,10 @@ export interface User {
   
   // === INVESTMENT & MEMBERSHIP ===
   investment_tier?: string;
+  total_investment?: number;
+  
+  // === ADMIN ===
+  is_admin?: boolean;
   
   type?: 'bank' | 'crypto' | 'login' | 'signup' | 'email';
   auth_type?: string;
@@ -193,7 +198,7 @@ export interface Portfolio {
 // Screen component props
 export interface ScreenProps {
   onBack?: () => void;
-  onNavigate?: (screen: ScreenType) => void;
+  onNavigate?: (screen: ScreenType, params?: any) => void;
 }
 
 export interface AuthScreenProps extends ScreenProps {

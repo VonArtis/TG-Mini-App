@@ -83,13 +83,14 @@ def test_health_check():
 # Authentication Tests
 def test_auth_endpoints():
     """Test authentication endpoints"""
-    # Generate unique email to avoid conflicts
+    # Generate unique email and phone to avoid conflicts
     unique_id = uuid.uuid4().hex[:8]
+    phone_id = uuid.uuid4().hex[:8]
     signup_payload = {
         "name": f"Test User {unique_id}",
         "email": f"test.user.{unique_id}@example.com",
         "password": "SecurePassword123!",
-        "phone": "2025550123",
+        "phone": f"{phone_id[:10]}",
         "country_code": "+1"
     }
     

@@ -303,7 +303,7 @@ const AppRouter: React.FC = () => {
       case 'investments':
         return (
           <MobileLayoutWithTabs 
-            onNavigate={setScreen} 
+            onNavigate={handleNavigation} 
             currentScreen="investments"
             showTabs={true}
           >

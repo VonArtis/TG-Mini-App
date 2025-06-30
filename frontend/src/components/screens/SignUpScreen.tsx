@@ -424,7 +424,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
               </motion.div>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Email Availability Message */}
         {emailAvailable === true && (

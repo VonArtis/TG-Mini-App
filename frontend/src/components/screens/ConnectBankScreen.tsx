@@ -1,34 +1,47 @@
 import React, { useState } from 'react';
-import type { ConnectionScreenProps } from '../../types';
+import type { ScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
+import { Card } from '../common/Card';
 import { MobileLayout } from '../layout/MobileLayout';
-import { LanguageSelector } from '../common/LanguageSelector';
 import { useLanguage } from '../../hooks/useLanguage';
 
-export const ConnectBankScreen: React.FC<ConnectionScreenProps> = ({ onBack, onNavigate, onConnect }) => {
-  const [step, setStep] = useState<'select' | 'connect' | 'success'>('select');
-  const [selectedBank, setSelectedBank] = useState('');
+export const ConnectBankScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
+  const [selectedMethod, setSelectedMethod] = useState('plaid');
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();
 
-  const banks = [
-    { id: 'chase', name: 'Chase', icon: '🏦' },
-    { id: 'wellsfargo', name: 'Wells Fargo', icon: '🏛️' },
-    { id: 'bankofamerica', name: 'Bank of America', icon: '🏪' },
-    { id: 'citibank', name: 'Citibank', icon: '🏢' }
+  const methods = [
+    {
+      id: 'plaid',
+      name: t('bank.plaid', 'Instant Bank Connection'),
+      description: t('bank.plaidDesc', 'Connect securely through Plaid'),
+      icon: '🏦',
+      recommended: true
+    },
+    {
+      id: 'wire',
+      name: t('bank.wire', 'Wire Transfer'),
+      description: t('bank.wireDesc', '1-3 business days'),
+      icon: '💸',
+      recommended: false
+    },
+    {
+      id: 'ach',
+      name: t('bank.ach', 'ACH Transfer'),
+      description: t('bank.achDesc', '3-5 business days'),
+      icon: '🔄',
+      recommended: false
+    }
   ];
 
   const handleConnect = async () => {
     setLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
-      setStep('success');
-      if (onConnect) {
-        await onConnect();
-      }
+      onNavigate?.('verification-success');
     } catch (error) {
-      console.error('Bank connection failed:', error);
+      console.error('Connection failed:', error);
     } finally {
       setLoading(false);
     }
@@ -36,12 +49,16 @@ export const ConnectBankScreen: React.FC<ConnectionScreenProps> = ({ onBack, onN
 
   return (
     <MobileLayout centered maxWidth="xs">
-      <div className="absolute top-4 right-4">
-        <LanguageSelector variant="compact" />
-      </div>
-
+      {/* Back Button */}
       <div className="absolute top-4 left-4">
-        <button onClick={onBack} className="p-2 text-gray-400 hover:text-white">←</button>
+        <button 
+          onClick={onBack} 
+          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition-colors rounded-full hover:bg-gray-800"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
       </div>
       
       <div className="mb-6">
@@ -50,85 +67,76 @@ export const ConnectBankScreen: React.FC<ConnectionScreenProps> = ({ onBack, onN
           {t('bank.title', 'Connect Bank Account')}
         </h1>
         <p className="text-center text-sm text-gray-400">
-          {t('bank.subtitle', 'Link your bank for easy funding')}
+          {t('bank.subtitle', 'Fund your investments securely')}
         </p>
       </div>
 
-      {step === 'select' && (
-        <div className="w-full space-y-4">
-          <h2 className="text-lg font-semibold text-gray-300 mb-4">
-            {t('bank.selectBank', 'Select Your Bank')}
+      <div className="w-full space-y-6">
+        {/* Connection Methods */}
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold text-gray-300">
+            {t('bank.methods', 'Connection Methods')}
           </h2>
           
-          {banks.map((bank) => (
-            <div
-              key={bank.id}
-              onClick={() => setSelectedBank(bank.id)}
-              className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                selectedBank === bank.id
+          {methods.map((method) => (
+            <Card
+              key={method.id}
+              onClick={() => setSelectedMethod(method.id)}
+              className={`cursor-pointer transition-all ${
+                selectedMethod === method.id
                   ? 'border-purple-500 bg-purple-900/20'
                   : 'border-gray-600 hover:border-gray-500'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{bank.icon}</span>
-                <span className="font-semibold text-white">{bank.name}</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{method.icon}</span>
+                  <div>
+                    <div className="font-semibold text-white flex items-center gap-2">
+                      {method.name}
+                      {method.recommended && (
+                        <span className="text-xs bg-green-600 px-2 py-1 rounded">
+                          {t('bank.recommended', 'Recommended')}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-400">{method.description}</div>
+                  </div>
+                </div>
+                <div className={`w-4 h-4 rounded-full border-2 ${
+                  selectedMethod === method.id 
+                    ? 'border-purple-500 bg-purple-500' 
+                    : 'border-gray-500'
+                }`} />
               </div>
-            </div>
+            </Card>
           ))}
-
-          <Button 
-            onClick={() => setStep('connect')}
-            disabled={!selectedBank}
-            fullWidth
-            className="mt-6"
-          >
-            {t('bank.continue', 'Continue')}
-          </Button>
         </div>
-      )}
 
-      {step === 'connect' && (
-        <div className="w-full space-y-4">
-          <div className="text-center mb-6">
-            <div className="text-4xl mb-2">🔐</div>
-            <h2 className="text-lg font-semibold mb-2">
-              {t('bank.secureConnect', 'Secure Connection')}
-            </h2>
-            <p className="text-sm text-gray-400">
-              {t('bank.secureMessage', 'Your banking information is encrypted and secure')}
-            </p>
+        {/* Security Notice */}
+        <Card className="bg-blue-900/20 border-blue-500/30">
+          <div className="flex items-start gap-3">
+            <div className="text-blue-400 text-xl">🔒</div>
+            <div>
+              <h4 className="text-blue-400 font-semibold mb-2">
+                {t('bank.security', 'Bank-Grade Security')}
+              </h4>
+              <p className="text-sm text-blue-200">
+                {t('bank.securityDesc', 'Your banking information is encrypted and never stored on our servers. We use industry-leading security protocols.')}
+              </p>
+            </div>
           </div>
+        </Card>
 
-          <Button 
-            onClick={handleConnect}
-            loading={loading}
-            fullWidth
-          >
-            {t('bank.connectNow', 'Connect Bank Account')}
-          </Button>
-        </div>
-      )}
-
-      {step === 'success' && (
-        <div className="text-center">
-          <div className="text-8xl mb-6">✅</div>
-          <h2 className="text-xl font-bold mb-4 text-green-400">
-            {t('bank.success', 'Bank Connected!')}
-          </h2>
-          <p className="text-gray-400 text-sm mb-8">
-            {t('bank.successMessage', 'Your bank account has been successfully connected')}
-          </p>
-          
-          <Button 
-            onClick={() => onNavigate?.('dashboard')}
-            fullWidth
-            className="bg-green-600 hover:bg-green-700"
-          >
-            {t('bank.continue', 'Continue')}
-          </Button>
-        </div>
-      )}
+        <Button 
+          onClick={handleConnect}
+          disabled={loading}
+          loading={loading}
+          fullWidth
+        >
+          {t('bank.connect', 'Connect Bank Account')}
+        </Button>
+      </div>
     </MobileLayout>
   );
 };

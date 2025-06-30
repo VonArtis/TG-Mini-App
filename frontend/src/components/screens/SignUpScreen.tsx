@@ -3,6 +3,7 @@ import type { AuthScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { PasswordInput } from '../common/PasswordInput';
+import { CountryPhoneSelector } from '../common/CountryPhoneSelector';
 import { MobileLayout } from '../layout/MobileLayout';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';

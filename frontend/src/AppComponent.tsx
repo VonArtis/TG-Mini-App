@@ -256,12 +256,8 @@ const AppRouter: React.FC = () => {
       case 'verification-success':
         return (
           <VerificationSuccessScreen 
-            onNavigate={(screen) => {
-              if (screen === 'dashboard') {
-                handleVerificationComplete();
-              } else {
-                setScreen(screen);
-              }
+            onContinue={() => {
+              handleVerificationComplete();
             }}
           />
         );

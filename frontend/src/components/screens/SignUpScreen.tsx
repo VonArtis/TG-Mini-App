@@ -227,7 +227,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       });
       
       if (userData) {
-        onSignUp(userData);
+        // Success animation trigger
+        setSuccess(true);
+        setTimeout(() => {
+          onSignUp(userData);
+        }, 1500); // Delay to show success animation
       } else {
         setErrors({ general: t('auth.registrationError', 'Failed to create account. Please try again.') });
       }

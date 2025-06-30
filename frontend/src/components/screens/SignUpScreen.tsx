@@ -34,6 +34,8 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [capsLockWarning, setCapsLockWarning] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
+  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
   const { registerUser } = useAuth();
   const { t } = useLanguage();
 

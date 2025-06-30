@@ -169,40 +169,59 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     
     if (!form.firstName.trim()) {
       newErrors.firstName = t('validation.required', 'First name is required');
+      setShakeField('firstName');
     }
     
     if (!form.lastName.trim()) {
       newErrors.lastName = t('validation.required', 'Last name is required');
+      setShakeField('lastName');
     }
     
     if (!form.email.trim()) {
       newErrors.email = t('validation.required', 'Email is required');
+      setShakeField('email');
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
       newErrors.email = t('validation.invalidEmail', 'Please enter a valid email address');
+      setShakeField('email');
+    } else if (emailAvailable === false) {
+      newErrors.email = t('validation.emailTaken', 'This email is already taken');
+      setShakeField('email');
     }
     
     if (!form.phone.trim()) {
       newErrors.phone = t('validation.required', 'Phone number is required');
+      setShakeField('phone');
     } else {
       const phoneValidation = validatePhoneNumber(form.phone, form.countryCode);
       if (!phoneValidation.isValid) {
         newErrors.phone = phoneValidation.message || t('validation.invalidPhone', 'Please enter a valid phone number');
+        setShakeField('phone');
       }
     }
     
     if (!form.password.trim()) {
       newErrors.password = t('validation.required', 'Password is required');
+      setShakeField('password');
     } else if (form.password.length < 8) {
       newErrors.password = t('validation.passwordLength', 'Password must be at least 8 characters');
+      setShakeField('password');
     }
     
     if (!form.confirmPassword.trim()) {
       newErrors.confirmPassword = t('validation.required', 'Please confirm your password');
+      setShakeField('confirmPassword');
     } else if (form.password !== form.confirmPassword) {
       newErrors.confirmPassword = t('validation.passwordMismatch', 'Passwords do not match');
+      setShakeField('confirmPassword');
     }
     
     setErrors(newErrors);
+    
+    // Clear shake animation after 500ms
+    if (Object.keys(newErrors).length > 0) {
+      setTimeout(() => setShakeField(null), 500);
+    }
+    
     return Object.keys(newErrors).length === 0;
   };
 

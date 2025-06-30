@@ -207,6 +207,7 @@ const AppRouter: React.FC = () => {
       case 'signup':
         return (
           <SignUpScreen 
+            onBack={() => setScreen('welcome')}
             onSignUp={handleSignup}
             onGoToLogin={() => setScreen('login')}
           />

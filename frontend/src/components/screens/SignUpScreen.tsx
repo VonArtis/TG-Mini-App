@@ -36,6 +36,44 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   const { registerUser } = useAuth();
   const { t } = useLanguage();
 
+  // Auto-focus logic for intelligent field progression
+  const handleFieldComplete = (field: string, value: string) => {
+    setTimeout(() => {
+      switch (field) {
+        case 'firstName':
+          if (value.trim().length >= 2) {
+            const lastNameInput = document.querySelector('input[name="lastName"]') as HTMLInputElement;
+            if (lastNameInput) lastNameInput.focus();
+          }
+          break;
+        case 'lastName':
+          if (value.trim().length >= 2) {
+            const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
+            if (emailInput) emailInput.focus();
+          }
+          break;
+        case 'email':
+          if (/\S+@\S+\.\S+/.test(value)) {
+            const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
+            if (passwordInput) passwordInput.focus();
+          }
+          break;
+        case 'password':
+          if (value.length >= 8) {
+            const confirmPasswordInput = document.querySelectorAll('input[type="password"]')[1] as HTMLInputElement;
+            if (confirmPasswordInput) confirmPasswordInput.focus();
+          }
+          break;
+        case 'confirmPassword':
+          if (value === form.password && value.length >= 8) {
+            const phoneInput = document.querySelector('input[type="tel"]') as HTMLInputElement;
+            if (phoneInput) phoneInput.focus();
+          }
+          break;
+      }
+    }, 100);
+  };
+
   // Calculate completion percentage
   const calculateCompletion = () => {
     let completedSteps = 0;

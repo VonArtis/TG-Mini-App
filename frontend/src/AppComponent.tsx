@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { ScreenType, User } from './types';
 import { AppProvider } from './context/AppContext';
 import { ThemeProvider } from './hooks/useTheme';
+import { notificationService } from './services/NotificationService';
 import { useApp } from './context/AppContext';
 import { useAuth } from './hooks/useAuth';
 import { MobileLayoutWithTabs } from './components/layout/MobileLayoutWithTabs';

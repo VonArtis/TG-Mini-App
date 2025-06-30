@@ -2,7 +2,6 @@ import React from 'react';
 import type { AuthScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { MobileLayout } from '../layout/MobileLayout';
-import { LanguageSelector } from '../common/LanguageSelector';
 import { useLanguage } from '../../hooks/useLanguage';
 
 export const WelcomeScreen: React.FC<AuthScreenProps> = ({ onSignIn, onCreateAccount, onNavigate }) => {
@@ -10,11 +9,6 @@ export const WelcomeScreen: React.FC<AuthScreenProps> = ({ onSignIn, onCreateAcc
   
   return (
     <MobileLayout centered maxWidth="xs">
-      {/* Language Selector - Prominent position */}
-      <div className="absolute top-4 right-4">
-        <LanguageSelector variant="compact" />
-      </div>
-      
       <div className="mb-4">
         <svg className="h-12 w-12 text-purple-500" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <polygon points="10,80 40,20 50,35 60,20 90,80 70,80 50,45 30,80" fill="#9333ea" />

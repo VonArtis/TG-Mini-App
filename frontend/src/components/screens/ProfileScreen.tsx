@@ -14,8 +14,8 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
   const { t } = useLanguage();
   const { logout } = useAuth();
   const { theme } = useTheme();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const { settings, loading, error, actions } = useSettings();
+  const [showBiometricSetup, setShowBiometricSetup] = useState(false);
 
   const handleLogout = async () => {
     await logout();

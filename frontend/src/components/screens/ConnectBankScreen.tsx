@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import type { ScreenProps } from '../../types';
+import type { ConnectionScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { Card } from '../common/Card';
 import { MobileLayout } from '../layout/MobileLayout';
 import { useLanguage } from '../../hooks/useLanguage';
 
-export const ConnectBankScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
+export const ConnectBankScreen: React.FC<ConnectionScreenProps> = ({ onBack, onNavigate, onConnect }) => {
   const [selectedMethod, setSelectedMethod] = useState('plaid');
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();

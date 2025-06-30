@@ -38,8 +38,12 @@ export const ConnectBankScreen: React.FC<ConnectionScreenProps> = ({ onBack, onN
   const handleConnect = async () => {
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      onNavigate?.('verification-success');
+      if (onConnect) {
+        await onConnect();
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        onNavigate?.('verification-success');
+      }
     } catch (error) {
       console.error('Connection failed:', error);
     } finally {

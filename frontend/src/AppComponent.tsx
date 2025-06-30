@@ -485,6 +485,15 @@ const AppRouter: React.FC = () => {
     }
   };
 
+  const authScreens = ['welcome', 'login', 'signup', 'terms-of-service', 'privacy-policy'];
+  const isAuthScreen = authScreens.includes(screen);
+
+  // For authentication screens, render directly without MobileLayoutWithTabs wrapper
+  if (isAuthScreen) {
+    return renderScreen();
+  }
+
+  // For app screens, wrap with MobileLayoutWithTabs
   return (
     <MobileLayoutWithTabs 
       showTabs={showTabs}

@@ -250,15 +250,21 @@ const AppRouter: React.FC = () => {
   // Handle crypto connection
   const handleCryptoConnect = async () => {
     try {
-      const user = await authenticateCrypto();
-      if (user) {
-        alert('Wallet connected successfully!');
-        setScreen('dashboard');
+      // Require biometric authentication for crypto wallet connections
+      const biometricRequired = await biometricAuthService.requireBiometricForOperation('crypto-connection');
+      if (!biometricRequired) {
+        alert('Biometric authentication required for crypto wallet connections');
+        return;
       }
+      
+      await authenticateCrypto();
+      
+      // Notify successful crypto connection
+      await notificationService.notifyTransaction('trade', 0, 'Crypto Wallet Connected');
+      
+      setScreen('verification-success');
     } catch (error) {
-      console.error('Crypto connection error:', error);
-      alert('Wallet connected successfully!'); // Fallback for demo
-      setScreen('dashboard');
+      console.error('Crypto connection failed:', error);
     }
   };
 

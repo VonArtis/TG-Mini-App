@@ -194,6 +194,62 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
           {t('profile.logout', 'Sign Out')}
         </Button>
       </div>
+
+      {/* Biometric Setup Modal */}
+      <AnimatePresence>
+        {showBiometricSetup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-gray-800 rounded-lg p-6 max-w-sm w-full"
+            >
+              <div className="text-center mb-6">
+                <div className="text-4xl mb-4">👆</div>
+                <h2 className="text-xl font-bold mb-2">Setup Biometric Auth</h2>
+                <p className="text-sm text-gray-400">
+                  Use your fingerprint or face to securely access your account and authorize transactions.
+                </p>
+              </div>
+
+              {error && (
+                <div className="mb-4 p-3 bg-red-900/30 border border-red-500/50 rounded-lg">
+                  <p className="text-red-400 text-sm text-center">{error}</p>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <Button
+                  onClick={handleBiometricSetup}
+                  fullWidth
+                  disabled={loading}
+                  loading={loading}
+                >
+                  Setup Biometric Auth
+                </Button>
+                
+                <Button
+                  onClick={() => setShowBiometricSetup(false)}
+                  variant="outline"
+                  fullWidth
+                >
+                  Cancel
+                </Button>
+              </div>
+
+              <div className="mt-4 text-xs text-gray-500 text-center">
+                Your biometric data stays secure on your device and is never shared.
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

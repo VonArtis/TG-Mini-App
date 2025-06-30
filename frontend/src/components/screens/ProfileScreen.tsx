@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { ScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { LanguageSelector } from '../common/LanguageSelector';
+import { ThemeToggle, useTheme } from '../../hooks/useTheme';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useAuth } from '../../hooks/useAuth';

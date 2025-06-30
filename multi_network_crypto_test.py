@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 # Configuration
 # Get the backend URL from the frontend .env file
-BACKEND_URL = "https://eeb590eb-7848-4b96-8568-b422072548bb.preview.emergentagent.com"
+BACKEND_URL = "https://4c2ee1c4-632f-4a92-9825-bba940f8667f.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 JWT_SECRET = "your-secret-key"  # Same as in server.py
 

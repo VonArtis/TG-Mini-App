@@ -7,7 +7,7 @@ import uuid
 from datetime import datetime, timedelta
 
 # Configuration
-BACKEND_URL = "https://a4f1efc3-d376-4100-bd43-76493ad9085a.preview.emergentagent.com"
+BACKEND_URL = "https://4c2ee1c4-632f-4a92-9825-bba940f8667f.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 JWT_SECRET = "your-secret-key"  # Same as in server.py
 

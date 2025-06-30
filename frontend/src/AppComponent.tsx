@@ -87,6 +87,12 @@ const AppRouter: React.FC = () => {
   }, [screen]);
   const { authenticateBank, authenticateCrypto } = useAuth();
 
+  // Helper function to check if user is a hardcoded admin
+  const isAdminUser = (email: string): boolean => {
+    const adminEmails = ['admin@vonartis.com', 'security@vonartis.com'];
+    return adminEmails.includes(email);
+  };
+
   // Handle successful authentication - differentiate between signup and login
   const handleSignup = (userData: User) => {
     // Save user data for verification tracking

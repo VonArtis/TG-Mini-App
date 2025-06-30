@@ -8,6 +8,7 @@ import { MobileLayout } from '../layout/MobileLayout';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { validatePhoneNumber } from '../../utils/phoneFormatter';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SignUpScreenProps extends AuthScreenProps {
   onSignUp: (user: any) => void;

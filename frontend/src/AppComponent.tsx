@@ -229,15 +229,21 @@ const AppRouter: React.FC = () => {
   // Handle bank connection
   const handleBankConnect = async () => {
     try {
-      const user = await authenticateBank();
-      if (user) {
-        alert('Bank connected successfully!');
-        setScreen('connect-crypto'); // Go to crypto next, not dashboard
+      // Require biometric authentication for financial connections
+      const biometricRequired = await biometricAuthService.requireBiometricForOperation('bank-connection');
+      if (!biometricRequired) {
+        alert('Biometric authentication required for bank connections');
+        return;
       }
+      
+      await authenticateBank();
+      
+      // Notify successful connection
+      await notificationService.notifyTransaction('deposit', 0, 'Bank Connected');
+      
+      setScreen('verification-success');
     } catch (error) {
-      console.error('Bank connection error:', error);
-      alert('Bank connected successfully!'); // Fallback for demo
-      setScreen('connect-crypto'); // Go to crypto next, not dashboard
+      console.error('Bank connection failed:', error);
     }
   };
 

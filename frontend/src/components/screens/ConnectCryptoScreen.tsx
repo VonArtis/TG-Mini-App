@@ -62,20 +62,55 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
     }
   ];
 
+  // Real wallet connection handler
   const handleConnect = async () => {
     if (!selectedWallet) return;
     
     setLoading(true);
+    setError(null);
+    
     try {
+      let connection: WalletConnection;
+      
+      switch (selectedWallet) {
+        case 'metamask':
+          connection = await cryptoWalletService.connectMetaMask();
+          break;
+        case 'walletconnect':
+          connection = await cryptoWalletService.connectWalletConnect();
+          break;
+        case 'trust':
+          connection = await cryptoWalletService.connectTrustWallet();
+          break;
+        case 'coinbase':
+          connection = await cryptoWalletService.connectCoinbaseWallet();
+          break;
+        case 'other':
+          if (!manualAddress) {
+            setError('Please enter a wallet address');
+            return;
+          }
+          connection = await cryptoWalletService.connectManualWallet(manualAddress, manualName || 'Manual Wallet');
+          break;
+        default:
+          throw new Error('Invalid wallet selection');
+      }
+      
+      setSuccess(connection);
+      
+      // Call parent onConnect if provided
       if (onConnect) {
         await onConnect();
-      } else {
-        // Simulate wallet connection
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        onNavigate?.('verification-success');
       }
-    } catch (error) {
-      console.error('Connection failed:', error);
+      
+      // Delay then navigate to success
+      setTimeout(() => {
+        onNavigate?.('verification-success');
+      }, 2000);
+      
+    } catch (error: any) {
+      console.error('Wallet connection failed:', error);
+      setError(error.message || 'Failed to connect wallet');
     } finally {
       setLoading(false);
     }

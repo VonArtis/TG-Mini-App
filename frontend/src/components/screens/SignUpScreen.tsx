@@ -285,11 +285,29 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             setForm({ ...form, password: value });
             handleFieldComplete('password', value);
           }}
+          onKeyPress={handleKeyPress}
           error={errors.password}
           placeholder={t('auth.passwordPlaceholder', 'Create a secure password')}
           showPassword={showPassword}
           onToggleVisibility={() => setShowPassword(!showPassword)}
         />
+
+        {/* Caps Lock Warning */}
+        {capsLockWarning && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex items-center gap-2 p-2 bg-yellow-900/30 border border-yellow-600/50 rounded-lg"
+          >
+            <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.864-.833-2.634 0L4.168 18.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <span className="text-yellow-400 text-sm">
+              {t('warning.capsLock', 'Caps Lock is on')}
+            </span>
+          </motion.div>
+        )}
 
         <PasswordInput
           label={t('auth.confirmPassword', 'Confirm Password')}
@@ -299,6 +317,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             setForm({ ...form, confirmPassword: value });
             handleFieldComplete('confirmPassword', value);
           }}
+          onKeyPress={handleKeyPress}
           error={errors.confirmPassword}
           placeholder={t('auth.confirmPasswordPlaceholder', 'Re-enter your password')}
           showPassword={showConfirmPassword}

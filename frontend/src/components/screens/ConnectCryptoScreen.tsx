@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
 import type { ConnectionScreenProps } from '../../types';
 import { Button } from '../common/Button';
+import { Input } from '../common/Input';
 import { Card } from '../common/Card';
 import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
 import { CleanHeader } from '../layout/CleanHeader';
 import { useLanguage } from '../../hooks/useLanguage';
+import { cryptoWalletService, type WalletConnection } from '../../services/CryptoWalletService';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, onNavigate, onConnect }) => {
-  const [selectedWallet, setSelectedWallet] = useState('');
+  const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<WalletConnection | null>(null);
+  const [showManualInput, setShowManualInput] = useState(false);
+  const [manualAddress, setManualAddress] = useState('');
+  const [manualName, setManualName] = useState('');
   const { t } = useLanguage();
 
   const wallets = [

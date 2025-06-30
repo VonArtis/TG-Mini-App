@@ -122,19 +122,34 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     let completedSteps = 0;
     const totalSteps = 6;
 
-    // Name fields
-    const hasValidName = form.firstName.trim() && form.lastName.trim() && !errors.firstName && !errors.lastName;
+    // Name fields (1 step)
+    if (form.firstName.trim() && form.lastName.trim() && !errors.firstName && !errors.lastName) {
+      completedSteps++;
+    }
     
-    // Email validation
-    const hasValidEmail = form.email && /\S+@\S+\.\S+/.test(form.email) && !errors.email;
+    // Email validation (1 step)
+    if (form.email && /\S+@\S+\.\S+/.test(form.email) && !errors.email && emailAvailable === true) {
+      completedSteps++;
+    }
     
-    // Password validation
-    const hasValidPassword = form.password && form.password.length >= 8 && !errors.password;
-    const hasValidConfirmPassword = form.confirmPassword && form.password === form.confirmPassword && !errors.confirmPassword;
-    const hasValidPhone = form.phone && validatePhoneNumber(form.phone, form.countryCode).isValid && !errors.phone;
+    // Phone validation (1 step)  
+    if (form.phone && validatePhoneNumber(form.phone, form.countryCode).isValid && !errors.phone) {
+      completedSteps++;
+    }
     
-    if (hasValidName && hasValidEmail && hasValidPassword && hasValidConfirmPassword && hasValidPhone) {
-      completedSteps++; // Form complete = 20%
+    // Password validation (1 step)
+    if (form.password && form.password.length >= 8 && !errors.password) {
+      completedSteps++;
+    }
+    
+    // Confirm password validation (1 step)
+    if (form.confirmPassword && form.password === form.confirmPassword && !errors.confirmPassword) {
+      completedSteps++;
+    }
+    
+    // All validations passed (1 step)
+    if (completedSteps === 5) {
+      completedSteps++;
     }
 
     return (completedSteps / totalSteps) * 100;

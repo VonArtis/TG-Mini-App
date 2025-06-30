@@ -39,11 +39,39 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   const { registerUser } = useAuth();
   const { t } = useLanguage();
 
-  // Caps Lock Detection
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    const capsLock = e.getModifierState && e.getModifierState('CapsLock');
-    setCapsLockWarning(capsLock);
+  // Real-time Email Availability Checking
+  const checkEmailAvailability = async (email: string) => {
+    if (!email || !email.includes('@')) {
+      setEmailAvailable(null);
+      return;
+    }
+
+    setEmailChecking(true);
+    try {
+      // Simulate API call to check email availability
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Mock logic: admin emails are "taken", others are available
+      const isAdminEmail = ['admin@vonartis.com', 'security@vonartis.com', 'test@test.com'].includes(email.toLowerCase());
+      setEmailAvailable(!isAdminEmail);
+    } catch (error) {
+      console.error('Email availability check failed:', error);
+      setEmailAvailable(null);
+    } finally {
+      setEmailChecking(false);
+    }
   };
+
+  // Debounced email checking
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (form.email && form.email.includes('@')) {
+        checkEmailAvailability(form.email);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [form.email]);
 
   // Auto-focus logic for intelligent field progression
   const handleFieldComplete = (field: string, value: string) => {

@@ -266,6 +266,34 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
         <p className="text-center text-sm text-gray-400">
           {t('auth.signUpSubtitle', 'Create your account to start investing')}
         </p>
+        
+        {/* Security Progress Indicator */}
+        {showProgress && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-4 space-y-2"
+          >
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>{t('security.setupProgress', 'Security Setup Progress')}</span>
+              <span>{Math.round(calculateCompletion())}%</span>
+            </div>
+            <div className="w-full bg-gray-700 rounded-full h-2">
+              <motion.div
+                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${calculateCompletion()}%` }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              />
+            </div>
+            <div className="text-xs text-gray-400 text-center">
+              {calculateCompletion() === 100 
+                ? t('security.complete', '🔒 Account security setup complete!')
+                : t('security.inProgress', '🛡️ Securing your account...')
+              }
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {errors.general && (

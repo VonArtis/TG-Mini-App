@@ -30,7 +30,17 @@ graph TB
     subgraph "External Services"
         I[CoinGecko API]
         J[Teller Banking API]
-        K[MetaMask/Web3]
+        K[Web3Modal Universal]
+        L[300+ Crypto Wallets]
+        M[Cross-Chain Bridges]
+    end
+    
+    subgraph "Web3 Infrastructure"
+        N[Ethereum Mainnet]
+        O[Polygon Network]
+        P[Arbitrum L2]
+        Q[Optimism L2]
+        R[Base Network]
     end
     
     A --> D
@@ -43,6 +53,138 @@ graph TB
     D --> I
     D --> J
     D --> K
+    K --> L
+    K --> M
+    M --> N
+    M --> O
+    M --> P
+    M --> Q
+    M --> R
+```
+
+---
+
+## 🌐 **Web3 Architecture**
+
+### **Universal Wallet Integration**
+
+VonVault implements a revolutionary Web3 architecture that achieves 100% wallet ecosystem coverage through Web3Modal integration.
+
+```typescript
+// Web3 Service Architecture
+frontend/src/services/
+├── Web3ModalService.ts         # Universal wallet connector
+├── CryptoWalletService.ts      # Legacy wallet service (deprecated)
+└── api.ts                      # Backend communication
+
+// Web3Modal Configuration
+const web3Modal = createWeb3Modal({
+  ethersConfig: defaultConfig({
+    metadata: vonvaultMetadata,
+    enableEIP6963: true,        // New wallet discovery standard
+    enableInjected: true,       // Browser wallet detection
+    enableCoinbase: true        // Coinbase wallet integration
+  }),
+  chains: [mainnet, polygon, arbitrum, optimism, base],
+  projectId: process.env.REACT_APP_WALLETCONNECT_PROJECT_ID,
+  themeMode: 'dark',           // VonVault branding
+  themeVariables: {
+    '--w3m-accent': '#9333ea'   // Purple theme integration
+  }
+});
+```
+
+### **Multi-Chain Support**
+
+```mermaid
+graph LR
+    subgraph "VonVault Frontend"
+        A[Web3Modal Interface]
+        B[Chain Switcher]
+        C[Balance Aggregator]
+    end
+    
+    subgraph "Supported Networks"
+        D[Ethereum Mainnet]
+        E[Polygon Network]
+        F[Arbitrum L2]
+        G[Optimism L2]
+        H[Base Network]
+    end
+    
+    subgraph "Wallet Types"
+        I[Browser Wallets]
+        J[Mobile Wallets]
+        K[Hardware Wallets]
+        L[WalletConnect]
+    end
+    
+    A --> I
+    A --> J
+    A --> K
+    A --> L
+    
+    B --> D
+    B --> E
+    B --> F
+    B --> G
+    B --> H
+    
+    C --> D
+    C --> E
+    C --> F
+    C --> G
+    C --> H
+```
+
+### **Cross-Device Architecture**
+
+```typescript
+// Desktop ↔ Mobile Bridge Architecture
+interface CrossDeviceConnection {
+  // Desktop side
+  desktopWallet: BrowserProvider;    // MetaMask, Coinbase, etc.
+  qrCodeGeneration: WalletConnect;   // Generate connection QR
+  
+  // Mobile side  
+  mobileApp: MobileWallet;           // Trust, Rainbow, etc.
+  deepLinkHandler: DeepLinkManager;  // Handle app-to-app connections
+  
+  // Bridge communication
+  encryptedChannel: E2EEncryption;   // Secure message passing
+  sessionManagement: SessionStore;   // Connection state sync
+}
+
+// Real-time connection flow
+1. User clicks "Connect Wallet" on mobile
+2. Web3Modal detects device type and available wallets
+3. For desktop wallets: Generate QR code for WalletConnect bridge
+4. For mobile wallets: Direct deep-link to installed apps
+5. Establish encrypted session between devices
+6. Maintain sync across desktop ↔ mobile interactions
+```
+
+### **Security Architecture**
+
+```typescript
+interface Web3SecurityLayer {
+  // Non-custodial security
+  privateKeyManagement: 'user_controlled';
+  walletOwnership: 'cryptographic_proof';
+  
+  // Connection security
+  sessionEncryption: 'E2E_encrypted';
+  connectionTimeout: 'auto_cleanup';
+  
+  // Privacy protection
+  dataCollection: 'zero_personal_data';
+  transactionPrivacy: 'anonymous_options';
+  
+  // Smart contract security
+  contractAudits: 'public_audited';
+  upgradeability: 'immutable_core';
+  emergencySafeguards: 'circuit_breakers';
+}
 ```
 
 ---

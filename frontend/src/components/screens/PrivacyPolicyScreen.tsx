@@ -1,20 +1,34 @@
 import React from 'react';
 import type { ScreenProps } from '../../types';
-import { MobileLayout } from '../layout/MobileLayout';
-import { LanguageSelector } from '../common/LanguageSelector';
+import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
 import { useLanguage } from '../../hooks/useLanguage';
 
 export const PrivacyPolicyScreen: React.FC<ScreenProps> = ({ onBack }) => {
   const { t } = useLanguage();
 
   return (
-    <MobileLayout centered maxWidth="md">
-      <div className="absolute top-4 right-4">
-        <LanguageSelector variant="compact" />
-      </div>
-
+    <MobileLayoutWithTabs showTabs={false}>
       <div className="absolute top-4 left-4">
-        <button onClick={onBack} className="p-2 text-gray-400 hover:text-white">←</button>
+        <button 
+          onClick={onBack}
+          className="p-2 text-white hover:bg-gray-800 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+          aria-label="Go back"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-6 w-6" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth="2" 
+              d="M15 19l-7-7 7-7" 
+            />
+          </svg>
+        </button>
       </div>
       
       <div className="mb-6">
@@ -57,6 +71,6 @@ export const PrivacyPolicyScreen: React.FC<ScreenProps> = ({ onBack }) => {
           <p>Questions about privacy? Email us at privacy@vonvault.com</p>
         </section>
       </div>
-    </MobileLayout>
+    </MobileLayoutWithTabs>
   );
 };

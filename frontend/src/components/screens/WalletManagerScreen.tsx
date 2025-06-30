@@ -1,140 +1,150 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ScreenProps } from '../../types';
 import { Button } from '../common/Button';
-import { MobileLayout } from '../layout/MobileLayout';
-import { LanguageSelector } from '../common/LanguageSelector';
+import { Card } from '../common/Card';
+import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
+import { CleanHeader } from '../layout/CleanHeader';
+import { FullScreenLoader } from '../common/LoadingSpinner';
+import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../hooks/useLanguage';
 
 export const WalletManagerScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
-  const [wallets] = useState([
-    {
-      id: '1',
-      name: 'MetaMask Wallet',
-      type: 'metamask',
-      icon: '🦊',
-      address: '0x1234...5678',
-      balance: 2.5847,
-      usdValue: 4250.32,
-      isPrimary: true
-    },
-    {
-      id: '2',
-      name: 'Trust Wallet',
-      type: 'trust',
-      icon: '🛡️',
-      address: '0x8765...4321',
-      balance: 1.2456,
-      usdValue: 2050.87,
-      isPrimary: false
-    }
-  ]);
+  const [loading, setLoading] = useState(true);
+  const { connected_wallets, primary_wallet, fetchConnectedWallets } = useApp();
   const { t } = useLanguage();
 
+  useEffect(() => {
+    loadWallets();
+  }, []);
+
+  const loadWallets = async () => {
+    try {
+      setLoading(true);
+      await fetchConnectedWallets();
+    } catch (error) {
+      console.error('Error loading wallets:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getWalletIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'metamask': return '🦊';
+      case 'trustwallet': return '🛡️';
+      case 'walletconnect': return '🔗';
+      case 'coinbase': return '🔵';
+      default: return '💼';
+    }
+  };
+
+  if (loading) {
+    return <FullScreenLoader text="Loading wallets..." />;
+  }
+
   return (
-    <MobileLayout centered maxWidth="xs">
-      <div className="absolute top-4 right-4">
-        <LanguageSelector variant="compact" />
-      </div>
-
-      <div className="absolute top-4 left-4">
-        <button onClick={onBack} className="p-2 text-gray-400 hover:text-white">←</button>
-      </div>
+    <MobileLayoutWithTabs showTabs={false}>
+      <CleanHeader title="👛 Wallet Manager" onBack={onBack} />
       
-      <div className="mb-6">
-        <div className="text-6xl mb-4 text-center">👛</div>
-        <h1 className="text-2xl font-bold text-center mb-2">
-          {t('wallet.title', 'Wallet Manager')}
-        </h1>
-        <p className="text-center text-sm text-gray-400">
-          {t('wallet.subtitle', 'Manage your connected wallets')}
-        </p>
-      </div>
-
       <div className="w-full space-y-6">
+        {/* Primary Wallet */}
+        {primary_wallet && (
+          <Card className="border-green-500/30 bg-green-900/20">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span>⭐</span>
+              {t('wallet.primary', 'Primary Wallet')}
+            </h3>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{getWalletIcon(primary_wallet.type)}</span>
+                <div>
+                  <div className="font-semibold text-white">{primary_wallet.name}</div>
+                  <div className="text-sm text-gray-400 font-mono">
+                    {primary_wallet.address.slice(0, 8)}...{primary_wallet.address.slice(-6)}
+                  </div>
+                </div>
+              </div>
+              <div className="text-green-400 font-semibold">PRIMARY</div>
+            </div>
+          </Card>
+        )}
+
         {/* Connected Wallets */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-300">
-              {t('wallet.connected', 'Connected Wallets')}
-            </h2>
-            <Button
-              onClick={() => onNavigate?.('connect-crypto')}
-              size="sm"
-              variant="outline"
-              className="border-purple-500 text-purple-400"
-            >
-              + {t('wallet.add', 'Add')}
-            </Button>
-          </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span>🔗</span>
+            {t('wallet.connected', 'Connected Wallets')} ({connected_wallets?.length || 0})
+          </h3>
           
-          {wallets.map((wallet) => (
-            <div
-              key={wallet.id}
-              className={`p-4 border rounded-lg ${
-                wallet.isPrimary
-                  ? 'border-purple-500 bg-purple-900/20'
-                  : 'border-gray-700 bg-gray-900/30'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{wallet.icon}</span>
-                  <div>
-                    <div className="font-semibold text-white flex items-center gap-2">
-                      {wallet.name}
-                      {wallet.isPrimary && (
-                        <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded">
-                          {t('wallet.primary', 'Primary')}
+          {connected_wallets && connected_wallets.length > 0 ? (
+            <div className="space-y-3">
+              {connected_wallets.map((wallet, index) => (
+                <Card key={index} className={wallet.is_primary ? 'opacity-50' : ''}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{getWalletIcon(wallet.type)}</span>
+                      <div>
+                        <div className="font-semibold text-white">{wallet.name}</div>
+                        <div className="text-sm text-gray-400 font-mono">
+                          {wallet.address.slice(0, 8)}...{wallet.address.slice(-6)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {wallet.networks?.join(', ')}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-2">
+                      {wallet.is_primary && (
+                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded text-center">
+                          PRIMARY
                         </span>
                       )}
+                      {!wallet.is_primary && (
+                        <Button size="sm" variant="outline" className="text-xs">
+                          {t('wallet.setPrimary', 'Set Primary')}
+                        </Button>
+                      )}
                     </div>
-                    <div className="text-xs text-gray-400 font-mono">
-                      {wallet.address}
-                    </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-semibold text-purple-300">
-                    {wallet.balance.toFixed(4)} ETH
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    ${wallet.usdValue.toLocaleString()}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex gap-2">
-                {!wallet.isPrimary && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 border-blue-500 text-blue-400"
-                  >
-                    {t('wallet.setPrimary', 'Set Primary')}
-                  </Button>
-                )}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 border-red-500 text-red-400"
-                >
-                  {t('wallet.disconnect', 'Disconnect')}
-                </Button>
-              </div>
+                </Card>
+              ))}
             </div>
-          ))}
+          ) : (
+            <Card className="text-center">
+              <div className="text-gray-400 mb-4">💼</div>
+              <h3 className="text-lg font-semibold mb-2">
+                {t('wallet.noWallets', 'No Wallets Connected')}
+              </h3>
+              <p className="text-gray-400 mb-4">
+                {t('wallet.connectFirst', 'Connect your first crypto wallet to get started')}
+              </p>
+            </Card>
+          )}
         </div>
 
-        {/* Total Balance */}
-        <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-green-300 mb-1">
-            ${(6301.19).toLocaleString()}
-          </div>
-          <div className="text-gray-400 text-sm">
-            {t('wallet.totalValue', 'Total Wallet Value')}
-          </div>
+        {/* Actions */}
+        <div className="space-y-3">
+          <Button 
+            onClick={() => onNavigate?.('connect-crypto')}
+            fullWidth
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            + {t('wallet.connect', 'Connect New Wallet')}
+          </Button>
+          
+          {connected_wallets && connected_wallets.length > 0 && (
+            <Button 
+              onClick={() => onNavigate?.('crypto-deposit')}
+              variant="secondary"
+              fullWidth
+            >
+              {t('wallet.deposit', 'Deposit Crypto')}
+            </Button>
+          )}
         </div>
       </div>
-    </MobileLayout>
+    </MobileLayoutWithTabs>
   );
 };

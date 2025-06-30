@@ -3,8 +3,8 @@ import type { ScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { PasswordInput } from '../common/PasswordInput';
-import { MobileLayout } from '../layout/MobileLayout';
-import { LanguageSelector } from '../common/LanguageSelector';
+import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
+import { CleanHeader } from '../layout/CleanHeader';
 import { useLanguage } from '../../hooks/useLanguage';
 
 export const UiCatalogScreen: React.FC<ScreenProps> = ({ onBack }) => {
@@ -14,24 +14,8 @@ export const UiCatalogScreen: React.FC<ScreenProps> = ({ onBack }) => {
   const { t } = useLanguage();
 
   return (
-    <MobileLayout centered maxWidth="xs">
-      <div className="absolute top-4 right-4">
-        <LanguageSelector variant="compact" />
-      </div>
-
-      <div className="absolute top-4 left-4">
-        <button onClick={onBack} className="p-2 text-gray-400 hover:text-white">←</button>
-      </div>
-      
-      <div className="mb-6">
-        <div className="text-6xl mb-4 text-center">🎨</div>
-        <h1 className="text-2xl font-bold text-center mb-2">
-          {t('ui.title', 'UI Catalog')}
-        </h1>
-        <p className="text-center text-sm text-gray-400">
-          {t('ui.subtitle', 'Component showcase')}
-        </p>
-      </div>
+    <MobileLayoutWithTabs showTabs={false}>
+      <CleanHeader title="🎨 UI Catalog" onBack={onBack} />
 
       <div className="w-full space-y-8">
         {/* Buttons */}
@@ -118,6 +102,6 @@ export const UiCatalogScreen: React.FC<ScreenProps> = ({ onBack }) => {
           </div>
         </div>
       </div>
-    </MobileLayout>
+    </MobileLayoutWithTabs>
   );
 };

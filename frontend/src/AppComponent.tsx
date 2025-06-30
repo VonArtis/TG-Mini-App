@@ -224,27 +224,12 @@ const AppRouter: React.FC = () => {
         notificationService.notifyAccountVerification('approved');
         
         console.log('Verification marked as completed for user:', userData.email);
+        console.log('User data available after verification:', userData);
       } catch (error) {
         console.error('Error parsing user data during verification completion:', error);
       }
-    }
-    
-    // Enhanced completion - save status
-    const handleVerificationComplete = () => {
-      setScreen('dashboard');
-    }
-    
-    // Ensure user data is still available in context
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
-      try {
-        const userData = JSON.parse(currentUser);
-        console.log('User data available after skip:', userData);
-      } catch (error) {
-        console.error('Error parsing user data after skip:', error);
-      }
     } else {
-      console.warn('No user data found in localStorage after skip');
+      console.warn('No user data found in localStorage during verification');
     }
     
     setScreen('dashboard');

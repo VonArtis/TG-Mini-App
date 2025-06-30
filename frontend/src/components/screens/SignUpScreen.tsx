@@ -24,6 +24,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     lastName: '',
     email: '',
     phone: '',
+    countryCode: '+1', // Default country code
     password: '',
     confirmPassword: ''
   });

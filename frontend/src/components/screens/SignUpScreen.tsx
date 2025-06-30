@@ -73,6 +73,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     return () => clearTimeout(timeoutId);
   }, [form.email]);
 
+  // Caps Lock Detection
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    const capsLock = e.getModifierState && e.getModifierState('CapsLock');
+    setCapsLockWarning(capsLock);
+  };
+
   // Auto-focus logic for intelligent field progression
   const handleFieldComplete = (field: string, value: string) => {
     setTimeout(() => {

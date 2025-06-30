@@ -203,13 +203,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
           placeholder={t('auth.emailPlaceholder', 'Enter your email address')}
         />
 
-        <Input
+        <CountryPhoneSelector
           label={t('auth.phone', 'Phone Number')}
-          type="tel"
           value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          onChange={(phone, countryCode) => setForm({ ...form, phone, countryCode })}
           error={errors.phone}
-          placeholder={t('auth.phonePlaceholder', '+1 (555) 123-4567')}
+          placeholder={t('auth.phonePlaceholder', 'Enter your phone number')}
         />
 
         <PasswordInput

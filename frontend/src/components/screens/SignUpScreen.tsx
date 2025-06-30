@@ -330,35 +330,45 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
       <div className="w-full space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <Input
-            label={t('auth.firstName', 'First Name')}
-            name="firstName"
-            value={form.firstName}
-            onChange={(e) => {
-              const value = e.target.value;
-              setForm({ ...form, firstName: value });
-              handleFieldComplete('firstName', value);
-            }}
-            error={errors.firstName}
-            placeholder={t('auth.firstNamePlaceholder', 'First name')}
-            inputMode="text"
-            autoComplete="given-name"
-          />
+          <motion.div
+            animate={shakeField === 'firstName' ? { x: [-10, 10, -10, 10, 0] } : {}}
+            transition={{ duration: 0.5 }}
+          >
+            <Input
+              label={t('auth.firstName', 'First Name')}
+              name="firstName"
+              value={form.firstName}
+              onChange={(e) => {
+                const value = e.target.value;
+                setForm({ ...form, firstName: value });
+                handleFieldComplete('firstName', value);
+              }}
+              error={errors.firstName}
+              placeholder={t('auth.firstNamePlaceholder', 'First name')}
+              inputMode="text"
+              autoComplete="given-name"
+            />
+          </motion.div>
           
-          <Input
-            label={t('auth.lastName', 'Last Name')}
-            name="lastName"
-            value={form.lastName}
-            onChange={(e) => {
-              const value = e.target.value;
-              setForm({ ...form, lastName: value });
-              handleFieldComplete('lastName', value);
-            }}
-            error={errors.lastName}
-            placeholder={t('auth.lastNamePlaceholder', 'Last name')}
-            inputMode="text"
-            autoComplete="family-name"
-          />
+          <motion.div
+            animate={shakeField === 'lastName' ? { x: [-10, 10, -10, 10, 0] } : {}}
+            transition={{ duration: 0.5 }}
+          >
+            <Input
+              label={t('auth.lastName', 'Last Name')}
+              name="lastName"
+              value={form.lastName}
+              onChange={(e) => {
+                const value = e.target.value;
+                setForm({ ...form, lastName: value });
+                handleFieldComplete('lastName', value);
+              }}
+              error={errors.lastName}
+              placeholder={t('auth.lastNamePlaceholder', 'Last name')}
+              inputMode="text"
+              autoComplete="family-name"
+            />
+          </motion.div>
         </div>
 
         <div className="relative">

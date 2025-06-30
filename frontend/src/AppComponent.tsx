@@ -369,7 +369,7 @@ const AppRouter: React.FC = () => {
       case 'profile':
         return (
           <MobileLayoutWithTabs 
-            onNavigate={setScreen} 
+            onNavigate={handleNavigation} 
             currentScreen="profile"
             showTabs={true}
           >

@@ -24,9 +24,11 @@ interface InputProps {
 export const Input = forwardRef<HTMLInputElement, InputProps>(({
   label,
   type = 'text',
+  name,
   value,
   onChange,
   onKeyPress,
+  onBlur,
   placeholder,
   required = false,
   disabled = false,

@@ -3,6 +3,7 @@ import type { ScreenType, User } from './types';
 import { AppProvider } from './context/AppContext';
 import { ThemeProvider } from './hooks/useTheme';
 import { notificationService } from './services/NotificationService';
+import { biometricAuthService } from './services/BiometricAuthService';
 import { useApp } from './context/AppContext';
 import { useAuth } from './hooks/useAuth';
 import { MobileLayoutWithTabs } from './components/layout/MobileLayoutWithTabs';

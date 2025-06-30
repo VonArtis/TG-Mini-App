@@ -451,7 +451,6 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
             {t('email.taken', 'Email is already taken')}
           </motion.div>
         )}
-        </motion.div>
 
         <CountryPhoneSelector
           label={t('auth.phone', 'Phone Number')}

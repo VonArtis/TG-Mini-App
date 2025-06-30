@@ -3,7 +3,6 @@ import type { ScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { MobileLayout } from '../layout/MobileLayout';
-import { LanguageSelector } from '../common/LanguageSelector';
 import { useLanguage } from '../../hooks/useLanguage';
 
 export const AuthenticatorSetupScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
@@ -27,12 +26,16 @@ export const AuthenticatorSetupScreen: React.FC<ScreenProps> = ({ onBack, onNavi
 
   return (
     <MobileLayout centered maxWidth="xs">
-      <div className="absolute top-4 right-4">
-        <LanguageSelector variant="compact" />
-      </div>
-
+      {/* Back Button */}
       <div className="absolute top-4 left-4">
-        <button onClick={onBack} className="p-2 text-gray-400 hover:text-white">←</button>
+        <button 
+          onClick={onBack} 
+          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition-colors rounded-full hover:bg-gray-800"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
       </div>
       
       <div className="mb-6">

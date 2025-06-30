@@ -136,8 +136,8 @@ const AppRouter: React.FC = () => {
     // Save user data for verification tracking
     localStorage.setItem('currentUser', JSON.stringify(userData));
     
-    // Admin bypass - Skip verification for hardcoded admin
-    if (userData.email === 'admin@vonartis.com') {
+    // Admin bypass - Skip verification for hardcoded admins
+    if (userData.email === 'admin@vonartis.com' || userData.email === 'security@vonartis.com') {
       console.log('Admin user detected, bypassing verification');
       setScreen('dashboard');
       return;

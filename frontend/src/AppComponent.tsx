@@ -52,6 +52,47 @@ const AppRouter: React.FC = () => {
   const [userDetailsParams, setUserDetailsParams] = useState<any>(null);
   const { user: contextUser } = useApp(); // Access user from context for debugging
 
+  // Initialize security services on app startup
+  useEffect(() => {
+    const initializeSecurityServices = async () => {
+      try {
+        console.log('Initializing security services...');
+        
+        // Initialize notification service
+        await notificationService.init();
+        console.log('Notification service initialized');
+        
+        // Initialize biometric service
+        await biometricAuthService.init();
+        console.log('Biometric service initialized');
+        
+        // Check for existing login and require biometric if enabled
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+          const status = biometricAuthService.getStatus();
+          if (status.isEnabled && status.isSetup) {
+            try {
+              console.log('Requiring biometric authentication for app access...');
+              await biometricAuthService.authenticateBiometric();
+              console.log('Biometric authentication successful');
+            } catch (error) {
+              console.error('Biometric authentication failed:', error);
+              // Fallback to login screen
+              setScreen('login');
+              return;
+            }
+          }
+          // If user exists and biometric passed (or not required), go to dashboard
+          setScreen('dashboard');
+        }
+      } catch (error) {
+        console.error('Failed to initialize security services:', error);
+      }
+    };
+
+    initializeSecurityServices();
+  }, []);
+
   // Update document title based on current screen
   useEffect(() => {
     const titles = {

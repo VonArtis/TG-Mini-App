@@ -3,9 +3,11 @@ import type { ScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { LanguageSelector } from '../common/LanguageSelector';
 import { ThemeToggle, useTheme } from '../../hooks/useTheme';
+import { useSettings } from '../../hooks/useSettings';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useAuth } from '../../hooks/useAuth';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
   const { user, setUser } = useApp();

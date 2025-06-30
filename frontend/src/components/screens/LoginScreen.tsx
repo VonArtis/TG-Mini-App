@@ -4,7 +4,6 @@ import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { PasswordInput } from '../common/PasswordInput';
 import { MobileLayout } from '../layout/MobileLayout';
-import { LanguageSelector } from '../common/LanguageSelector';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 
@@ -52,15 +51,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     setLoading(true);
     try {
       const userData = await login(form.email, form.password);
-      
       if (userData) {
         onLogin(userData);
       } else {
-        setErrors({ general: t('auth.invalidCredentials', 'Invalid email or password') });
+        setErrors({ general: t('auth.loginError', 'Invalid email or password') });
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      setErrors({ general: error.message || t('auth.loginError', 'Failed to sign in. Please try again.') });
+      setErrors({ 
+        general: error.message || t('auth.loginError', 'Invalid email or password') 
+      });
     } finally {
       setLoading(false);
     }
@@ -74,18 +74,15 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
   return (
     <MobileLayout centered maxWidth="xs">
-      {/* Language Selector */}
-      <div className="absolute top-4 right-4">
-        <LanguageSelector variant="compact" />
-      </div>
-
       {/* Back Button */}
       <div className="absolute top-4 left-4">
-        <button
-          onClick={onBack}
-          className="p-2 text-gray-400 hover:text-white transition-colors"
+        <button 
+          onClick={onBack} 
+          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition-colors rounded-full hover:bg-gray-800"
         >
-          ←
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
       </div>
       

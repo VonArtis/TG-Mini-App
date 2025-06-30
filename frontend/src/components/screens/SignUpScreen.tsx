@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { AuthScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { PasswordInput } from '../common/PasswordInput';
 import { MobileLayout } from '../layout/MobileLayout';
-import { LanguageSelector } from '../common/LanguageSelector';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { validatePhoneNumber } from '../../utils/phoneFormatter';
@@ -103,6 +102,16 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
+  const isFormValid = () => {
+    return form.firstName.trim() && 
+           form.lastName.trim() && 
+           form.email.trim() && 
+           form.phone.trim() && 
+           form.password.trim() && 
+           form.confirmPassword.trim() &&
+           Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
     
@@ -133,18 +142,15 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
   return (
     <MobileLayout centered maxWidth="xs">
-      {/* Language Selector */}
-      <div className="absolute top-4 right-4">
-        <LanguageSelector variant="compact" />
-      </div>
-
       {/* Back Button */}
       <div className="absolute top-4 left-4">
-        <button
-          onClick={onBack}
-          className="p-2 text-gray-400 hover:text-white transition-colors"
+        <button 
+          onClick={onBack} 
+          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition-colors rounded-full hover:bg-gray-800"
         >
-          ←
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
       </div>
       
@@ -226,7 +232,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
         <Button 
           onClick={handleSubmit} 
-          disabled={loading || !isFormValid}
+          disabled={loading || !isFormValid()}
           loading={loading}
           fullWidth
         >

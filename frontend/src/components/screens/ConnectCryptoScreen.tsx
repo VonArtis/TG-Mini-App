@@ -22,31 +22,43 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
   const wallets = [
     {
       id: 'metamask',
-      name: 'MetaMask',
+      name: t('crypto.metamask', 'MetaMask'),
       description: t('crypto.metamaskDesc', 'Most popular Ethereum wallet'),
       icon: '🦊',
-      recommended: true
-    },
-    {
-      id: 'trustwallet',
-      name: 'Trust Wallet',
-      description: t('crypto.trustDesc', 'Mobile-first multi-chain wallet'),
-      icon: '🛡️',
-      recommended: false
+      recommended: true,
+      available: cryptoWalletService.isWalletAvailable('metamask')
     },
     {
       id: 'walletconnect',
-      name: 'WalletConnect',
-      description: t('crypto.walletConnectDesc', 'Connect any mobile wallet'),
+      name: t('crypto.walletconnect', 'WalletConnect'),
+      description: t('crypto.walletconnectDesc', 'Connect any mobile wallet'),
       icon: '🔗',
-      recommended: false
+      recommended: false,
+      available: cryptoWalletService.isWalletAvailable('walletconnect')
+    },
+    {
+      id: 'trust',
+      name: t('crypto.trust', 'Trust Wallet'),
+      description: t('crypto.trustDesc', 'Secure multichain wallet'),
+      icon: '🛡️',
+      recommended: false,
+      available: cryptoWalletService.isWalletAvailable('trust')
     },
     {
       id: 'coinbase',
-      name: 'Coinbase Wallet',
+      name: t('crypto.coinbase', 'Coinbase Wallet'),
       description: t('crypto.coinbaseDesc', 'Self-custody wallet by Coinbase'),
       icon: '🔵',
-      recommended: false
+      recommended: false,
+      available: cryptoWalletService.isWalletAvailable('coinbase')
+    },
+    {
+      id: 'other',
+      name: t('crypto.other', 'Other Wallet'),
+      description: t('crypto.otherDesc', 'Enter wallet address manually'),
+      icon: '➕',
+      recommended: false,
+      available: true
     }
   ];
 

@@ -50,7 +50,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     // Password validation
     const hasValidPassword = form.password && form.password.length >= 8 && !errors.password;
     const hasValidConfirmPassword = form.confirmPassword && form.password === form.confirmPassword && !errors.confirmPassword;
-    const hasValidPhone = form.phone && validatePhoneNumber(form.phone, 'US') && !errors.phone;
+    const hasValidPhone = form.phone && validatePhoneNumber(form.phone, form.countryCode).isValid && !errors.phone;
     
     if (hasValidName && hasValidEmail && hasValidPassword && hasValidConfirmPassword && hasValidPhone) {
       completedSteps++; // Form complete = 20%

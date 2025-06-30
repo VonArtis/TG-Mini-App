@@ -283,7 +283,7 @@ const AppRouter: React.FC = () => {
       case 'dashboard':
         return (
           <MobileLayoutWithTabs 
-            onNavigate={setScreen} 
+            onNavigate={handleNavigation} 
             currentScreen="dashboard"
             showTabs={true}
           >

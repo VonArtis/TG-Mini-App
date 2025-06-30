@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import type { ScreenProps } from '../../types';
+import { CleanHeader } from '../layout/CleanHeader';
+import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
-import { MobileLayout } from '../layout/MobileLayout';
 import { useApp } from '../../context/AppContext';
 import { apiService } from '../../services/api';
 
@@ -192,25 +193,8 @@ export const SMSTwoFactorSetupScreen: React.FC<ScreenProps> = ({ onBack, onNavig
   };
 
   return (
-    <MobileLayout centered maxWidth="xs">
-      {/* Back Button */}
-      <div className="absolute top-4 left-4">
-        <button 
-          onClick={onBack} 
-          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition-colors rounded-full hover:bg-gray-800"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-      </div>
-
-      <div className="mb-6">
-        <div className="text-6xl mb-4 text-center">📱</div>
-        <h1 className="text-2xl font-bold text-center mb-2">
-          Setup SMS 2FA
-        </h1>
-      </div>
+    <MobileLayoutWithTabs showTabs={false}>
+      <CleanHeader title="Setup SMS 2FA" onBack={onBack} />
 
       {step === 'confirm' && (
         <>
@@ -448,6 +432,6 @@ export const SMSTwoFactorSetupScreen: React.FC<ScreenProps> = ({ onBack, onNavig
           </Button>
         </>
       )}
-    </MobileLayout>
+    </MobileLayoutWithTabs>
   );
 };

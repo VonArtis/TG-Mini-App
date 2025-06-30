@@ -371,7 +371,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
           </motion.div>
         </div>
 
-        <div className="relative">
+        <motion.div
+          animate={shakeField === 'email' ? { x: [-10, 10, -10, 10, 0] } : {}}
+          transition={{ duration: 0.5 }}
+          className="relative"
+        >
           <Input
             label={t('auth.email', 'Email Address')}
             type="email"

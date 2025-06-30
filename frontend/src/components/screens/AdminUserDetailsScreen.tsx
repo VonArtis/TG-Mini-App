@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { ScreenProps } from '../../types';
-import { CleanHeader } from '../layout/CleanHeader';
-import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
+import { MobileLayout } from '../layout/MobileLayout';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { FullScreenLoader } from '../common/LoadingSpinner';
@@ -106,28 +105,60 @@ export const AdminUserDetailsScreen: React.FC<ScreenProps & { userId?: string }>
 
   if (error || !userDetails) {
     return (
-      <MobileLayoutWithTabs showTabs={false}>
-        <CleanHeader title="User Details" onBack={onBack} />
+      <MobileLayout centered maxWidth="xs">
+        {/* Back Button */}
+        <div className="absolute top-4 left-4">
+          <button 
+            onClick={onBack} 
+            className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition-colors rounded-full hover:bg-gray-800"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="mb-6">
+          <div className="text-6xl mb-4 text-center">👤</div>
+          <h1 className="text-2xl font-bold text-center mb-2">
+            User Details
+          </h1>
+        </div>
+
         <Card className="text-center">
           <div className="text-red-400 mb-4">⚠️</div>
           <h3 className="text-lg font-semibold mb-2">Error Loading User</h3>
           <p className="text-gray-400 mb-4">{error || 'User not found'}</p>
-          <Button onClick={() => window.location.reload()} className="bg-purple-400 hover:bg-purple-500">
+          <Button onClick={() => window.location.reload()} className="bg-purple-600 hover:bg-purple-700">
             Retry
           </Button>
         </Card>
-      </MobileLayoutWithTabs>
+      </MobileLayout>
     );
   }
 
   const { user: userInfo, investments, crypto_transactions, membership } = userDetails;
 
   return (
-    <MobileLayoutWithTabs showTabs={false}>
-      <CleanHeader 
-        title="👤 User Details" 
-        onBack={onBack}
-        action={
+    <MobileLayout centered maxWidth="xs">
+      {/* Back Button */}
+      <div className="absolute top-4 left-4">
+        <button 
+          onClick={onBack} 
+          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition-colors rounded-full hover:bg-gray-800"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="mb-6">
+        <div className="text-6xl mb-4 text-center">👤</div>
+        <h1 className="text-2xl font-bold text-center mb-2">
+          User Details
+        </h1>
+        <div className="text-center">
           <Button 
             onClick={fetchUserDetails} 
             size="sm" 
@@ -136,8 +167,8 @@ export const AdminUserDetailsScreen: React.FC<ScreenProps & { userId?: string }>
           >
             ↻ Refresh
           </Button>
-        }
-      />
+        </div>
+      </div>
 
       {/* User Information */}
       <Card className="mb-6">
@@ -364,6 +395,6 @@ export const AdminUserDetailsScreen: React.FC<ScreenProps & { userId?: string }>
           </div>
         </div>
       </Card>
-    </MobileLayoutWithTabs>
+    </MobileLayout>
   );
 };

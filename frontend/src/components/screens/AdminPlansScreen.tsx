@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { ScreenProps, InvestmentPlan, InvestmentPlanCreate } from '../../types';
-import { CleanHeader } from '../layout/CleanHeader';
-import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
+import { MobileLayout } from '../layout/MobileLayout';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
@@ -130,8 +129,25 @@ export const AdminPlansScreen: React.FC<ScreenProps> = ({ onBack }) => {
   }
 
   return (
-    <MobileLayoutWithTabs showTabs={false}>
-      <CleanHeader title="⚙️ Manage Investment Plans" onBack={onBack} />
+    <MobileLayout centered maxWidth="xs">
+      {/* Back Button */}
+      <div className="absolute top-4 left-4">
+        <button 
+          onClick={onBack} 
+          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition-colors rounded-full hover:bg-gray-800"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="mb-6">
+        <div className="text-6xl mb-4 text-center">⚙️</div>
+        <h1 className="text-2xl font-bold text-center mb-2">
+          Manage Investment Plans
+        </h1>
+      </div>
 
       {!showCreateForm ? (
         <>
@@ -198,7 +214,7 @@ export const AdminPlansScreen: React.FC<ScreenProps> = ({ onBack }) => {
           {/* Create New Plan Button */}
           <Button
             onClick={() => setShowCreateForm(true)}
-            className="w-full min-h-[44px] h-16 bg-purple-400 hover:bg-purple-500"
+            className="w-full min-h-[44px] h-16 bg-purple-600 hover:bg-purple-700"
             size="lg"
           >
             + Create New Investment Plan
@@ -283,7 +299,7 @@ export const AdminPlansScreen: React.FC<ScreenProps> = ({ onBack }) => {
           <div className="flex space-x-4">
             <Button
               onClick={handleSubmit}
-              className="flex-1 min-h-[44px] bg-purple-400 hover:bg-purple-500"
+              className="flex-1 min-h-[44px] bg-purple-600 hover:bg-purple-700"
             >
               {editingPlan ? 'Update Plan' : 'Create Plan'}
             </Button>
@@ -297,6 +313,6 @@ export const AdminPlansScreen: React.FC<ScreenProps> = ({ onBack }) => {
           </div>
         </>
       )}
-    </MobileLayoutWithTabs>
+    </MobileLayout>
   );
 };

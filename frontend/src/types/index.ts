@@ -83,6 +83,8 @@ export interface User {
   // === EXISTING FIELDS ===
   bank_connected?: boolean;
   crypto_connected?: boolean;
+  connected_wallets_count?: number;
+  total_crypto_value?: number;
   
   // === VERIFICATION STATUS ===
   email_verified?: boolean;

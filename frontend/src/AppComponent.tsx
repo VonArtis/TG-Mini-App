@@ -323,7 +323,7 @@ const AppRouter: React.FC = () => {
       case 'crypto':
         return (
           <MobileLayoutWithTabs 
-            onNavigate={setScreen} 
+            onNavigate={handleNavigation} 
             currentScreen="crypto"
             showTabs={true}
           >

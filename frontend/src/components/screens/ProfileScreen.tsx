@@ -84,6 +84,37 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
                 
                 {item.component === 'language' ? (
                   <LanguageSelector variant="compact" />
+                ) : item.component === 'theme' ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">{theme === 'dark' ? 'Dark' : 'Light'}</span>
+                    <ThemeToggle />
+                  </div>
+                ) : item.component === 'notifications' ? (
+                  <button
+                    onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      notificationsEnabled ? 'bg-purple-600' : 'bg-gray-600'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                ) : item.component === 'biometric' ? (
+                  <button
+                    onClick={() => setBiometricEnabled(!biometricEnabled)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      biometricEnabled ? 'bg-purple-600' : 'bg-gray-600'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        biometricEnabled ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
                 ) : (
                   <button
                     onClick={() => item.action && onNavigate?.(item.action as any)}

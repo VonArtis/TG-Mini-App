@@ -10,11 +10,6 @@ export const WelcomeScreen: React.FC<AuthScreenProps> = ({ onSignIn, onCreateAcc
   
   return (
     <MobileLayout centered maxWidth="xs">
-      {/* Language Selector - Keep on Splash screen */}
-      <div className="absolute top-4 right-4">
-        <LanguageSelector variant="compact" />
-      </div>
-      
       <div className="mb-4">
         <svg className="h-12 w-12 text-purple-500" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <polygon points="10,80 40,20 50,35 60,20 90,80 70,80 50,45 30,80" fill="#9333ea" />
@@ -33,7 +28,13 @@ export const WelcomeScreen: React.FC<AuthScreenProps> = ({ onSignIn, onCreateAcc
           {t('auth:welcome.createAccount')}
         </Button>
       </div>
-      <p className="mt-10 text-xs text-center text-gray-500">
+      
+      {/* Language Selector - Bottom Center */}
+      <div className="mt-8 flex justify-center">
+        <LanguageSelector variant="compact" />
+      </div>
+      
+      <p className="mt-6 text-xs text-center text-gray-500">
         {t('auth:welcome.termsPrefix')} <br />
         <span 
           className="text-purple-400 cursor-pointer hover:text-purple-300 transition-colors underline"

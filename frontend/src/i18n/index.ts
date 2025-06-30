@@ -52,9 +52,9 @@ import plAuth from '../locales/pl/auth.json';
 import nlCommon from '../locales/nl/common.json';
 import nlAuth from '../locales/nl/auth.json';
 
-// Define supported languages
+// Define supported languages - Updated to use UK flag for English
 export const SUPPORTED_LANGUAGES = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'en', name: 'English', flag: '🇬🇧' },
   { code: 'es', name: 'Español (Spanish)', flag: '🇪🇸' },
   { code: 'fr', name: 'Français (French)', flag: '🇫🇷' },
   { code: 'de', name: 'Deutsch (German)', flag: '🇩🇪' },

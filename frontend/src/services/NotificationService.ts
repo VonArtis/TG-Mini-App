@@ -88,7 +88,6 @@ class NotificationService {
         icon: '/favicon.ico',
         badge: '/favicon.ico',
         tag: 'vonvault',
-        renotify: true,
         requireInteraction: false,
         ...options
       });

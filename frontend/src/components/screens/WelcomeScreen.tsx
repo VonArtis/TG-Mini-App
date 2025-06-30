@@ -1,7 +1,6 @@
 import React from 'react';
 import type { AuthScreenProps } from '../../types';
 import { Button } from '../common/Button';
-import { MobileLayout } from '../layout/MobileLayout';
 import { LanguageSelector } from '../common/LanguageSelector';
 import { useLanguage } from '../../hooks/useLanguage';
 
@@ -9,9 +8,8 @@ export const WelcomeScreen: React.FC<AuthScreenProps> = ({ onSignIn, onCreateAcc
   const { t } = useLanguage();
   
   return (
-    <MobileLayout centered maxWidth="xs">
-      {/* Main content container with better vertical spacing */}
-      <div className="flex flex-col items-center text-center space-y-6">
+    <div className="min-h-screen bg-black text-white flex items-center justify-center px-6">
+      <div className="w-full max-w-xs flex flex-col items-center text-center space-y-6">
         {/* Logo */}
         <div className="mb-2">
           <svg className="h-16 w-16 text-purple-500 mx-auto" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -61,6 +59,6 @@ export const WelcomeScreen: React.FC<AuthScreenProps> = ({ onSignIn, onCreateAcc
           </span>
         </p>
       </div>
-    </MobileLayout>
+    </div>
   );
 };

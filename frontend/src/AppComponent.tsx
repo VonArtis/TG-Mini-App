@@ -211,13 +211,42 @@ const AppRouter: React.FC = () => {
     }
   };
 
-  // Handle verification completion - save status
+  // Handle successful authentication - differentiate between signup and login
   const handleVerificationComplete = () => {
-    // Save verification status in localStorage (in real app, this would be in backend)
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    if (currentUser.email) {
-      localStorage.setItem(`verification_${currentUser.email}`, 'completed');
+    // Mark verification as completed for this user
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      try {
+        const userData = JSON.parse(currentUser);
+        localStorage.setItem(`verification_${userData.email}`, 'completed');
+        
+        // Notify successful verification
+        notificationService.notifyAccountVerification('approved');
+        
+        console.log('Verification marked as completed for user:', userData.email);
+      } catch (error) {
+        console.error('Error parsing user data during verification completion:', error);
+      }
     }
+    
+    // Enhanced completion - save status
+    const handleVerificationComplete = () => {
+      setScreen('dashboard');
+    }
+    
+    // Ensure user data is still available in context
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      try {
+        const userData = JSON.parse(currentUser);
+        console.log('User data available after skip:', userData);
+      } catch (error) {
+        console.error('Error parsing user data after skip:', error);
+      }
+    } else {
+      console.warn('No user data found in localStorage after skip');
+    }
+    
     setScreen('dashboard');
   };
 

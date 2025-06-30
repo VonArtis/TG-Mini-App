@@ -40,6 +40,9 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
       title: t('profile.settings', 'Settings'),
       items: [
         { label: t('profile.language', 'Language'), icon: '🌐', component: 'language' },
+        { label: t('profile.theme', 'Dark/Light Mode'), icon: '🌙', component: 'theme' },
+        { label: t('profile.notifications', 'Notifications'), icon: '🔔', component: 'notifications' },
+        { label: t('profile.biometric', 'Biometric Auth'), icon: '👆', component: 'biometric' },
         { label: t('profile.terms', 'Terms of Service'), icon: '📄', action: 'terms-of-service' },
         { label: t('profile.privacy', 'Privacy Policy'), icon: '🔒', action: 'privacy-policy' }
       ]

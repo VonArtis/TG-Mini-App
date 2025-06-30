@@ -92,6 +92,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({
             ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
           `}
           autoComplete="new-password"
+          inputMode="text"
         />
         
         {/* Animated Eye icon toggle button */}

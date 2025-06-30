@@ -97,15 +97,39 @@ export const DashboardScreen: React.FC<ScreenProps> = ({ onNavigate }) => {
           </Button>
         </div>
 
-        {!user?.crypto_connected && (
-          <Button
-            onClick={() => onNavigate?.('connect-crypto')}
-            variant="outline"
-            className="w-full h-12 border-orange-500 text-orange-400 hover:bg-orange-500/10"
-          >
-            🔗 {t('dashboard.connectWallet', 'Connect Crypto Wallet')}
-          </Button>
-        )}
+        {/* Dynamic Crypto Wallet Button */}
+        <Button
+          onClick={() => onNavigate?.(user?.crypto_connected ? 'crypto' : 'connect-crypto')}
+          variant="outline"
+          className={`w-full h-12 transition-all ${
+            user?.crypto_connected 
+              ? 'border-green-500 text-green-400 hover:bg-green-500/10' 
+              : 'border-orange-500 text-orange-400 hover:bg-orange-500/10'
+          }`}
+        >
+          {user?.crypto_connected ? (
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-2">
+                <span>💼</span>
+                <span>{t('dashboard.myCryptoWallets', 'My Crypto Wallets')}</span>
+                {user?.connected_wallets_count && (
+                  <span className="text-xs bg-green-500/20 px-2 py-1 rounded-full">
+                    {user.connected_wallets_count}
+                  </span>
+                )}
+              </div>
+              {user?.total_crypto_value && (
+                <span className="text-sm font-medium">
+                  ${user.total_crypto_value.toLocaleString()}
+                </span>
+              )}
+            </div>
+          ) : (
+            <>
+              🔗 {t('dashboard.connectWallet', 'Connect Crypto Wallet')}
+            </>
+          )}
+        </Button>
       </div>
 
       {/* Membership Status */}

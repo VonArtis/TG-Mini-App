@@ -151,6 +151,11 @@ const AppRouter: React.FC = () => {
     setScreen('dashboard');
   };
 
+  // Helper function to handle navigation with proper typing
+  const handleNavigation = (screen: string) => {
+    setScreen(screen as ScreenType);
+  };
+
   // Handle bank connection
   const handleBankConnect = async () => {
     try {

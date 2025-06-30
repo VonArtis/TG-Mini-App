@@ -502,6 +502,55 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
           {t('auth.privacyPolicy', 'Privacy Policy')}
         </span>
       </p>
+
+      {/* Success Animation Overlay */}
+      <AnimatePresence>
+        {success && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-full p-8"
+            >
+              <motion.svg
+                className="w-16 h-16 text-white"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <motion.path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={3}
+                  d="M5 13l4 4L19 7"
+                />
+              </motion.svg>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="absolute mt-32 text-center"
+            >
+              <h2 className="text-2xl font-bold text-white mb-2">
+                {t('success.accountCreated', 'Account Created!')}
+              </h2>
+              <p className="text-gray-300">
+                {t('success.redirecting', 'Setting up your secure account...')}
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </MobileLayout>
   );
 };

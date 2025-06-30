@@ -98,6 +98,13 @@ const AppRouter: React.FC = () => {
     // This ensures user data is available in profile screen even if verification is skipped
     console.log('Setting user data in context after signup:', userData);
     
+    // Admin bypass - Skip verification for hardcoded admin
+    if (userData.email === 'admin@vonartis.com') {
+      console.log('Admin user detected during signup, bypassing verification');
+      setScreen('dashboard');
+      return;
+    }
+    
     // New enhanced flow: User can choose verification path
     // Since user is now authenticated immediately, they can access dashboard
     // Default to verification flow but allow skipping

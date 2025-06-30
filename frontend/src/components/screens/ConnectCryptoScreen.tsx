@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import type { ScreenProps } from '../../types';
+import type { ConnectionScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
 import { CleanHeader } from '../layout/CleanHeader';
 import { useLanguage } from '../../hooks/useLanguage';
 
-export const ConnectCryptoScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
+export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, onNavigate, onConnect }) => {
   const [selectedWallet, setSelectedWallet] = useState('');
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();

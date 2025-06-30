@@ -84,8 +84,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     
     if (!form.phone.trim()) {
       newErrors.phone = t('validation.required', 'Phone number is required');
-    } else if (!validatePhoneNumber(form.phone, 'US')) {
-      newErrors.phone = t('validation.invalidPhone', 'Please enter a valid phone number');
+    } else {
+      const phoneValidation = validatePhoneNumber(form.phone, form.countryCode);
+      if (!phoneValidation.isValid) {
+        newErrors.phone = phoneValidation.message || t('validation.invalidPhone', 'Please enter a valid phone number');
+      }
     }
     
     if (!form.password.trim()) {

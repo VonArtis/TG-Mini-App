@@ -220,18 +220,32 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <Input
             label={t('auth.firstName', 'First Name')}
+            name="firstName"
             value={form.firstName}
-            onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+            onChange={(e) => {
+              const value = e.target.value;
+              setForm({ ...form, firstName: value });
+              handleFieldComplete('firstName', value);
+            }}
             error={errors.firstName}
             placeholder={t('auth.firstNamePlaceholder', 'First name')}
+            inputMode="text"
+            autoComplete="given-name"
           />
           
           <Input
             label={t('auth.lastName', 'Last Name')}
+            name="lastName"
             value={form.lastName}
-            onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+            onChange={(e) => {
+              const value = e.target.value;
+              setForm({ ...form, lastName: value });
+              handleFieldComplete('lastName', value);
+            }}
             error={errors.lastName}
             placeholder={t('auth.lastNamePlaceholder', 'Last name')}
+            inputMode="text"
+            autoComplete="family-name"
           />
         </div>
 
@@ -239,7 +253,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
           label={t('auth.email', 'Email Address')}
           type="email"
           value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          onChange={(e) => {
+            const value = e.target.value;
+            setForm({ ...form, email: value });
+            handleFieldComplete('email', value);
+          }}
           error={errors.email}
           placeholder={t('auth.emailPlaceholder', 'Enter your email address')}
         />

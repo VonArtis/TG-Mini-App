@@ -21,6 +21,43 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
     await logout();
   };
 
+  // Handle notification toggle
+  const handleNotificationToggle = async () => {
+    const success = await actions.toggleNotifications();
+    if (!success && error) {
+      alert(error); // In production, use proper toast/modal
+    }
+  };
+
+  // Handle biometric toggle
+  const handleBiometricToggle = async () => {
+    if (!settings.biometric.setup) {
+      setShowBiometricSetup(true);
+      return;
+    }
+    
+    const success = await actions.toggleBiometric();
+    if (!success && error) {
+      alert(error); // In production, use proper toast/modal
+    }
+  };
+
+  // Handle biometric setup
+  const handleBiometricSetup = async () => {
+    if (!user?.email) {
+      alert('User email not available');
+      return;
+    }
+
+    const success = await actions.setupBiometric(user.id || 'user123', user.email);
+    if (success) {
+      setShowBiometricSetup(false);
+      alert('Biometric authentication setup successful!');
+    } else if (error) {
+      alert(error);
+    }
+  };
+
   const profileSections = [
     {
       title: t('profile.account', 'Account'),

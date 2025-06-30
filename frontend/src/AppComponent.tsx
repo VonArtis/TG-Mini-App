@@ -105,7 +105,7 @@ const AppRouter: React.FC = () => {
     console.log('Setting user data in context after signup:', userData);
     
     // Admin bypass - Skip verification for hardcoded admins
-    if (userData.email === 'admin@vonartis.com' || userData.email === 'security@vonartis.com') {
+    if (isAdminUser(userData.email || '')) {
       console.log('Admin user detected during signup, bypassing verification');
       setScreen('dashboard');
       return;

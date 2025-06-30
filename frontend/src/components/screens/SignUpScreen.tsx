@@ -292,18 +292,82 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
           />
         </div>
 
-        <Input
-          label={t('auth.email', 'Email Address')}
-          type="email"
-          value={form.email}
-          onChange={(e) => {
-            const value = e.target.value;
-            setForm({ ...form, email: value });
-            handleFieldComplete('email', value);
-          }}
-          error={errors.email}
-          placeholder={t('auth.emailPlaceholder', 'Enter your email address')}
-        />
+        <div className="relative">
+          <Input
+            label={t('auth.email', 'Email Address')}
+            type="email"
+            value={form.email}
+            onChange={(e) => {
+              const value = e.target.value;
+              setForm({ ...form, email: value });
+              handleFieldComplete('email', value);
+              setEmailAvailable(null); // Reset availability while typing
+            }}
+            error={errors.email}
+            placeholder={t('auth.emailPlaceholder', 'Enter your email address')}
+            inputMode="email"
+            autoComplete="email"
+          />
+          
+          {/* Email Availability Indicator */}
+          <div className="absolute right-3 top-9 flex items-center">
+            {emailChecking && (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full"
+              />
+            )}
+            {!emailChecking && emailAvailable === true && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="text-green-400"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </motion.div>
+            )}
+            {!emailChecking && emailAvailable === false && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="text-red-400"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </motion.div>
+            )}
+          </div>
+        </div>
+
+        {/* Email Availability Message */}
+        {emailAvailable === true && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-green-400 text-sm flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            {t('email.available', 'Email is available!')}
+          </motion.div>
+        )}
+        {emailAvailable === false && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-red-400 text-sm flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            {t('email.taken', 'Email is already taken')}
+          </motion.div>
+        )}
 
         <CountryPhoneSelector
           label={t('auth.phone', 'Phone Number')}

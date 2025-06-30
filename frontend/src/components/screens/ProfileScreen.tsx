@@ -129,31 +129,46 @@ export const ProfileScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => 
                     <ThemeToggle />
                   </div>
                 ) : item.component === 'notifications' ? (
-                  <button
-                    onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      notificationsEnabled ? 'bg-purple-600' : 'bg-gray-600'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {!settings.notifications.supported && (
+                      <span className="text-xs text-gray-400">Not supported</span>
+                    )}
+                    <button
+                      onClick={handleNotificationToggle}
+                      disabled={!settings.notifications.supported || loading}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        settings.notifications.enabled ? 'bg-purple-600' : 'bg-gray-600'
+                      } ${!settings.notifications.supported ? 'opacity-50' : ''}`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          settings.notifications.enabled ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 ) : item.component === 'biometric' ? (
-                  <button
-                    onClick={() => setBiometricEnabled(!biometricEnabled)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      biometricEnabled ? 'bg-purple-600' : 'bg-gray-600'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        biometricEnabled ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {!settings.biometric.supported && (
+                      <span className="text-xs text-gray-400">Not supported</span>
+                    )}
+                    {!settings.biometric.available && settings.biometric.supported && (
+                      <span className="text-xs text-gray-400">Not available</span>
+                    )}
+                    <button
+                      onClick={handleBiometricToggle}
+                      disabled={!settings.biometric.supported || !settings.biometric.available || loading}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        settings.biometric.enabled ? 'bg-purple-600' : 'bg-gray-600'
+                      } ${(!settings.biometric.supported || !settings.biometric.available) ? 'opacity-50' : ''}`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          settings.biometric.enabled ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 ) : (
                   <button
                     onClick={() => item.action && onNavigate?.(item.action as any)}

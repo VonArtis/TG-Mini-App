@@ -126,18 +126,11 @@ export const WalletManagerScreen: React.FC<ScreenProps> = ({ onBack, onNavigate 
 
         {/* Actions */}
         <div className="space-y-3">
-          <Button 
-            onClick={() => onNavigate?.('connect-crypto')}
-            fullWidth
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            + {t('wallet.connect', 'Connect New Wallet')}
-          </Button>
-          
           {connected_wallets && connected_wallets.length > 0 && (
-            <Button 
-              onClick={() => onNavigate?.('crypto-deposit')}
-              variant="secondary"
+            <>
+              <Button 
+                onClick={() => onNavigate?.('crypto-deposit')}
+                variant="secondary"
               fullWidth
             >
               {t('wallet.deposit', 'Deposit Crypto')}

@@ -144,6 +144,9 @@ const AppRouter: React.FC = () => {
     // Save user data for verification tracking
     localStorage.setItem('currentUser', JSON.stringify(userData));
     
+    // Trigger login notification
+    notificationService.notifyLoginAttempt('Current Location', 'This Device');
+    
     // Admin bypass - Skip verification for hardcoded admins
     if (isAdminUser(userData.email || '')) {
       console.log('Admin user detected, bypassing verification');

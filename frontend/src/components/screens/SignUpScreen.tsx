@@ -33,8 +33,15 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   const [showProgress, setShowProgress] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [capsLockWarning, setCapsLockWarning] = useState(false);
   const { registerUser } = useAuth();
   const { t } = useLanguage();
+
+  // Caps Lock Detection
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    const capsLock = e.getModifierState && e.getModifierState('CapsLock');
+    setCapsLockWarning(capsLock);
+  };
 
   // Auto-focus logic for intelligent field progression
   const handleFieldComplete = (field: string, value: string) => {

@@ -110,9 +110,10 @@ class BiometricAuthService {
       }
 
       // Store credential info
+      const response = credential.response as AuthenticatorAttestationResponse;
       const credentialInfo: BiometricCredential = {
         id: credential.id,
-        publicKey: this.arrayBufferToBase64(credential.response.publicKey!),
+        publicKey: this.arrayBufferToBase64(response.publicKey || new ArrayBuffer(0)),
         counter: 0,
         createdAt: new Date().toISOString(),
       };

@@ -47,9 +47,13 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
     
     setLoading(true);
     try {
-      // Simulate wallet connection
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      onNavigate?.('verification-success');
+      if (onConnect) {
+        await onConnect();
+      } else {
+        // Simulate wallet connection
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        onNavigate?.('verification-success');
+      }
     } catch (error) {
       console.error('Connection failed:', error);
     } finally {

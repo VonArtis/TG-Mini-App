@@ -273,7 +273,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
         <PasswordInput
           label={t('auth.password', 'Password')}
           value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          onChange={(e) => {
+            const value = e.target.value;
+            setForm({ ...form, password: value });
+            handleFieldComplete('password', value);
+          }}
           error={errors.password}
           placeholder={t('auth.passwordPlaceholder', 'Create a secure password')}
           showPassword={showPassword}
@@ -283,7 +287,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
         <PasswordInput
           label={t('auth.confirmPassword', 'Confirm Password')}
           value={form.confirmPassword}
-          onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+          onChange={(e) => {
+            const value = e.target.value;
+            setForm({ ...form, confirmPassword: value });
+            handleFieldComplete('confirmPassword', value);
+          }}
           error={errors.confirmPassword}
           placeholder={t('auth.confirmPasswordPlaceholder', 'Re-enter your password')}
           showPassword={showConfirmPassword}

@@ -1,7 +1,47 @@
 // Web3Modal Universal Wallet Service - 300+ Wallet Support
 import { createWeb3Modal, defaultConfig } from '@web3modal/ethers'
-import { mainnet, arbitrum, polygon, optimism, base } from '@web3modal/ethers/networks'
 import { BrowserProvider } from 'ethers'
+
+// Define networks manually (correct approach for v5.1.11)
+const mainnet = {
+  chainId: 1,
+  name: 'Ethereum',
+  currency: 'ETH',
+  explorerUrl: 'https://etherscan.io',
+  rpcUrl: 'https://cloudflare-eth.com'
+}
+
+const polygon = {
+  chainId: 137,
+  name: 'Polygon',
+  currency: 'MATIC',
+  explorerUrl: 'https://polygonscan.com',
+  rpcUrl: 'https://polygon-rpc.com'
+}
+
+const arbitrum = {
+  chainId: 42161,
+  name: 'Arbitrum One',
+  currency: 'ETH',
+  explorerUrl: 'https://arbiscan.io',
+  rpcUrl: 'https://arb1.arbitrum.io/rpc'
+}
+
+const optimism = {
+  chainId: 10,
+  name: 'Optimism',
+  currency: 'ETH',
+  explorerUrl: 'https://optimistic.etherscan.io',
+  rpcUrl: 'https://mainnet.optimism.io'
+}
+
+const base = {
+  chainId: 8453,
+  name: 'Base',
+  currency: 'ETH',
+  explorerUrl: 'https://basescan.org',
+  rpcUrl: 'https://mainnet.base.org'
+}
 
 // VonVault Web3Modal Configuration
 const projectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID || 'demo-project-id'

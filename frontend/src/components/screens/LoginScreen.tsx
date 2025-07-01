@@ -58,8 +58,25 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
       }
     } catch (error: any) {
       console.error('Login error:', error);
+      
+      // Handle specific HTTP status codes with user-friendly messages
+      let errorMessage = t('auth.loginError', 'Invalid email or password');
+      
+      if (error.response?.status === 401) {
+        errorMessage = t('auth.incorrectPassword', 'Incorrect email or password');
+      } else if (error.response?.status === 404) {
+        errorMessage = t('auth.userNotFound', 'Account not found');
+      } else if (error.response?.status === 400) {
+        errorMessage = t('auth.invalidRequest', 'Please check your email and password');
+      } else if (error.response?.status >= 500) {
+        errorMessage = t('auth.serverError', 'Server error. Please try again later');
+      } else if (error.message && !error.message.includes('status code')) {
+        // Only use error.message if it's not a technical HTTP error
+        errorMessage = error.message;
+      }
+      
       setErrors({ 
-        general: error.message || t('auth.loginError', 'Invalid email or password') 
+        general: errorMessage
       });
     } finally {
       setLoading(false);

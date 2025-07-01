@@ -119,31 +119,15 @@ class Web3ModalService {
     this.loadStoredConnections()
   }
 
-  // Initialize Web3Modal event listeners
+  // Initialize Web3Modal event listeners (CORRECT v5.1.11 API)
   private initializeListeners() {
-    // Listen for connection events
-    modal.subscribeProvider(({ provider, address, chainId, isConnected }) => {
-      if (isConnected && provider && address) {
-        this.handleConnection(provider, address, chainId)
-      } else {
-        this.handleDisconnection()
-      }
-    })
-
-    // Listen for account changes
-    modal.subscribeAccount((account) => {
-      if (account.isConnected && account.address) {
-        this.updateConnection(account.address, account.chainId)
-      }
-    })
-
-    // Listen for chain changes
-    modal.subscribeChainId((chainId) => {
-      if (this.connection) {
-        this.connection.chainId = chainId
-        this.updateUserCryptoStatus()
-      }
-    })
+    // Note: Web3Modal v5 uses different event system than described in our code
+    // The modal object doesn't have subscribeProvider/subscribeAccount methods
+    // These are handled through ethereum provider events after connection
+    
+    console.log('Web3Modal service initialized - events handled post-connection')
+    
+    // Events will be set up after wallet connection in connectWallet method
   }
 
   // Handle new wallet connection
@@ -197,25 +181,66 @@ class Web3ModalService {
 
   // Public methods for VonVault integration
   
-  // Open Web3Modal connection interface
+  // Open Web3Modal connection interface (CORRECT v5.1.11 API)
   async connectWallet(): Promise<Web3ModalConnection> {
     try {
-      await modal.open()
+      // Use Web3Modal v5 API correctly
+      const web3Provider = await modal.connect()
       
-      // Wait for connection
-      return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          reject(new Error('Connection timeout'))
-        }, 30000) // 30 second timeout
+      if (!web3Provider) {
+        throw new Error('Failed to connect to wallet')
+      }
 
-        const checkConnection = setInterval(() => {
-          if (this.connection) {
-            clearTimeout(timeout)
-            clearInterval(checkConnection)
-            resolve(this.connection)
+      // Create ethers provider from Web3Modal connection
+      const ethersProvider = new BrowserProvider(web3Provider)
+      const signer = await ethersProvider.getSigner()
+      const address = await signer.getAddress()
+      const network = await ethersProvider.getNetwork()
+
+      const connection: Web3ModalConnection = {
+        address,
+        chainId: Number(network.chainId),
+        provider: ethersProvider,
+        isConnected: true,
+        walletInfo: {
+          name: 'Connected Wallet',
+          icon: '🦊'
+        }
+      }
+
+      // Set up provider event listeners for this connection
+      if (web3Provider.on) {
+        web3Provider.on('accountsChanged', (accounts: string[]) => {
+          if (accounts.length > 0) {
+            this.updateConnection(accounts[0])
+          } else {
+            this.handleDisconnection()
           }
-        }, 100)
+        })
+
+        web3Provider.on('chainChanged', (chainId: string) => {
+          if (this.connection) {
+            this.connection.chainId = parseInt(chainId, 16)
+            this.updateUserCryptoStatus()
+          }
+        })
+
+        web3Provider.on('disconnect', () => {
+          this.handleDisconnection()
+        })
+      }
+
+      this.connection = connection
+      this.addWalletConnection(connection)
+      this.updateUserCryptoStatus()
+
+      console.log('Web3Modal connection established:', {
+        address: address.slice(0, 6) + '...' + address.slice(-4),
+        chain: Number(network.chainId),
+        wallet: connection.walletInfo?.name
       })
+
+      return connection
 
     } catch (error: any) {
       console.error('Web3Modal connection failed:', error)
@@ -223,7 +248,7 @@ class Web3ModalService {
     }
   }
 
-  // Disconnect current wallet
+  // Disconnect current wallet (CORRECT v5.1.11 API)
   async disconnectWallet(): Promise<void> {
     try {
       await modal.disconnect()
@@ -231,7 +256,9 @@ class Web3ModalService {
       this.updateUserCryptoStatus()
     } catch (error) {
       console.error('Error disconnecting wallet:', error)
-      throw new Error('Failed to disconnect wallet')
+      // Even if modal.disconnect fails, clear our local state
+      this.connection = null
+      this.updateUserCryptoStatus()
     }
   }
 

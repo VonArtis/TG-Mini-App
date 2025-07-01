@@ -1,9 +1,6 @@
-// Web3Modal Universal Wallet Service - 300+ Wallet Support (Fixed v5.1.11 API)
+// Web3Modal Universal Wallet Service - 300+ Wallet Support
+import { createWeb3Modal, defaultConfig } from '@web3modal/ethers'
 import { BrowserProvider } from 'ethers'
-
-// Note: Web3Modal v5.1.11 uses React hooks, not direct modal calls
-// The actual connection is handled through the w3m-button component
-// This service provides compatibility layer for VonVault's existing API
 
 // Define networks manually (correct approach for v5.1.11)
 const mainnet = {
@@ -46,7 +43,7 @@ const base = {
   rpcUrl: 'https://mainnet.base.org'
 }
 
-// VonVault Web3Modal Configuration (Fixed for v5.1.11)
+// VonVault Web3Modal Configuration
 const projectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID || 'demo-project-id'
 
 const metadata = {
@@ -56,8 +53,50 @@ const metadata = {
   icons: ['https://vonartis.app/favicon.ico']
 }
 
-// Note: Web3Modal v5 configuration is typically done at app level with createWeb3Modal
-// This service provides a compatibility layer for the existing VonVault API
+// Supported chains for VonVault
+const chains = [
+  mainnet,
+  arbitrum,
+  polygon,
+  optimism,
+  base
+]
+
+// Ethers config
+const ethersConfig = defaultConfig({
+  metadata,
+  enableEIP6963: true, // Enable new wallet discovery standard
+  enableInjected: true, // Enable injected wallets (MetaMask, etc.)
+  enableCoinbase: true, // Enable Coinbase Wallet
+  rpcUrl: 'https://cloudflare-eth.com', // Fallback RPC
+})
+
+// Create Web3Modal instance
+const modal = createWeb3Modal({
+  ethersConfig,
+  chains,
+  projectId,
+  themeMode: 'dark', // Match VonVault design
+  themeVariables: {
+    '--w3m-color-mix': '#9333ea', // VonVault purple
+    '--w3m-color-mix-strength': 20,
+    '--w3m-accent': '#9333ea',
+    '--w3m-border-radius-master': '8px',
+  },
+  enableAnalytics: false, // Privacy-focused
+  includeWalletIds: [
+    // Priority wallets for VonVault
+    'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
+    '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
+    'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Coinbase Wallet
+    '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
+    '19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927', // Ledger Live
+    '163d2cf19babf05eb8962e9748f9ebe613ed52ebf9c8107c9a0f104bfcf161b3', // Frame
+  ],
+  excludeWalletIds: [
+    // Exclude problematic or deprecated wallets
+  ],
+})
 
 // Interface for VonVault wallet connections
 export interface Web3ModalConnection {
@@ -142,33 +181,26 @@ class Web3ModalService {
 
   // Public methods for VonVault integration
   
-  // FIXED: Direct wallet connection using ethereum provider (v5.1.11 compatible)
+  // Open Web3Modal connection interface (CORRECT v5.1.11 API)
   async connectWallet(): Promise<Web3ModalConnection> {
     try {
-      // For Web3Modal v5.1.11, we need to use direct ethereum provider access
-      // The modal.connect() method doesn't exist in this version
+      // Use Web3Modal v5 API correctly
+      const web3Provider = await modal.connect()
       
-      if (!window.ethereum) {
-        throw new Error('Please install MetaMask or another Web3 wallet. Web3Modal v5 requires a wallet extension to be installed.')
+      if (!web3Provider) {
+        throw new Error('Failed to connect to wallet')
       }
 
-      // Request account access directly from ethereum provider
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts',
-      })
-
-      if (!accounts || accounts.length === 0) {
-        throw new Error('No accounts found. Please create an account in your wallet.')
-      }
-
-      const address = accounts[0]
-      const provider = new BrowserProvider(window.ethereum)
-      const network = await provider.getNetwork()
+      // Create ethers provider from Web3Modal connection
+      const ethersProvider = new BrowserProvider(web3Provider)
+      const signer = await ethersProvider.getSigner()
+      const address = await signer.getAddress()
+      const network = await ethersProvider.getNetwork()
 
       const connection: Web3ModalConnection = {
         address,
         chainId: Number(network.chainId),
-        provider,
+        provider: ethersProvider,
         isConnected: true,
         walletInfo: {
           name: 'Connected Wallet',
@@ -177,8 +209,8 @@ class Web3ModalService {
       }
 
       // Set up provider event listeners for this connection
-      if (window.ethereum.on) {
-        window.ethereum.on('accountsChanged', (accounts: string[]) => {
+      if (web3Provider.on) {
+        web3Provider.on('accountsChanged', (accounts: string[]) => {
           if (accounts.length > 0) {
             this.updateConnection(accounts[0])
           } else {
@@ -186,14 +218,14 @@ class Web3ModalService {
           }
         })
 
-        window.ethereum.on('chainChanged', (chainId: string) => {
+        web3Provider.on('chainChanged', (chainId: string) => {
           if (this.connection) {
             this.connection.chainId = parseInt(chainId, 16)
             this.updateUserCryptoStatus()
           }
         })
 
-        window.ethereum.on('disconnect', () => {
+        web3Provider.on('disconnect', () => {
           this.handleDisconnection()
         })
       }
@@ -202,7 +234,7 @@ class Web3ModalService {
       this.addWalletConnection(connection)
       this.updateUserCryptoStatus()
 
-      console.log('Wallet connection established (direct provider):', {
+      console.log('Web3Modal connection established:', {
         address: address.slice(0, 6) + '...' + address.slice(-4),
         chain: Number(network.chainId),
         wallet: connection.walletInfo?.name
@@ -211,34 +243,20 @@ class Web3ModalService {
       return connection
 
     } catch (error: any) {
-      console.error('Wallet connection failed:', error)
-      
-      // User-friendly error messages
-      let friendlyMessage = 'Failed to connect wallet'
-      
-      if (error.code === 4001) {
-        friendlyMessage = 'Connection cancelled by user'
-      } else if (error.message.includes('install')) {
-        friendlyMessage = 'Please install MetaMask or another Web3 wallet'
-      } else if (error.message.includes('accounts')) {
-        friendlyMessage = 'No wallet accounts found. Please check your wallet.'
-      }
-      
-      throw new Error(friendlyMessage)
+      console.error('Web3Modal connection failed:', error)
+      throw new Error(error.message || 'Failed to connect wallet')
     }
   }
 
-  // Disconnect current wallet (FIXED v5.1.11 compatible)
+  // Disconnect current wallet (CORRECT v5.1.11 API)
   async disconnectWallet(): Promise<void> {
     try {
-      // Web3Modal v5.1.11 doesn't have modal.disconnect()
-      // We clear our local state and the wallet will handle its own disconnection
+      await modal.disconnect()
       this.connection = null
       this.updateUserCryptoStatus()
-      console.log('Wallet disconnected locally')
     } catch (error) {
       console.error('Error disconnecting wallet:', error)
-      // Always clear local state even if disconnect fails
+      // Even if modal.disconnect fails, clear our local state
       this.connection = null
       this.updateUserCryptoStatus()
     }
@@ -396,6 +414,11 @@ class Web3ModalService {
       // In production, you'd fetch actual token balances and prices
       return total + 1000 // Placeholder value
     }, 0)
+  }
+
+  // Get Web3Modal instance (for advanced usage)
+  getModal() {
+    return modal
   }
 }
 

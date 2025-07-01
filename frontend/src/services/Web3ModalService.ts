@@ -1,7 +1,6 @@
 // Web3Modal Universal Wallet Service - 300+ Wallet Support
-import { createWeb3Modal } from '@web3modal/ethers'
-import { defaultConfig } from '@web3modal/ethers'
-import { mainnet, arbitrum, polygon, optimism, base } from '@web3modal/ethers/chains'
+import { createWeb3Modal, defaultConfig } from '@web3modal/ethers'
+import { mainnet, arbitrum, polygon, optimism, base } from '@web3modal/ethers/networks'
 import { BrowserProvider } from 'ethers'
 
 // VonVault Web3Modal Configuration

@@ -115,17 +115,12 @@ class Web3ModalService {
   private connectedWallets: Web3ModalConnection[] = []
 
   constructor() {
-    // Temporarily disable problematic listeners due to Web3Modal deprecation
-    // this.initializeListeners()
+    this.initializeListeners()
     this.loadStoredConnections()
   }
 
-  // DEPRECATED: Web3Modal event listeners no longer work
   // Initialize Web3Modal event listeners
   private initializeListeners() {
-    console.warn('Web3Modal listeners disabled due to deprecation')
-    // TODO: Replace with Reown AppKit listeners during migration
-    /*
     // Listen for connection events
     modal.subscribeProvider(({ provider, address, chainId, isConnected }) => {
       if (isConnected && provider && address) {
@@ -149,7 +144,6 @@ class Web3ModalService {
         this.updateUserCryptoStatus()
       }
     })
-    */
   }
 
   // Handle new wallet connection
@@ -203,51 +197,28 @@ class Web3ModalService {
 
   // Public methods for VonVault integration
   
-  // Open Web3Modal connection interface (simplified for deprecated API)
+  // Open Web3Modal connection interface
   async connectWallet(): Promise<Web3ModalConnection> {
     try {
-      // Fallback to basic ethereum provider connection due to Web3Modal deprecation
-      if (!window.ethereum) {
-        throw new Error('Please install MetaMask or another Web3 wallet')
-      }
+      await modal.open()
+      
+      // Wait for connection
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Connection timeout'))
+        }, 30000) // 30 second timeout
 
-      // Request account access directly
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts',
+        const checkConnection = setInterval(() => {
+          if (this.connection) {
+            clearTimeout(timeout)
+            clearInterval(checkConnection)
+            resolve(this.connection)
+          }
+        }, 100)
       })
-
-      if (!accounts || accounts.length === 0) {
-        throw new Error('No accounts found. Please create an account in your wallet.')
-      }
-
-      const address = accounts[0]
-      const provider = new BrowserProvider(window.ethereum)
-      const network = await provider.getNetwork()
-
-      const connection: Web3ModalConnection = {
-        address,
-        chainId: Number(network.chainId),
-        provider,
-        isConnected: true,
-        walletInfo: {
-          name: 'Connected Wallet',
-          icon: '🦊'
-        }
-      }
-
-      this.connection = connection
-      this.addWalletConnection(connection)
-      this.updateUserCryptoStatus()
-
-      console.log('Wallet connected (fallback mode):', {
-        address: address.slice(0, 6) + '...' + address.slice(-4),
-        chain: Number(network.chainId)
-      })
-
-      return connection
 
     } catch (error: any) {
-      console.error('Wallet connection failed:', error)
+      console.error('Web3Modal connection failed:', error)
       throw new Error(error.message || 'Failed to connect wallet')
     }
   }

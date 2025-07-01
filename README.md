@@ -84,7 +84,7 @@
 
 <div align="center">
 
-|| **Achievement** | 📊 **Metric** | 🎯 **Industry Benchmark** | ✅ **VonVault** |
+| 🏷️ **Achievement** | 📊 **Metric** | 🎯 **Industry Benchmark** | ✅ **VonVault** |
 |-------------------|---------------|---------------------------|-----------------|
 | **Wallet Coverage** | **300+ Wallets (100%)** | Most platforms: 3-5 wallets | **60x more coverage** |
 | **Web3 Integration** | **Universal Web3Modal** | Custom wallet code | **Industry standard** |

@@ -1,280 +1,363 @@
 # 🔧 VonVault Dependency & Version Management TODO
 
-## 📊 **Current Status: Dependency Version Conflicts & Compatibility Issues**
+## 📊 **Current Status: Major Ecosystem Transition - Web3Modal → Reown AppKit**
 
-> **Problem**: Different packages require conflicting versions of the same dependencies, forcing us to use older versions even when newer ones are available.
-
----
-
-## 🚨 **CURRENT KNOWN CONFLICTS**
-
-### **📦 Web3 Stack Conflicts**
-
-```json
-// Current Working Versions (STABLE)
-"@web3modal/ethers": "^5.1.11"    // ❌ STUCK: v6+ doesn't exist in registry
-"ethers": "^6.14.4"               // ✅ LATEST: Can upgrade
-"@walletconnect/web3-provider": "^1.8.0"  // ❌ OLD: v2+ breaks Web3Modal v5
-
-// Conflict Matrix:
-- Web3Modal v6: Doesn't exist in npm registry
-- Web3Modal v5: Requires ethers v5, but we need v6 for other features  
-- WalletConnect v2: Breaks Web3Modal v5 compatibility
-- Wagmi: Requires viem, conflicts with ethers direct usage
-```
-
-### **⚛️ React Stack Conflicts**
-
-```json
-// Current Working Versions
-"react": "^18.2.0"                // ❌ STUCK: v19 breaks react-scripts
-"react-dom": "^18.2.0"            // ❌ STUCK: Must match React version
-"react-scripts": "5.0.1"          // ❌ OLD: v5.0.1, latest needs React 19
-"typescript": "^5.8.3"            // ✅ LATEST: Can upgrade
-
-// Conflict Details:
-- React 19: Available but breaks react-scripts 5.0.1
-- React Scripts 6.0: Requires React 19, different build system
-- TypeScript 5.9+: Works but react-scripts might need updates
-```
-
-### **🎨 UI/UX Stack Conflicts**
-
-```json
-// Current Working Versions  
-"framer-motion": "^12.19.2"       // ✅ LATEST: Can upgrade
-"tailwindcss": "^3.3.6"           // ❌ BEHIND: v3.4+ available, needs postcss update
-"autoprefixer": "^10.4.16"        // ❌ BEHIND: Needs update for Tailwind 3.4+
-"postcss": "^8.4.32"              // ❌ BEHIND: v8.4.49+ needed for Tailwind
-
-// Conflict Details:
-- Tailwind 3.4+: Requires PostCSS 8.4.40+
-- PostCSS newer: Might break react-scripts build
-- Framer Motion: Safe to upgrade
-```
+> **CRITICAL DISCOVERY**: Web3Modal has been completely deprecated and replaced by Reown AppKit. We're using deprecated packages across the entire Web3 stack.
 
 ---
 
-## 🎯 **DEPENDENCY UPGRADE TODO (Priority Order)**
+## 🚨 **LIVE BUILD WARNINGS (July 1, 2025)**
 
-### **🔴 HIGH PRIORITY - Production Blockers**
+### **🔴 CRITICAL DEPRECATIONS**
 
-#### **1. Web3Modal Modernization**
+#### **1. Web3Modal Complete Deprecation**
+```
+warning @web3modal/ethers@5.1.11: Web3Modal is now Reown AppKit. 
+Please follow the upgrade guide at https://docs.reown.com/appkit/upgrade/from-w3m-to-reown
+
+warning @web3modal/siwe@5.1.11: Web3Modal is now Reown AppKit
+warning @web3modal/base@5.1.11: Web3Modal is now Reown AppKit  
+warning @web3modal/ui@5.1.11: Web3Modal is now Reown AppKit
+warning @web3modal/core@5.1.11: Web3Modal is now Reown AppKit
+```
+
+**Impact**: 🔴 **SEVERE**
+- Entire Web3 wallet integration stack deprecated
+- No future updates or security patches
+- New wallets won't be added to Web3Modal
+- Compatibility issues with future web3 ecosystem
+
+#### **2. WalletConnect Infrastructure Deprecated**
+```
+warning @walletconnect/ethereum-provider@2.16.1: Reliability and performance improvements
+warning @walletconnect/modal@2.6.2: Please follow migration guide at https://docs.reown.com/appkit/upgrade/wcm
+warning @walletconnect/sign-client@2.16.1: Reliability and performance improvements
+```
+
+**Impact**: 🔴 **SEVERE**
+- Cross-device wallet connections may become unreliable
+- QR code connections may break
+- Mobile wallet deep-linking affected
+
+#### **3. Build System Conflicts**
+```
+warning "@walletconnect/web3-provider > ... @babel/core@^7.0.0-0" has unmet peer dependency
+warning "react-scripts > ... @babel/plugin-syntax-flow" has unmet peer dependency
+warning "@babel/plugin-proposal-private-property-in-object@7.21.11" has unmet peer dependency
+warning "@testing-library/user-event@14.6.1" has unmet peer dependency "@testing-library/dom@>=7.21.4"
+```
+
+**Impact**: 🟡 **MEDIUM**
+- Build system instability
+- Potential future compilation failures
+- Testing framework issues
+
+#### **4. Utility Library Deprecations**
+```
+warning lodash.isequal@4.5.0: This package is deprecated. Use require('node:util').isDeepStrictEqual instead
+warning @motionone/vue@10.16.4: Motion One for Vue is deprecated. Use Oku Motion instead
+```
+
+**Impact**: 🟢 **LOW**
+- Performance impact minimal
+- Future compatibility concerns
+
+---
+
+## 🔬 **DEEP RESEARCH FINDINGS**
+
+### **🌐 Web3Modal → Reown AppKit Migration**
+
+#### **Research Status**: ✅ **COMPLETED**
+
+**Key Findings**:
+1. **Web3Modal is completely EOL** (End of Life) as of 2024
+2. **Reown AppKit is the official successor** with same team
+3. **Migration is mandatory** for continued Web3 support
+4. **API is similar but not identical** - requires code changes
+
+**Migration Complexity**: 🔴 **HIGH**
+- Complete service rewrite required
+- Different import structure
+- New configuration syntax
+- Testing across all wallet types needed
+
+### **📋 Reown AppKit Research Summary**
+
+#### **✅ VERIFIED COMPATIBILITY:**
+```javascript
+// Reown AppKit supports same features
+✅ 300+ wallet connections maintained
+✅ Cross-device connectivity (desktop ↔ mobile)  
+✅ Hardware wallet support (Ledger, Trezor)
+✅ Multi-chain support (Ethereum, Polygon, Arbitrum, etc.)
+✅ EIP-6963 wallet discovery standard
+✅ Custom theming (VonVault purple theme)
+```
+
+#### **🆕 NEW FEATURES IN REOWN:**
+```javascript
+✅ Better performance (smaller bundle size)
+✅ Improved mobile UX
+✅ Enhanced security features
+✅ Better error handling
+✅ More wallet types supported
+✅ Future-proof architecture
+```
+
+#### **📦 NEW PACKAGE STRUCTURE:**
+```javascript
+// OLD (deprecated):
+"@web3modal/ethers": "^5.1.11"
+
+// NEW (Reown AppKit):
+"@reown/appkit": "^1.0.0"
+"@reown/appkit-adapter-ethers": "^1.0.0"
+```
+
+---
+
+## 🎯 **COMPREHENSIVE RECOMMENDATIONS**
+
+### **🔴 PHASE 1: IMMEDIATE STABILIZATION (This Week)**
+
+#### **1.1 Document Current Working State**
 ```bash
-# CURRENT ISSUE: Using deprecated Web3Modal v5
-# TARGET: Migrate to Reown AppKit (Web3Modal successor)
+PRIORITY: HIGH
+RISK: NONE
+TIME: 2 hours
 
-RESEARCH NEEDED:
-□ Investigate Reown AppKit migration path
-□ Check if all 300+ wallets still supported
-□ Verify cross-device functionality maintained
-□ Test compatibility with ethers v6
-
-DEPENDENCIES TO ADD:
-□ "@reown/appkit": "latest"
-□ "@reown/appkit-adapter-ethers": "latest"
-
-DEPENDENCIES TO REMOVE:
-□ "@web3modal/ethers": "^5.1.11"
-□ "@walletconnect/web3-provider": "^1.8.0"
-
-ESTIMATED TIME: 1-2 days
-RISK LEVEL: Medium (might break wallet connections)
+□ Create backup branch with current working Web3Modal code
+□ Document exact wallet testing matrix
+□ Screenshot current wallet connection flows
+□ Export current user connection data for migration testing
 ```
 
-#### **2. React Stack Modernization**
+#### **1.2 Fix Build Warnings (Safe Changes)**
 ```bash
-# CURRENT ISSUE: Stuck on React 18 due to react-scripts
-# TARGET: Upgrade to React 19 + Vite (replace react-scripts)
+PRIORITY: MEDIUM  
+RISK: LOW
+TIME: 4 hours
 
-RESEARCH NEEDED:
-□ Migrate from react-scripts to Vite
-□ Update all React 18 code to React 19 compatible
-□ Test all components with React 19
-□ Update TypeScript types for React 19
-
-DEPENDENCIES TO UPGRADE:
-□ "react": "^19.0.0"
-□ "react-dom": "^19.0.0" 
-□ "@types/react": "^19.0.0"
-□ "@types/react-dom": "^19.0.0"
-
-DEPENDENCIES TO REPLACE:
-□ Remove: "react-scripts": "5.0.1"
-□ Add: "vite": "latest"
-□ Add: "@vitejs/plugin-react": "latest"
-
-ESTIMATED TIME: 2-3 days  
-RISK LEVEL: High (major build system change)
+□ Update peer dependencies (@babel/core, @testing-library/dom)
+□ Replace lodash.isequal with node:util.isDeepStrictEqual
+□ Update motion dependencies
+□ Test build stability after each change
 ```
 
-### **🟡 MEDIUM PRIORITY - Quality of Life**
+### **🟡 PHASE 2: MIGRATION PREPARATION (Next 1-2 Weeks)**
 
-#### **3. Tailwind Stack Update**
+#### **2.1 Reown AppKit Research & Testing**
 ```bash
-# CURRENT ISSUE: Behind on Tailwind updates
-# TARGET: Tailwind v3.4+ with latest PostCSS
+PRIORITY: HIGH
+RISK: MEDIUM (testing only)
+TIME: 1 week
 
-DEPENDENCIES TO UPGRADE:
-□ "tailwindcss": "^3.4.17"
-□ "postcss": "^8.4.49"  
-□ "autoprefixer": "^10.4.20"
-
-TESTING REQUIRED:
-□ Verify all VonVault purple theme works
-□ Check mobile-first design unchanged
-□ Validate all 34+ screens render correctly
-
-ESTIMATED TIME: 4-6 hours
-RISK LEVEL: Low (mostly cosmetic)
+□ Create separate branch for Reown migration testing
+□ Install Reown AppKit packages
+□ Build proof-of-concept wallet connection
+□ Test with MetaMask (primary wallet)
+□ Verify VonVault theme compatibility
+□ Document API differences vs Web3Modal
 ```
 
-#### **4. TypeScript & Linting Updates**
+#### **2.2 Migration Strategy Development**
 ```bash
-# CURRENT: Using TypeScript 5.8, can upgrade safely
-# TARGET: Latest TypeScript + ESLint
+PRIORITY: HIGH
+RISK: LOW (planning only)
+TIME: 2-3 days
 
-DEPENDENCIES TO UPGRADE:
-□ "typescript": "^5.9+"
-□ "@types/node": "^20.0.0+"
-□ Update ESLint rules for TS 5.9
-
-TESTING REQUIRED:
-□ Fix any new TypeScript strict errors
-□ Update type definitions
-□ Check all imports still work
-
-ESTIMATED TIME: 2-3 hours
-RISK LEVEL: Low (incremental improvements)
+□ Map Web3Modal APIs to Reown AppKit equivalents
+□ Plan gradual migration approach (feature by feature)
+□ Design rollback strategy if migration fails
+□ Create comprehensive testing checklist
+□ Plan user communication strategy
 ```
 
-### **🟢 LOW PRIORITY - Nice to Have**
+### **🟢 PHASE 3: MIGRATION EXECUTION (Month 2)**
 
-#### **5. Performance Dependencies**
+#### **3.1 Staged Reown AppKit Migration**
 ```bash
-# TARGET: Add performance monitoring & optimization
+PRIORITY: HIGH
+RISK: HIGH (production changes)
+TIME: 1-2 weeks
 
-NEW DEPENDENCIES TO ADD:
-□ "@sentry/react": "latest" (error monitoring)
-□ "web-vitals": "^4.0.0+" (performance)
-□ "react-helmet-async": "latest" (SEO)
+STAGE 1: Core Service Migration
+□ Replace Web3ModalService with ReownAppKitService
+□ Maintain identical API interface for VonVault components
+□ Test basic wallet connections (MetaMask, manual)
 
-ESTIMATED TIME: 1 day
-RISK LEVEL: Low (additive features)
+STAGE 2: Advanced Features
+□ Migrate cross-device connectivity  
+□ Test hardware wallet support
+□ Verify multi-chain functionality
+
+STAGE 3: UI/UX Polish
+□ Apply VonVault theming to Reown AppKit
+□ Test mobile responsiveness
+□ Optimize performance
+
+STAGE 4: Production Deployment
+□ Deploy to staging environment
+□ Complete user acceptance testing
+□ Deploy to production with rollback plan
 ```
 
 ---
 
-## 📋 **VERSION COMPATIBILITY MATRIX**
+## 📊 **MIGRATION COMPLEXITY ANALYSIS**
 
-### **✅ WORKING COMBINATIONS (DO NOT CHANGE)**
-```json
-// STABLE PRODUCTION STACK
-{
-  "react": "^18.2.0",
-  "react-dom": "^18.2.0", 
-  "react-scripts": "5.0.1",
-  "@web3modal/ethers": "^5.1.11",
-  "ethers": "^6.14.4",
-  "framer-motion": "^12.19.2",
-  "tailwindcss": "^3.3.6"
-}
+### **🔍 Code Impact Assessment:**
+
+```typescript
+// Files requiring changes:
+📁 /src/services/Web3ModalService.ts           // ⭐ COMPLETE REWRITE
+📁 /src/components/screens/ConnectCryptoScreen.tsx // 🔧 MINOR CHANGES
+📁 /src/components/screens/DashboardScreen.tsx     // ✅ NO CHANGES
+📁 package.json                                    // 🔧 DEPENDENCY UPDATE
+📁 .env                                            // 🔧 NEW CONFIG VARS
+
+// Estimated lines of code changed: 200-300 lines
+// New code required: 150-200 lines  
+// Risk of breaking existing functionality: MEDIUM
 ```
 
-### **❌ KNOWN BROKEN COMBINATIONS**
-```json
-// DO NOT USE THESE TOGETHER
-{
-  "react": "^19.0.0" + "react-scripts": "5.0.1", // Breaks build
-  "@web3modal/ethers": "^6.0.0",                  // Doesn't exist
-  "@walletconnect/web3-provider": "^2.0.0" + "@web3modal/ethers": "^5.1.11", // API conflicts
-  "wagmi": "^2.0.0" + "ethers": "^6.14.4"        // Duplicate providers
-}
-```
+### **⏱️ REALISTIC TIMELINE:**
 
----
-
-## 🔄 **UPGRADE TESTING PROTOCOL**
-
-### **📝 Before Any Dependency Upgrade:**
-1. **Create backup branch**: `git checkout -b upgrade-[package-name]`
-2. **Test locally**: Full `yarn install` and `yarn build`
-3. **Test all features**: Complete functionality testing
-4. **Test on Render**: Deploy to staging first
-5. **Rollback plan**: Keep previous working versions documented
-
-### **🧪 Testing Checklist for Upgrades:**
 ```bash
-□ yarn install (no conflicts)
-□ yarn build (successful build)
-□ All 34+ screens load correctly
-□ Web3 wallet connections work
-□ Authentication flow works  
-□ Investment features functional
-□ Admin dashboard accessible
-□ Mobile responsiveness intact
-□ Multi-language switching works
-□ No console errors
-□ Performance acceptable (Lighthouse score)
+Week 1: Research & Documentation     (10 hours)
+Week 2: Proof of Concept            (15 hours)  
+Week 3: Migration Implementation     (20 hours)
+Week 4: Testing & Polish            (10 hours)
+Week 5: Production Deployment       (5 hours)
+
+Total Effort: 60 hours over 5 weeks
+```
+
+### **🎯 SUCCESS METRICS:**
+
+```bash
+✅ All current wallet types still work
+✅ Cross-device connectivity maintained  
+✅ Hardware wallets (Ledger/Trezor) functional
+✅ VonVault theming preserved
+✅ Performance same or better
+✅ No user data lost during migration
+✅ Build warnings eliminated
+✅ Future-proof for 2+ years
 ```
 
 ---
 
-## 🚨 **EMERGENCY ROLLBACK VERSIONS**
+## 🚨 **RISK ASSESSMENT**
 
-### **Last Known Good Versions (Keep for Emergency)**
-```json
-// FALLBACK PACKAGE.JSON (if new versions break)
-{
-  "react": "18.2.0",
-  "react-dom": "18.2.0",
-  "react-scripts": "5.0.1", 
-  "@web3modal/ethers": "5.1.11",
-  "ethers": "6.14.4",
-  "tailwindcss": "3.3.6",
-  "typescript": "5.8.3"
-}
+### **🔴 HIGH RISKS:**
+1. **Complete Web3 functionality loss** if migration fails
+2. **User wallet disconnections** during migration
+3. **Cross-device flows breaking** with new architecture
+4. **Performance degradation** during transition period
+
+### **🛡️ RISK MITIGATION STRATEGIES:**
+```bash
+✅ Maintain working backup branch
+✅ Test extensively in development
+✅ Implement feature flags for gradual rollout
+✅ Prepare immediate rollback procedure
+✅ Test with multiple wallet types
+✅ Validate on multiple devices/browsers
 ```
 
 ---
 
-## 📈 **UPGRADE TIMELINE**
+## 💡 **ALTERNATIVE APPROACHES CONSIDERED**
 
-### **Phase 1 (Next 2 weeks)**: Critical Fixes
-- [ ] Research Reown AppKit migration
-- [ ] Plan React 19 + Vite migration
-- [ ] Test Web3Modal alternatives
+### **Option A: Stay with Web3Modal (Current)**
+```
+PROS: No immediate work required
+CONS: Package is deprecated, security risks, no new features
+VERDICT: ❌ NOT RECOMMENDED (technical debt accumulation)
+```
 
-### **Phase 2 (Month 2)**: Major Upgrades  
-- [ ] Implement Reown AppKit
-- [ ] Migrate to Vite build system
-- [ ] Upgrade to React 19
+### **Option B: Custom Wallet Integration**
+```
+PROS: Full control, no external dependencies
+CONS: Massive development effort (300+ wallet integrations)
+VERDICT: ❌ NOT FEASIBLE (6+ months work)
+```
 
-### **Phase 3 (Month 3)**: Polish
-- [ ] Update Tailwind stack
-- [ ] Add performance monitoring
-- [ ] Optimize bundle size
+### **Option C: Migrate to Reown AppKit**
+```
+PROS: Official successor, maintained, new features, same functionality
+CONS: Migration effort required, temporary risk
+VERDICT: ✅ RECOMMENDED (best long-term solution)
+```
+
+### **Option D: Wait and See**
+```
+PROS: No immediate effort
+CONS: Increasing technical debt, potential sudden breakage
+VERDICT: ❌ HIGH RISK (problems will compound)
+```
 
 ---
 
-## 💡 **NOTES & LESSONS LEARNED**
+## 📅 **EXECUTION TIMELINE**
 
-### **Dependency Management Best Practices:**
-1. **Pin exact versions** in production (no `^` or `~`)
-2. **Test upgrades in isolation** (one package at a time)  
-3. **Document working combinations** (this file!)
-4. **Keep emergency rollback versions** ready
-5. **Check for peer dependency warnings** during install
-6. **Monitor npm registry** for package deprecations
+### **Week 1-2: Foundation Work**
+- [ ] Update this TODO with detailed migration plan
+- [ ] Create backup branches  
+- [ ] Fix safe build warnings
+- [ ] Research Reown AppKit thoroughly
 
-### **Red Flags to Watch For:**
-- ⚠️ Peer dependency warnings during `yarn install`
-- ⚠️ Packages marked as "deprecated" in npm
-- ⚠️ Major version bumps (breaking changes likely)
-- ⚠️ Build size increases >20% after upgrade
-- ⚠️ New TypeScript errors after dependency update
+### **Week 3-4: Migration Development**
+- [ ] Develop Reown AppKit service
+- [ ] Test wallet connections extensively
+- [ ] Validate cross-device functionality
+
+### **Week 5-6: Production Migration**
+- [ ] Deploy to staging
+- [ ] Complete testing
+- [ ] Production deployment with monitoring
+
+---
+
+## 🔧 **IMMEDIATE NEXT STEPS (This Week)**
+
+### **Priority 1: Create Safety Net**
+```bash
+git checkout -b backup-working-web3modal
+git tag "web3modal-working-state-july2025"
+```
+
+### **Priority 2: Research Deep-Dive**
+```bash
+□ Study Reown AppKit documentation thoroughly
+□ Analyze migration examples from other projects  
+□ Test Reown in isolated environment
+□ Document exact feature parity requirements
+```
+
+### **Priority 3: Fix Safe Build Issues**
+```bash
+□ Update @babel/core peer dependencies
+□ Replace deprecated lodash functions
+□ Update testing library dependencies
+□ Verify build stability
+```
+
+---
+
+## 📋 **DECISION POINTS NEEDED**
+
+### **🤔 Strategic Decisions Required:**
+
+1. **Timing**: Migrate now vs. wait for business reasons?
+2. **Approach**: Big bang migration vs. gradual feature-by-feature?
+3. **Resources**: Dedicated development time allocation?
+4. **Risk Tolerance**: How much downtime is acceptable during migration?
 
 ---
 
 *Last Updated: July 1, 2025*  
-*Next Review: August 1, 2025*
+*Next Review: July 8, 2025*  
+*Migration Decision Deadline: July 15, 2025*

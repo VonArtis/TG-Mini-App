@@ -6,13 +6,13 @@ import { Card } from '../common/Card';
 import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
 import { CleanHeader } from '../layout/CleanHeader';
 import { useLanguage } from '../../hooks/useLanguage';
-import { web3ModalService, type Web3ModalConnection } from '../../services/Web3ModalService';
+import { reownAppKitService, type ReownAppKitConnection } from '../../services/Web3ModalService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, onNavigate, onConnect }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<Web3ModalConnection | null>(null);
+  const [success, setSuccess] = useState<ReownAppKitConnection | null>(null);
   const [showManualInput, setShowManualInput] = useState(false);
   const [manualAddress, setManualAddress] = useState('');
   const [manualName, setManualName] = useState('');
@@ -24,7 +24,7 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
     setError(null);
     
     try {
-      const connection = await web3ModalService.connectWallet();
+      const connection = await reownAppKitService.connectWallet();
       setSuccess(connection);
 
       // Call parent onConnect if provided
@@ -56,7 +56,7 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
     setError(null);
     
     try {
-      const connection = await web3ModalService.addManualWallet(manualAddress, manualName || 'Manual Wallet');
+      const connection = await reownAppKitService.addManualWallet(manualAddress, manualName || 'Manual Wallet');
       setSuccess(connection);
 
       // Call parent onConnect if provided

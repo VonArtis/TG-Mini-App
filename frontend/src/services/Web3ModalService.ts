@@ -1,8 +1,9 @@
-// Web3Modal Universal Wallet Service - 300+ Wallet Support
-import { createWeb3Modal, defaultConfig } from '@web3modal/ethers'
+// Reown AppKit Universal Wallet Service - 600+ Wallet Support
+import { createAppKit } from '@reown/appkit'
+import { EthersAdapter } from '@reown/appkit-adapter-ethers'
 import { BrowserProvider } from 'ethers'
 
-// Define networks manually (correct approach for v5.1.11)
+// Define networks for Reown AppKit
 const mainnet = {
   chainId: 1,
   name: 'Ethereum',
@@ -43,7 +44,7 @@ const base = {
   rpcUrl: 'https://mainnet.base.org'
 }
 
-// VonVault Web3Modal Configuration
+// VonVault Reown AppKit Configuration
 const projectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID || 'demo-project-id'
 
 const metadata = {
@@ -62,20 +63,15 @@ const chains = [
   base
 ]
 
-// Ethers config
-const ethersConfig = defaultConfig({
-  metadata,
-  enableEIP6963: true, // Enable new wallet discovery standard
-  enableInjected: true, // Enable injected wallets (MetaMask, etc.)
-  enableCoinbase: true, // Enable Coinbase Wallet
-  rpcUrl: 'https://cloudflare-eth.com', // Fallback RPC
-})
+// Create Ethers adapter
+const ethersAdapter = new EthersAdapter()
 
-// Create Web3Modal instance
-const modal = createWeb3Modal({
-  ethersConfig,
-  chains,
+// Create Reown AppKit instance
+const appKit = createAppKit({
+  adapters: [ethersAdapter],
+  networks: chains as any, // Type assertion to handle AppKit network requirements
   projectId,
+  metadata,
   themeMode: 'dark', // Match VonVault design
   themeVariables: {
     '--w3m-color-mix': '#9333ea', // VonVault purple
@@ -99,10 +95,10 @@ const modal = createWeb3Modal({
 })
 
 // Interface for VonVault wallet connections
-export interface Web3ModalConnection {
+export interface ReownAppKitConnection {
   address: string
   chainId: number
-  provider: BrowserProvider
+  provider: any
   isConnected: boolean
   walletInfo?: {
     name: string
@@ -110,22 +106,22 @@ export interface Web3ModalConnection {
   }
 }
 
-class Web3ModalService {
-  private connection: Web3ModalConnection | null = null
-  private connectedWallets: Web3ModalConnection[] = []
+class ReownAppKitService {
+  private connection: ReownAppKitConnection | null = null
+  private connectedWallets: ReownAppKitConnection[] = []
 
   constructor() {
     this.initializeListeners()
     this.loadStoredConnections()
   }
 
-  // Initialize Web3Modal event listeners (CORRECT v5.1.11 API)
+  // Initialize Reown AppKit event listeners
   private initializeListeners() {
-    // Note: Web3Modal v5 uses different event system than described in our code
-    // The modal object doesn't have subscribeProvider/subscribeAccount methods
+    // Note: Reown AppKit uses different event system
+    // The appKit object doesn't have subscribeProvider/subscribeAccount methods
     // These are handled through ethereum provider events after connection
     
-    console.log('Web3Modal service initialized - events handled post-connection')
+    console.log('Reown AppKit service initialized - events handled post-connection')
     
     // Events will be set up after wallet connection in connectWallet method
   }
@@ -135,14 +131,14 @@ class Web3ModalService {
     try {
       const ethersProvider = new BrowserProvider(provider)
       
-      const connection: Web3ModalConnection = {
+      const connection: ReownAppKitConnection = {
         address,
         chainId,
         provider: ethersProvider,
         isConnected: true,
         walletInfo: {
-          name: modal.getWalletProvider()?.name || 'Connected Wallet',
-          icon: modal.getWalletProvider()?.icon || ''
+          name: appKit.getWalletProvider()?.name || 'Connected Wallet',
+          icon: appKit.getWalletProvider()?.icon || ''
         }
       }
 
@@ -150,14 +146,14 @@ class Web3ModalService {
       this.addWalletConnection(connection)
       this.updateUserCryptoStatus()
 
-      console.log('Web3Modal connection established:', {
+      console.log('Reown AppKit connection established:', {
         address: address.slice(0, 6) + '...' + address.slice(-4),
         chain: chainId,
         wallet: connection.walletInfo?.name
       })
 
     } catch (error) {
-      console.error('Error handling Web3Modal connection:', error)
+      console.error('Error handling Reown AppKit connection:', error)
       throw new Error('Failed to establish wallet connection')
     }
   }
@@ -181,36 +177,38 @@ class Web3ModalService {
 
   // Public methods for VonVault integration
   
-  // Open Web3Modal connection interface (CORRECT v5.1.11 API)
-  async connectWallet(): Promise<Web3ModalConnection> {
+  // Open Reown AppKit connection interface
+  async connectWallet(): Promise<ReownAppKitConnection> {
     try {
-      // Use Web3Modal v5 API correctly
-      const web3Provider = await modal.connect()
+      // Open Reown AppKit modal
+      await appKit.open()
       
-      if (!web3Provider) {
+      // Wait for connection to be established
+      const provider = appKit.getWalletProvider() as any
+      if (!provider) {
         throw new Error('Failed to connect to wallet')
       }
 
-      // Create ethers provider from Web3Modal connection
-      const ethersProvider = new BrowserProvider(web3Provider)
+      // Create ethers provider from Reown AppKit connection
+      const ethersProvider = new BrowserProvider(provider)
       const signer = await ethersProvider.getSigner()
       const address = await signer.getAddress()
       const network = await ethersProvider.getNetwork()
 
-      const connection: Web3ModalConnection = {
+      const connection: ReownAppKitConnection = {
         address,
         chainId: Number(network.chainId),
         provider: ethersProvider,
         isConnected: true,
         walletInfo: {
-          name: 'Connected Wallet',
-          icon: '🦊'
+          name: (provider as any)?.name || 'Connected Wallet',
+          icon: (provider as any)?.icon || '🦊'
         }
       }
 
       // Set up provider event listeners for this connection
-      if (web3Provider.on) {
-        web3Provider.on('accountsChanged', (accounts: string[]) => {
+      if (provider && provider.on) {
+        provider.on('accountsChanged', (accounts: string[]) => {
           if (accounts.length > 0) {
             this.updateConnection(accounts[0])
           } else {
@@ -218,14 +216,14 @@ class Web3ModalService {
           }
         })
 
-        web3Provider.on('chainChanged', (chainId: string) => {
+        provider.on('chainChanged', (chainId: string) => {
           if (this.connection) {
             this.connection.chainId = parseInt(chainId, 16)
             this.updateUserCryptoStatus()
           }
         })
 
-        web3Provider.on('disconnect', () => {
+        provider.on('disconnect', () => {
           this.handleDisconnection()
         })
       }
@@ -234,7 +232,7 @@ class Web3ModalService {
       this.addWalletConnection(connection)
       this.updateUserCryptoStatus()
 
-      console.log('Web3Modal connection established:', {
+      console.log('Reown AppKit connection established:', {
         address: address.slice(0, 6) + '...' + address.slice(-4),
         chain: Number(network.chainId),
         wallet: connection.walletInfo?.name
@@ -243,32 +241,32 @@ class Web3ModalService {
       return connection
 
     } catch (error: any) {
-      console.error('Web3Modal connection failed:', error)
+      console.error('Reown AppKit connection failed:', error)
       throw new Error(error.message || 'Failed to connect wallet')
     }
   }
 
-  // Disconnect current wallet (CORRECT v5.1.11 API)
+  // Disconnect current wallet (CORRECT Reown AppKit API)
   async disconnectWallet(): Promise<void> {
     try {
-      await modal.disconnect()
+      await appKit.disconnect()
       this.connection = null
       this.updateUserCryptoStatus()
     } catch (error) {
       console.error('Error disconnecting wallet:', error)
-      // Even if modal.disconnect fails, clear our local state
+      // Even if appKit.disconnect fails, clear our local state
       this.connection = null
       this.updateUserCryptoStatus()
     }
   }
 
   // Get current connection status
-  getConnection(): Web3ModalConnection | null {
+  getConnection(): ReownAppKitConnection | null {
     return this.connection
   }
 
   // Get all connected wallets
-  getConnectedWallets(): Web3ModalConnection[] {
+  getConnectedWallets(): ReownAppKitConnection[] {
     return [...this.connectedWallets]
   }
 
@@ -309,7 +307,7 @@ class Web3ModalService {
   }
 
   // Add manual wallet (for compatibility with existing VonVault system)
-  async addManualWallet(address: string, name: string = 'Manual Wallet'): Promise<Web3ModalConnection> {
+  async addManualWallet(address: string, name: string = 'Manual Wallet'): Promise<ReownAppKitConnection> {
     try {
       // Validate address format
       if (!address.match(/^0x[a-fA-F0-9]{40}$/)) {
@@ -325,7 +323,7 @@ class Web3ModalService {
       }
 
       // Create manual connection (view-only)
-      const manualConnection: Web3ModalConnection = {
+      const manualConnection: ReownAppKitConnection = {
         address,
         chainId: 1, // Default to mainnet
         provider: new BrowserProvider(window.ethereum || {}),
@@ -347,7 +345,7 @@ class Web3ModalService {
 
   // Private helper methods
 
-  private addWalletConnection(connection: Web3ModalConnection) {
+  private addWalletConnection(connection: ReownAppKitConnection) {
     // Remove existing connection with same address
     this.connectedWallets = this.connectedWallets.filter(
       w => w.address.toLowerCase() !== connection.address.toLowerCase()
@@ -368,12 +366,12 @@ class Web3ModalService {
       walletInfo: conn.walletInfo
     }))
 
-    localStorage.setItem('web3modal_connections', JSON.stringify(storableConnections))
+    localStorage.setItem('reown_appkit_connections', JSON.stringify(storableConnections))
   }
 
   private loadStoredConnections() {
     try {
-      const stored = localStorage.getItem('web3modal_connections')
+      const stored = localStorage.getItem('reown_appkit_connections')
       if (stored) {
         const connections = JSON.parse(stored)
         // Note: We can't restore the provider, so these become view-only
@@ -416,12 +414,12 @@ class Web3ModalService {
     }, 0)
   }
 
-  // Get Web3Modal instance (for advanced usage)
+  // Get Reown AppKit instance (for advanced usage)
   getModal() {
-    return modal
+    return appKit
   }
 }
 
 // Export singleton instance
-export const web3ModalService = new Web3ModalService()
-export type { Web3ModalConnection }
+export const reownAppKitService = new ReownAppKitService()
+export type { ReownAppKitConnection }

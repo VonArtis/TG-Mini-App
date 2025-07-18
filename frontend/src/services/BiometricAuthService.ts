@@ -50,8 +50,8 @@ class BiometricAuthService {
     return !!(
       window.PublicKeyCredential &&
       window.navigator.credentials &&
-      window.navigator.credentials.create &&
-      window.navigator.credentials.get
+      typeof window.navigator.credentials.create === 'function' &&
+      typeof window.navigator.credentials.get === 'function'
     );
   }
 
@@ -113,7 +113,7 @@ class BiometricAuthService {
       const response = credential.response as AuthenticatorAttestationResponse;
       const credentialInfo: BiometricCredential = {
         id: credential.id,
-        publicKey: this.arrayBufferToBase64(response.publicKey || new ArrayBuffer(0)),
+        publicKey: this.arrayBufferToBase64(response.getPublicKey() || new ArrayBuffer(0)),
         counter: 0,
         createdAt: new Date().toISOString(),
       };

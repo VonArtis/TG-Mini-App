@@ -47,7 +47,7 @@ class CryptoWalletService implements WalletService {
       }
 
       // Request account access
-      const accounts = await window.ethereum.request({
+      const accounts = await (window.ethereum as any).request({
         method: 'eth_requestAccounts',
       });
 
@@ -56,7 +56,7 @@ class CryptoWalletService implements WalletService {
       }
 
       const address = accounts[0];
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum as any);
 
       // Get network information
       const network = await provider.getNetwork();
@@ -95,7 +95,7 @@ class CryptoWalletService implements WalletService {
       
       const provider = new WalletConnectProvider({
         infuraId: process.env.REACT_APP_INFURA_ID || "demo", // Use demo for now
-        qrcodeModal: true,
+        qrcodeModal: undefined as any, // QRCodeModal will be handled internally
       });
 
       // Enable session (triggers QR Code modal)
@@ -141,7 +141,7 @@ class CryptoWalletService implements WalletService {
       }
 
       // Request account access
-      const accounts = await window.ethereum.request({
+      const accounts = await (window.ethereum as any).request({
         method: 'eth_requestAccounts',
       });
 
@@ -150,7 +150,7 @@ class CryptoWalletService implements WalletService {
       }
 
       const address = accounts[0];
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum as any);
       const network = await provider.getNetwork();
       const balance = await provider.getBalance(address);
       const formattedBalance = ethers.formatEther(balance);
@@ -182,7 +182,7 @@ class CryptoWalletService implements WalletService {
         throw new Error('Coinbase Wallet is not detected. Please install Coinbase Wallet extension.');
       }
 
-      const accounts = await window.ethereum.request({
+      const accounts = await (window.ethereum as any).request({
         method: 'eth_requestAccounts',
       });
 
@@ -191,7 +191,7 @@ class CryptoWalletService implements WalletService {
       }
 
       const address = accounts[0];
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum as any);
       const network = await provider.getNetwork();
       const balance = await provider.getBalance(address);
       const formattedBalance = ethers.formatEther(balance);

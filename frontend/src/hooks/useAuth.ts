@@ -182,7 +182,9 @@ export const useAuth = () => {
         };
         
         // Save token to secure storage
-        secureStorage.setToken(user.token);
+        if (user.token) {
+          secureStorage.setToken(user.token);
+        }
         
         // Save user to both state and localStorage
         setUser(user);
@@ -229,7 +231,9 @@ export const useAuth = () => {
         };
         
         // Save token to secure storage
-        secureStorage.setToken(user.token);
+        if (user.token) {
+          secureStorage.setToken(user.token);
+        }
         
         // Save user to both state and localStorage
         setUser(user);

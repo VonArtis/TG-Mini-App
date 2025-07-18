@@ -39,7 +39,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
   const [success, setSuccess] = useState(false);
   const [shakeField, setShakeField] = useState<string | null>(null);
-  const { registerUser } = useAuth();
+  const { signup } = useAuth();
   const { t } = useLanguage();
 
   // Real-time Email Availability Checking
@@ -240,12 +240,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
     
     setLoading(true);
     try {
-      const userData = await registerUser({
-        firstName: form.firstName,
-        lastName: form.lastName,
+      const userData = await signup({
+        name: `${form.firstName} ${form.lastName}`.trim(),
         email: form.email,
         phone: form.phone,
-        password: form.password
+        password: form.password,
+        country_code: form.countryCode
       });
       
       if (userData) {

@@ -45,7 +45,7 @@ const levenshteinDistance = (str1: string, str2: string): number => {
 const suggestDomain = (domain: string): string | null => {
   const allDomains = [...COMMON_DOMAINS, ...BUSINESS_DOMAINS];
   
-  let bestMatch = null;
+  let bestMatch: string | null = null;
   let minDistance = Infinity;
   
   for (const commonDomain of allDomains) {

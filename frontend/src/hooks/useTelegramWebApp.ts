@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 
 // Telegram WebApp Hook for VonVault
 export const useTelegramWebApp = () => {
-  const [webApp, setWebApp] = useState(null);
-  const [user, setUser] = useState(null);
+  const [webApp, setWebApp] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
   const [isTelegram, setIsTelegram] = useState(false);
 
   useEffect(() => {

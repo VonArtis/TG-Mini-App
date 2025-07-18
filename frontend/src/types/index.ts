@@ -12,12 +12,14 @@ export type ScreenType =
   | 'authenticator-setup'
   | 'enhanced-2fa-setup'
   | '2fa-sms-setup'
+  | 'sms-2fa-setup'
   | 'verification-success'
   | 'connect-bank'
   | 'connect-crypto'
   | 'dashboard'
   | 'investments'
   | 'new-investment'
+  | 'make-investment'
   | 'crypto'
   | 'crypto-deposit'
   | 'wallet-manager'
@@ -64,6 +66,8 @@ export interface User {
   name?: string;
   first_name?: string;
   last_name?: string;
+  firstName?: string; // For backward compatibility
+  lastName?: string; // For backward compatibility
   email?: string;
   phone?: string;
   token?: string;
@@ -106,9 +110,15 @@ export interface Investment {
   id: string;
   user_id: string;
   name: string;
+  plan_name?: string;
   amount: number;
+  current_value?: number;
+  profit?: number;
   rate: number;
+  apy_rate?: number;
   term: number;
+  start_date?: string;
+  maturity_date?: string;
   membership_level?: string;
   status: 'active' | 'completed' | 'pending';
   created_at?: string;
@@ -182,6 +192,11 @@ export interface Portfolio {
   user_id: string;
   membership: MembershipStatus;
   total_portfolio: number;
+  total_profit?: number;
+  available_balance?: number;
+  cash_balance?: number;
+  crypto_value?: number;
+  pending_deposits?: number;
   investments: {
     total: number;
     count: number;
@@ -218,6 +233,19 @@ export interface ConnectionScreenProps extends ScreenProps {
   onConnect?: () => Promise<void>;
 }
 
+export interface VerificationScreenProps extends ScreenProps {
+  onVerified?: () => void;
+  onContinue?: () => void;
+}
+
+export interface SMSVerificationScreenProps extends VerificationScreenProps {
+  phoneNumber?: string;
+}
+
+export interface EmailVerificationScreenProps extends VerificationScreenProps {
+  email?: string;
+}
+
 // Context types
 export interface AppContextType {
   user: User | null;
@@ -239,6 +267,15 @@ export interface AppContextType {
   renameWallet: (walletId: string, name: string) => Promise<void>;
   refreshWalletBalances: () => Promise<void>;
   getWalletByNetwork: (network: string) => ConnectedWallet | null;
+  fetchConnectedWallets: () => Promise<void>;
+  
+  // Auth functions
+  login: (email: string, password: string) => Promise<User>;
+  signup: (userData: any) => Promise<User>;
+  logout: () => void;
+  isAuthenticated: boolean;
+  authenticateBank: () => Promise<User>;
+  authenticateCrypto: () => Promise<User>;
 }
 
 // API Response types

@@ -79,7 +79,6 @@ const appKit = createAppKit({
     '--w3m-accent': '#9333ea',
     '--w3m-border-radius-master': '8px',
   },
-  enableAnalytics: false, // Privacy-focused
   includeWalletIds: [
     // Priority wallets for VonVault
     'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
@@ -137,8 +136,8 @@ class ReownAppKitService {
         provider: ethersProvider,
         isConnected: true,
         walletInfo: {
-          name: appKit.getWalletProvider()?.name || 'Connected Wallet',
-          icon: appKit.getWalletProvider()?.icon || ''
+          name: (appKit.getWalletProvider() as any)?.name || 'Connected Wallet',
+          icon: (appKit.getWalletProvider() as any)?.icon || ''
         }
       }
 
@@ -326,7 +325,9 @@ class ReownAppKitService {
       const manualConnection: ReownAppKitConnection = {
         address,
         chainId: 1, // Default to mainnet
-        provider: new BrowserProvider(window.ethereum || {}),
+        provider: new BrowserProvider(window.ethereum || {
+          request: async () => { throw new Error('No wallet provider'); }
+        } as any),
         isConnected: true,
         walletInfo: {
           name,
@@ -422,4 +423,3 @@ class ReownAppKitService {
 
 // Export singleton instance
 export const reownAppKitService = new ReownAppKitService()
-export type { ReownAppKitConnection }

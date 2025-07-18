@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { ScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
-import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
+import { MobileLayout } from '../layout/MobileLayout';
 import { useLanguage } from '../../hooks/useLanguage';
 
 export const CryptoDepositScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
@@ -10,7 +10,7 @@ export const CryptoDepositScreen: React.FC<ScreenProps> = ({ onBack, onNavigate 
   const { t } = useLanguage();
 
   return (
-    <MobileLayoutWithTabs showTabs={false} centered maxWidth="xs">
+    <MobileLayout centered maxWidth="xs">
       <div className="absolute top-4 left-4">
         <button 
           onClick={onBack}
@@ -65,6 +65,6 @@ export const CryptoDepositScreen: React.FC<ScreenProps> = ({ onBack, onNavigate 
           {t('deposit.confirm', 'Confirm Deposit')}
         </Button>
       </div>
-    </MobileLayoutWithTabs>
+    </MobileLayout>
   );
 };

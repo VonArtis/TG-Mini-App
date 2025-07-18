@@ -39,10 +39,14 @@ export const InvestmentsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate })
       setInvestments([
         {
           id: 'demo-1',
+          user_id: 'demo-user',
+          name: 'Demo Investment 1',
           plan_name: 'Growth Plan',
           amount: 5000,
           current_value: 5250,
           profit: 250,
+          rate: 7.5,
+          term: 12,
           status: 'active',
           start_date: '2024-01-15',
           maturity_date: '2025-01-15',
@@ -50,10 +54,14 @@ export const InvestmentsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate })
         },
         {
           id: 'demo-2', 
+          user_id: 'demo-user',
+          name: 'Demo Investment 2',
           plan_name: 'Stability Plan',
           amount: 2000,
           current_value: 2080,
           profit: 80,
+          rate: 5.0,
+          term: 6,
           status: 'active',
           start_date: '2024-02-01',
           maturity_date: '2024-08-01',
@@ -103,7 +111,7 @@ export const InvestmentsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate })
   };
 
   const totalInvested = investments.reduce((sum, inv) => sum + inv.amount, 0);
-  const totalCurrentValue = investments.reduce((sum, inv) => sum + inv.current_value, 0);
+  const totalCurrentValue = investments.reduce((sum, inv) => sum + (inv.current_value || inv.amount), 0);
   const totalProfit = totalCurrentValue - totalInvested;
 
   if (loading) {
@@ -203,13 +211,13 @@ export const InvestmentsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate })
                       {investment.plan_name}
                     </div>
                     <div className="text-xs text-gray-400">
-                      {formatDate(investment.start_date)} - {formatDate(investment.maturity_date)}
+                      {formatDate(investment.start_date || '')} - {formatDate(investment.maturity_date || '')}
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="font-semibold text-purple-300">
-                    {formatCurrency(investment.current_value)}
+                    {formatCurrency(investment.current_value || investment.amount)}
                   </div>
                   <div className="text-xs text-gray-400">
                     {investment.apy_rate}% APY
@@ -221,13 +229,13 @@ export const InvestmentsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate })
               <div className="mb-3">
                 <div className="flex justify-between text-xs text-gray-400 mb-1">
                   <span>{t('investments.progress', 'Progress')}</span>
-                  <span>{Math.round(calculateProgress(investment.start_date, investment.maturity_date))}%</span>
+                  <span>{Math.round(calculateProgress(investment.start_date || '', investment.maturity_date || ''))}%</span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-2">
                   <div
                     className="bg-purple-500 h-2 rounded-full transition-all"
                     style={{
-                      width: `${calculateProgress(investment.start_date, investment.maturity_date)}%`
+                      width: `${calculateProgress(investment.start_date || '', investment.maturity_date || '')}%`
                     }}
                   />
                 </div>
@@ -238,7 +246,7 @@ export const InvestmentsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate })
                   {investment.status.toUpperCase()}
                 </span>
                 <div className="text-xs text-gray-400">
-                  +{formatCurrency(investment.current_value - investment.amount)}
+                  +{formatCurrency((investment.current_value || investment.amount) - investment.amount)}
                 </div>
               </div>
             </div>

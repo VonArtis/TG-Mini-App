@@ -6,7 +6,7 @@ interface InputProps {
   type?: string;
   name?: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   placeholder?: string;
@@ -61,7 +61,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
           type={type}
           name={name}
           value={value}
-          onChange={onChange}
+          onChange={onChange || (() => {})}
           onKeyPress={onKeyPress}
           onBlur={onBlur}
           placeholder={placeholder}

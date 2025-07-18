@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { ScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
-import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
+import { MobileLayout } from '../layout/MobileLayout';
 import { useLanguage } from '../../hooks/useLanguage';
 
 export const TransferFundsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate }) => {
@@ -30,7 +30,7 @@ export const TransferFundsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate 
   };
 
   return (
-    <MobileLayoutWithTabs showTabs={false} centered maxWidth="xs">
+    <MobileLayout centered maxWidth="xs">
       <div className="absolute top-4 left-4">
         <button 
           onClick={onBack}
@@ -140,6 +140,6 @@ export const TransferFundsScreen: React.FC<ScreenProps> = ({ onBack, onNavigate 
           {t('transfer.confirm', 'Transfer Funds')}
         </Button>
       </div>
-    </MobileLayoutWithTabs>
+    </MobileLayout>
   );
 };

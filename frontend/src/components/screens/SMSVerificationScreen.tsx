@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import type { AuthScreenProps } from '../../types';
+import { MobileLayout } from '../layout/MobileLayout';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
-import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
+import { apiService } from '../../services/api';
 import { useLanguage } from '../../hooks/useLanguage';
+import { SMSVerificationScreenProps } from '../../types';
 
-interface SMSVerificationScreenProps extends AuthScreenProps {}
 
 export const SMSVerificationScreen: React.FC<SMSVerificationScreenProps> = ({ 
   onBack, 
@@ -35,7 +35,7 @@ export const SMSVerificationScreen: React.FC<SMSVerificationScreenProps> = ({
   };
 
   return (
-    <MobileLayoutWithTabs showTabs={false} centered maxWidth="xs">
+    <MobileLayout centered maxWidth="xs">
       <div className="absolute top-4 left-4">
         <button 
           onClick={onBack}
@@ -102,6 +102,6 @@ export const SMSVerificationScreen: React.FC<SMSVerificationScreenProps> = ({
           {t('verification.resend', 'Resend Code')}
         </span>
       </p>
-    </MobileLayoutWithTabs>
+    </MobileLayout>
   );
 };

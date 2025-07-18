@@ -1,6 +1,6 @@
 // React context for global app state
 import React, { createContext, useContext, ReactNode } from 'react';
-import type { AppContextType, ConnectedWallet } from '../types';
+import type { AppContextType, ConnectedWallet, User } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { usePortfolio } from '../hooks/usePortfolio';
 import { useMembership } from '../hooks/useMembership';
@@ -54,7 +54,16 @@ const AppProviderInner: React.FC<AppProviderProps> = ({ children }) => {
     setPrimaryWallet: multiWallet.setPrimaryWallet,
     renameWallet: multiWallet.renameWallet,
     refreshWalletBalances: multiWallet.refreshWalletBalances,
-    getWalletByNetwork: multiWallet.getWalletByNetwork
+    getWalletByNetwork: multiWallet.getWalletByNetwork,
+    fetchConnectedWallets: multiWallet.fetchWallets,
+    
+    // === AUTH FUNCTIONS ===
+    login: auth.login as (email: string, password: string) => Promise<User>,
+    signup: auth.signup as (userData: any) => Promise<User>,
+    logout: auth.logout,
+    isAuthenticated: auth.isAuthenticated,
+    authenticateBank: auth.authenticateBank as () => Promise<User>,
+    authenticateCrypto: auth.authenticateCrypto as () => Promise<User>
   };
 
   return (

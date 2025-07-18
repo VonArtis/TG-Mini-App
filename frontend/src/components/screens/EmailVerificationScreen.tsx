@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import type { AuthScreenProps } from '../../types';
+import type { EmailVerificationScreenProps } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { MobileLayout } from '../layout/MobileLayout';
 import { useLanguage } from '../../hooks/useLanguage';
-
-interface EmailVerificationScreenProps extends AuthScreenProps {}
 
 export const EmailVerificationScreen: React.FC<EmailVerificationScreenProps> = ({ 
   onBack, 

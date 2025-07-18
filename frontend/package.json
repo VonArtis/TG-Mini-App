@@ -16,7 +16,6 @@
     "@types/node": "^18.19.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "@walletconnect/web3-provider": "^1.8.0",
     "@reown/appkit": "^1.7.11",
     "@reown/appkit-adapter-ethers": "^1.7.11",
     "axios": "^1.10.0",

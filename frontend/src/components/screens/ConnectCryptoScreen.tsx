@@ -6,7 +6,7 @@ import { Card } from '../common/Card';
 import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
 import { CleanHeader } from '../layout/CleanHeader';
 import { useLanguage } from '../../hooks/useLanguage';
-import { reownAppKitService, type ReownAppKitConnection } from '../../services/Web3ModalService';
+import { reownAppKitService, type ReownAppKitConnection } from '../../services/ReownAppKitService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, onNavigate, onConnect }) => {
@@ -18,8 +18,8 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
   const [manualName, setManualName] = useState('');
   const { t } = useLanguage();
 
-  // Web3Modal connection handler
-  const handleWeb3ModalConnect = async () => {
+  // Reown AppKit connection handler
+  const handleReownAppKitConnect = async () => {
     setLoading(true);
     setError(null);
     
@@ -38,7 +38,7 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
       }, 2000);
 
     } catch (error: any) {
-      console.error('Web3Modal connection failed:', error);
+      console.error('Reown AppKit connection failed:', error);
       setError(error.message || 'Failed to connect wallet');
     } finally {
       setLoading(false);
@@ -82,7 +82,7 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
       <CleanHeader title="🔗 Connect Crypto Wallet" onBack={onBack} />
       
       <div className="w-full space-y-6">
-        {/* Web3Modal Universal Wallet Connection */}
+        {/* Reown AppKit Universal Wallet Connection */}
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-gray-300">
             {t('crypto.selectWallet', 'Choose Your Wallet')}
@@ -307,7 +307,7 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
 
         {/* Main Connect Button */}
         <Button 
-          onClick={handleWeb3ModalConnect}
+          onClick={handleReownAppKitConnect}
           disabled={loading || !!success}
           loading={loading}
           fullWidth

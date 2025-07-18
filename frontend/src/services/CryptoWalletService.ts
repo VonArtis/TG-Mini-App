@@ -12,7 +12,7 @@ interface WalletConnection {
 
 interface WalletService {
   connectMetaMask(): Promise<WalletConnection>;
-  connectWalletConnect(): Promise<WalletConnection>;
+  // connectWalletConnect(): Promise<WalletConnection>; // Removed - handled by Reown AppKit
   connectTrustWallet(): Promise<WalletConnection>;
   connectCoinbaseWallet(): Promise<WalletConnection>;
   connectManualWallet(address: string, name?: string): Promise<WalletConnection>;
@@ -87,50 +87,8 @@ class CryptoWalletService implements WalletService {
     }
   }
 
-  // WalletConnect Integration
-  async connectWalletConnect(): Promise<WalletConnection> {
-    try {
-      // Dynamic import for WalletConnect
-      const WalletConnectProvider = (await import('@walletconnect/web3-provider')).default;
-      
-      const provider = new WalletConnectProvider({
-        infuraId: process.env.REACT_APP_INFURA_ID || "demo", // Use demo for now
-        qrcodeModal: undefined as any, // QRCodeModal will be handled internally
-      });
-
-      // Enable session (triggers QR Code modal)
-      await provider.enable();
-
-      const ethersProvider = new ethers.BrowserProvider(provider);
-      const signer = await ethersProvider.getSigner();
-      const address = await signer.getAddress();
-
-      // Get network and balance
-      const network = await ethersProvider.getNetwork();
-      const balance = await ethersProvider.getBalance(address);
-      const formattedBalance = ethers.formatEther(balance);
-
-      const connection: WalletConnection = {
-        type: 'walletconnect',
-        address,
-        provider,
-        balance: formattedBalance,
-        network: network.name,
-        name: 'WalletConnect'
-      };
-
-      // Verify ownership
-      await this.verifyWalletOwnership(connection);
-
-      // Store connection
-      this.addWalletConnection(connection);
-
-      return connection;
-    } catch (error: any) {
-      console.error('WalletConnect connection failed:', error);
-      throw new Error(error.message || 'Failed to connect via WalletConnect');
-    }
-  }
+  // NOTE: WalletConnect integration now handled by Reown AppKit
+  // Legacy WalletConnect method removed - use ReownAppKitService instead
 
   // Trust Wallet Integration (uses same interface as MetaMask on web)
   async connectTrustWallet(): Promise<WalletConnection> {

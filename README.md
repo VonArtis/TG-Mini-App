@@ -1,8 +1,8 @@
-# 🏆 VonVault - World's Most Secure DeFi Platform
+# 🏆 VonVault - World's Most Secure DeFi Platform - built for Web3.0
 
 <div align="center">
 
-![VonVault Logo](https://img.shields.io/badge/VonVault-World's%20Most%20Secure%20DeFi-9333ea?style=for-the-badge&logo=telegram)
+![VonVault Logo](https://img.shields.io/badge/VonVault-World's%20Most%20Secure%20DeFi%20Platform%20built%20for%20Web3.0-9333ea?style=for-the-badge&logo=telegram)
 
 [![Live App](https://img.shields.io/badge/🚀%20Live%20App-www.vonartis.app-success?style=for-the-badge)](https://www.vonartis.app)
 [![Security Rating](https://img.shields.io/badge/🛡️%20Security%20Rating-9.95/10-green?style=for-the-badge)](https://www.vonartis.app)
@@ -22,7 +22,7 @@
 
 <div align="center">
 
-### **The World's Most Secure DeFi Investment Platform Built for Telegram**
+### **VonVault - World's Most Secure DeFi Platform - built for Web3.0**
 
 **Experience the future of finance where 9.95/10 security rating meets DeFi innovation and global accessibility**
 
@@ -715,7 +715,7 @@ VonVault uses **Vonage SMS API** for secure SMS verification. To configure SMS i
 
 [**🚀 Launch VonVault Now →**](https://www.vonartis.app)
 
-*🛡️ 9.95/10 Security • 🌍 15+ Languages • 📱 Zero Downloads • ⚡ 60-Second Setup*
+*🛡️ 9.95/10 Security • 🌍 15+ Languages • 🌐 Built for Web3.0 • ⚡ 60-Second Setup*
 
 ---
 

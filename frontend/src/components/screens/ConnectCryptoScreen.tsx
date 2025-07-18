@@ -7,6 +7,7 @@ import { MobileLayoutWithTabs } from '../layout/MobileLayoutWithTabs';
 import { CleanHeader } from '../layout/CleanHeader';
 import { useLanguage } from '../../hooks/useLanguage';
 import { reownAppKitService, type ReownAppKitConnection } from '../../services/ReownAppKitService';
+import { cryptoWalletService } from '../../services/CryptoWalletService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, onNavigate, onConnect }) => {
@@ -40,6 +41,118 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
     } catch (error: any) {
       console.error('Reown AppKit connection failed:', error);
       setError(error.message || 'Failed to connect wallet');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Individual wallet connection handlers
+  const handleMetaMaskConnect = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const connection = await cryptoWalletService.connectMetaMask();
+      // Convert to ReownAppKitConnection format for success display
+      const reownConnection: ReownAppKitConnection = {
+        address: connection.address,
+        chainId: 1, // Default to Ethereum mainnet
+        provider: connection.provider,
+        isConnected: true,
+        walletInfo: {
+          name: connection.name,
+          icon: '🦊'
+        }
+      };
+      setSuccess(reownConnection);
+
+      // Call parent onConnect if provided
+      if (onConnect) {
+        await onConnect();
+      }
+
+      // Delay then navigate to success
+      setTimeout(() => {
+        onNavigate?.('verification-success');
+      }, 2000);
+
+    } catch (error: any) {
+      console.error('MetaMask connection failed:', error);
+      setError(error.message || 'Failed to connect to MetaMask');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTrustWalletConnect = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const connection = await cryptoWalletService.connectTrustWallet();
+      // Convert to ReownAppKitConnection format for success display
+      const reownConnection: ReownAppKitConnection = {
+        address: connection.address,
+        chainId: 1, // Default to Ethereum mainnet
+        provider: connection.provider,
+        isConnected: true,
+        walletInfo: {
+          name: connection.name,
+          icon: '🛡️'
+        }
+      };
+      setSuccess(reownConnection);
+
+      // Call parent onConnect if provided
+      if (onConnect) {
+        await onConnect();
+      }
+
+      // Delay then navigate to success
+      setTimeout(() => {
+        onNavigate?.('verification-success');
+      }, 2000);
+
+    } catch (error: any) {
+      console.error('Trust Wallet connection failed:', error);
+      setError(error.message || 'Failed to connect to Trust Wallet');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCoinbaseWalletConnect = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const connection = await cryptoWalletService.connectCoinbaseWallet();
+      // Convert to ReownAppKitConnection format for success display
+      const reownConnection: ReownAppKitConnection = {
+        address: connection.address,
+        chainId: 1, // Default to Ethereum mainnet
+        provider: connection.provider,
+        isConnected: true,
+        walletInfo: {
+          name: connection.name,
+          icon: '🔵'
+        }
+      };
+      setSuccess(reownConnection);
+
+      // Call parent onConnect if provided
+      if (onConnect) {
+        await onConnect();
+      }
+
+      // Delay then navigate to success
+      setTimeout(() => {
+        onNavigate?.('verification-success');
+      }, 2000);
+
+    } catch (error: any) {
+      console.error('Coinbase Wallet connection failed:', error);
+      setError(error.message || 'Failed to connect to Coinbase Wallet');
     } finally {
       setLoading(false);
     }
@@ -82,34 +195,97 @@ export const ConnectCryptoScreen: React.FC<ConnectionScreenProps> = ({ onBack, o
       <CleanHeader title="🔗 Connect Crypto Wallet" onBack={onBack} />
       
       <div className="w-full space-y-6">
-        {/* Reown AppKit Universal Wallet Connection */}
+        {/* Individual Wallet Connections */}
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-gray-300">
             {t('crypto.selectWallet', 'Choose Your Wallet')}
           </h2>
           
-          <Card className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 border-purple-500/30">
-            <div className="text-center space-y-4">
-              <div className="text-4xl">🌐</div>
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  {t('crypto.universalConnect', 'Universal Wallet Connect')}
-                </h3>
-                <p className="text-sm text-gray-300 mb-4">
-                  {t('crypto.universalDesc', 'Connect to 300+ wallets including MetaMask, Trust Wallet, Coinbase, hardware wallets, and mobile wallets')}
-                </p>
-                
-                <div className="flex flex-wrap gap-2 justify-center mb-4">
-                  <span className="text-xs bg-purple-600/20 px-2 py-1 rounded">🦊 MetaMask</span>
-                  <span className="text-xs bg-purple-600/20 px-2 py-1 rounded">🛡️ Trust</span>
-                  <span className="text-xs bg-purple-600/20 px-2 py-1 rounded">🔵 Coinbase</span>
-                  <span className="text-xs bg-purple-600/20 px-2 py-1 rounded">🌈 Rainbow</span>
-                  <span className="text-xs bg-purple-600/20 px-2 py-1 rounded">🔗 WalletConnect</span>
-                  <span className="text-xs bg-purple-600/20 px-2 py-1 rounded">📱 Mobile</span>
-                  <span className="text-xs bg-purple-600/20 px-2 py-1 rounded">🔐 Hardware</span>
-                  <span className="text-xs bg-purple-600/20 px-2 py-1 rounded">+290 more</span>
+          {/* MetaMask Connection */}
+          <Card className="bg-gradient-to-r from-orange-900/20 to-yellow-900/20 border-orange-500/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="text-3xl">🦊</div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">MetaMask</h3>
+                  <p className="text-sm text-gray-300">
+                    {t('crypto.metamaskDesc', 'Connect using MetaMask browser extension')}
+                  </p>
                 </div>
               </div>
+              <Button
+                onClick={handleMetaMaskConnect}
+                disabled={loading}
+                className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2"
+              >
+                {t('crypto.connect', 'Connect')}
+              </Button>
+            </div>
+          </Card>
+
+          {/* Trust Wallet Connection */}
+          <Card className="bg-gradient-to-r from-blue-900/20 to-cyan-900/20 border-blue-500/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="text-3xl">🛡️</div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Trust Wallet</h3>
+                  <p className="text-sm text-gray-300">
+                    {t('crypto.trustDesc', 'Connect using Trust Wallet mobile or browser extension')}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={handleTrustWalletConnect}
+                disabled={loading}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+              >
+                {t('crypto.connect', 'Connect')}
+              </Button>
+            </div>
+          </Card>
+
+          {/* Coinbase Wallet Connection */}
+          <Card className="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border-blue-500/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="text-3xl">🔵</div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Coinbase Wallet</h3>
+                  <p className="text-sm text-gray-300">
+                    {t('crypto.coinbaseDesc', 'Connect using Coinbase Wallet mobile or browser extension')}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={handleCoinbaseWalletConnect}
+                disabled={loading}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+              >
+                {t('crypto.connect', 'Connect')}
+              </Button>
+            </div>
+          </Card>
+
+          {/* Universal Connection (Reown AppKit fallback) */}
+          <Card className="bg-gradient-to-r from-purple-900/20 to-pink-900/20 border-purple-500/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="text-3xl">🌐</div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Other Wallets</h3>
+                  <p className="text-sm text-gray-300">
+                    {t('crypto.otherDesc', 'Connect to 300+ other wallets including hardware wallets')}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={handleReownAppKitConnect}
+                disabled={loading}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2"
+              >
+                {t('crypto.connect', 'Connect')}
+              </Button>
             </div>
           </Card>
         </div>
